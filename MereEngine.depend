@@ -1,0 +1,170 @@
+# depslib dependency file v1.0
+1421509106 source:/home/kane/MereEngine/src/Camera.cc
+	<SDL/SDL.h>
+	"GameObject.h"
+
+1416758830 /home/kane/MereEngine/src/Camera.h
+	<iostream>
+	<cmath>
+	<glm/glm.hpp>
+	<glm/gtx/transform.hpp>
+	<glm/gtx/rotate_vector.hpp>
+	<SDL/SDL.h>
+	"GameObject.h"
+	"boundary.h"
+
+1419625964 /home/kane/MereEngine/src/boundary.h
+	<iostream>
+	<string>
+	<fstream>
+	<vector>
+	<cmath>
+	<glm/glm.hpp>
+	<glm/gtx/transform.hpp>
+	<glm/gtx/rotate_vector.hpp>
+
+1421505822 source:/home/kane/MereEngine/src/GameState.cpp
+	"GameState.h"
+
+1420987834 /home/kane/MereEngine/src/GameState.h
+	<string>
+	<vector>
+	<fstream>
+	<windows.h>
+	<GL/glew.h>
+	<GL/gl.h>
+	<GL/glu.h>
+	<GL/glext.h>
+	<SDL/SDL.h>
+	<SDL/SDL_ttf.h>
+	"GameObject.h"
+	"Shader.h"
+	"boundary.h"
+
+1422480982 /home/kane/MereEngine/src/GameObject.h
+	<cstdio>
+	<cstdlib>
+	<cassert>
+	<ctime>
+	<algorithm>
+	<vector>
+	<list>
+	<map>
+	<cmath>
+	<windows.h>
+	<GL/glew.h>
+	<GL/gl.h>
+	<GL/glext.h>
+	<SOIL/SOIL.h>
+	<glm/glm.hpp>
+	<glm/gtx/transform.hpp>
+	<glm/gtx/rotate_vector.hpp>
+	<glm/gtx/quaternion.hpp>
+	<glm/gtx/norm.hpp>
+	<glm/gtc/type_ptr.hpp>
+	<glm/gtx/string_cast.hpp>
+	<assimp.hpp>
+	<aiScene.h>
+	<aiPostProcess.h>
+	<assimp/assimp.hpp>
+	<assimp/aiScene.h>
+	<assimp/aiPostProcess.h>
+	"GameState.h"
+	"boundary.h"
+
+1415546178 /home/kane/MereEngine/src/Textures.h
+	<string>
+	<vector>
+	<windows.h>
+	<GL/gl.h>
+
+1420837356 /home/kane/MereEngine/src/Shader.h
+	<iostream>
+	<cstdio>
+	<cstdlib>
+	<GL/glew.h>
+	<GL/gl.h>
+	<GL/glext.h>
+
+1419613862 source:/home/kane/MereEngine/src/Menu.cpp
+	"Menu.h"
+
+1419613820 /home/kane/MereEngine/src/Menu.h
+	<iostream>
+	<windows.h>
+	<SDL/SDL.h>
+	<SDL/SDL_ttf.h>
+	<GL/glew.h>
+	<GL/gl.h>
+	<GL/glext.h>
+	<SOIL/SOIL.h>
+	"Shader.h"
+
+1419709018 source:/home/kane/MereEngine/src/MenuState.cpp
+	"MenuState.h"
+
+1420837378 source:/home/kane/MereEngine/src/Shader.cpp
+	"Shader.h"
+
+1420990634 source:/home/kane/MereEngine/src/System.cpp
+	"System.h"
+
+1419613970 /home/kane/MereEngine/src/System.h
+	<windows.h>
+	<SDL/SDL.h>
+	<GL/glew.h>
+	<SDL/SDL_opengl.h>
+	<GL/gl.h>
+	"GameState.h"
+	"MenuState.h"
+
+1412438948 source:/home/kane/MereEngine/src/Textures.cpp
+	"Textures.h"
+
+1419626028 source:/home/kane/MereEngine/src/boundary.cc
+	"boundary.h"
+
+1417666348 source:/home/kane/MereEngine/src/main.cpp
+	"System.h"
+
+1420837326 source:/home/kane/MereEngine/src/GameObject.cpp
+	"GameObject.h"
+
+1422481007 source:/home/kane/MereEngine/src/Character.cpp
+	"GameObject.h"
+
+1420838514 source:/home/kane/MereEngine/src/ProjectileObject.cpp
+	"GameObject.h"
+
+1420838514 source:/home/kane/MereEngine/src/StaticObject.cpp
+	"GameObject.h"
+
+1416778354 source:/home/kane/MereEngine/src/OBB.cpp
+
+1420838514 source:/home/kane/MereEngine/src/BulletObject.cpp
+	"GameObject.h"
+
+1421190266 source:/home/kane/MereEngine/src/ParticleSource.cpp
+	"GameObject.h"
+
+1419701968 /home/kane/MereEngine/src/MenuState.h
+	<iostream>
+	<fstream>
+	<vector>
+	<windows.h>
+	<SDL/SDL.h>
+	<SDL/SDL_ttf.h>
+	<GL/glew.h>
+	<GL/gl.h>
+	<GL/glext.h>
+	<glm/glm.hpp>
+	<glm/gtx/transform.hpp>
+	<glm/gtc/type_ptr.hpp>
+	"Shader.h"
+
+1421190222 source:/home/kane/MereEngine/src/Particle.cpp
+	"GameObject.h"
+
+1420900080 source:/home/kane/MereEngine/src/SkyBox.cpp
+	"GameObject.h"
+

@@ -1,0 +1,60 @@
+﻿Build started 12/29/2014 8:27:32 PM.
+     1>Project "C:\Users\kane\Documents\Visual Studio 2012\Projects\MereEngine\MereEngine.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /I"C:\SDL_ttf-2.0.11\include" /IC:\SOIL\include /I"C:\assimp--2.0.863-sdk\include" /I"C:\SDL-1.2.15\include" /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt src\ParticleSource.cpp
+         ParticleSource.cpp
+     1>c:\users\kane\documents\visual studio 2012\projects\mereengine\src\gameobject.h(130): warning C4305: 'initializing' : truncation from 'double' to 'const float'
+     1>c:\users\kane\documents\visual studio 2012\projects\mereengine\src\gameobject.h(151): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\kane\documents\visual studio 2012\projects\mereengine\src\gameobject.h(152): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\kane\documents\visual studio 2012\projects\mereengine\src\gameobject.h(153): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\kane\documents\visual studio 2012\projects\mereengine\src\gameobject.h(219): warning C4244: 'return' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\kane\documents\visual studio 2012\projects\mereengine\src\gameobject.h(221): warning C4244: 'return' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\kane\documents\visual studio 2012\projects\mereengine\src\gameobject.h(225): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\kane\documents\visual studio 2012\projects\mereengine\src\gameobject.h(226): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\kane\documents\visual studio 2012\projects\mereengine\src\gameobject.h(227): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\kane\documents\visual studio 2012\projects\mereengine\src\gameobject.h(231): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\kane\documents\visual studio 2012\projects\mereengine\src\gameobject.h(232): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\kane\documents\visual studio 2012\projects\mereengine\src\gameobject.h(233): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\kane\documents\visual studio 2012\projects\mereengine\src\gameobject.h(237): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\kane\documents\visual studio 2012\projects\mereengine\src\gameobject.h(238): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\kane\documents\visual studio 2012\projects\mereengine\src\gameobject.h(239): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\kane\documents\visual studio 2012\projects\mereengine\src\gameobject.h(243): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\kane\documents\visual studio 2012\projects\mereengine\src\gameobject.h(244): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\kane\documents\visual studio 2012\projects\mereengine\src\gameobject.h(245): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\kane\documents\visual studio 2012\projects\mereengine\src\gameobject.h(249): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\kane\documents\visual studio 2012\projects\mereengine\src\gameobject.h(250): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\kane\documents\visual studio 2012\projects\mereengine\src\gameobject.h(251): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\kane\documents\visual studio 2012\projects\mereengine\src\gameobject.h(255): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\kane\documents\visual studio 2012\projects\mereengine\src\gameobject.h(256): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\kane\documents\visual studio 2012\projects\mereengine\src\gameobject.h(257): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\kane\documents\visual studio 2012\projects\mereengine\src\particlesource.cpp(39): warning C4244: 'argument' : conversion from 'time_t' to 'unsigned int', possible loss of data
+     1>c:\users\kane\documents\visual studio 2012\projects\mereengine\src\particlesource.cpp(100): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\kane\documents\visual studio 2012\projects\mereengine\src\particlesource.cpp(104): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\kane\documents\visual studio 2012\projects\mereengine\src\particlesource.cpp(126): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\kane\documents\visual studio 2012\projects\mereengine\src\particlesource.cpp(130): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\kane\documents\visual studio 2012\projects\mereengine\src\particlesource.cpp(141): warning C4244: '-=' : conversion from 'double' to 'GLfloat', possible loss of data
+         GLM: rotate function taking degrees as a parameter is deprecated. #define GLM_FORCE_RADIANS before including GLM headers to remove this message.
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\kane\Documents\Visual Studio 2012\Projects\MereEngine\Debug\MereEngine.exe" /INCREMENTAL /NOLOGO /LIBPATH:"C:\SDL_ttf-2.0.11\lib\x86" /LIBPATH:"C:\assimp--2.0.863-sdk\lib\assimp_release-dll_win32" /LIBPATH:C:\SOIL\lib /LIBPATH:"C:\SDL-1.2.15\lib\x86" SDL.lib opengl32.lib glu32.lib glew32.lib SOIL.lib SDL_ttf.lib assimp.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\kane\Documents\Visual Studio 2012\Projects\MereEngine\Debug\MereEngine.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\kane\Documents\Visual Studio 2012\Projects\MereEngine\Debug\MereEngine.lib" /MACHINE:X86 Debug\boundary.obj
+         Debug\BulletObject.obj
+         Debug\Camera.obj
+         Debug\Character.obj
+         Debug\GameObject.obj
+         Debug\GameState.obj
+         Debug\main.obj
+         Debug\MenuState.obj
+         Debug\ParticleSource.obj
+         Debug\ProjectileObject.obj
+         Debug\Shader.obj
+         Debug\StaticObject.obj
+         Debug\System.obj
+     1>SOIL.lib(image_DXT.obj) : warning LNK4204: 'C:\Users\kane\Documents\Visual Studio 2012\Projects\MereEngine\Debug\vc110.pdb' is missing debugging information for referencing module; linking object as if no debug info
+     1>SOIL.lib(image_helper.obj) : warning LNK4204: 'C:\Users\kane\Documents\Visual Studio 2012\Projects\MereEngine\Debug\vc110.pdb' is missing debugging information for referencing module; linking object as if no debug info
+     1>SOIL.lib(SOIL.obj) : warning LNK4204: 'C:\Users\kane\Documents\Visual Studio 2012\Projects\MereEngine\Debug\vc110.pdb' is missing debugging information for referencing module; linking object as if no debug info
+     1>SOIL.lib(stb_image_aug.obj) : warning LNK4204: 'C:\Users\kane\Documents\Visual Studio 2012\Projects\MereEngine\Debug\vc110.pdb' is missing debugging information for referencing module; linking object as if no debug info
+         MereEngine.vcxproj -> C:\Users\kane\Documents\Visual Studio 2012\Projects\MereEngine\Debug\MereEngine.exe
+     1>Done Building Project "C:\Users\kane\Documents\Visual Studio 2012\Projects\MereEngine\MereEngine.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:02.33

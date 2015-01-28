@@ -1,0 +1,3 @@
+all:
+	g++ main.cc System.cpp GameState.cpp Menu.cpp Shader.cpp Textures.cpp GameObject.cpp tiny_obj_loader.cc Camera.cc boundary.cc -I/home/kane/Game/ -lSDL -lGL -lGLU -lSOIL
+
