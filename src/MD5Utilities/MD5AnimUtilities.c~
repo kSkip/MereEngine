@@ -134,10 +134,13 @@ int parent, flags, startIndex;
 		}
 
 		strcpy(joints[i].name,jointName);
-		joints[i].id = i;
 		joints[i].parentId = parent;
 		joints[i].flags = flags;
 		joints[i].startIndex = startIndex;
+
+		/*printf("Joint: %s\n",jointName);
+		printf("parent id: %d\n",parent);
+		printf("parent Joint: %s\n",parentName);*/
 
 	}
 

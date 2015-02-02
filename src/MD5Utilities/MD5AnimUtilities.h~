@@ -8,7 +8,6 @@
 
 struct md5hierarchyjoint{
 	char name[128];
-	unsigned int id;
 	int parentId;
 	int flags;
 	int startIndex;
