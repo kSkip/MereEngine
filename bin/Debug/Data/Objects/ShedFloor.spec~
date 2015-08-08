@@ -1,0 +1,4 @@
+TYPE OBJ
+DIR Data/Objects/Shed/
+MESH Data/Objects/Shed/Ground.obj
+BOUNDS Data/Objects/Shed/Ground.bounds

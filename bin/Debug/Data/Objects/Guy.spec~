@@ -1,0 +1,4 @@
+TYPE MD5
+MESH Data/Objects/Guy/Guy.md5mesh
+ANIM RUN Data/Objects/Guy/Guy.md5anim
+BOUNDS Data/Objects/Guy/Guy.bounds

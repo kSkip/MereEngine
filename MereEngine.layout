@@ -1,67 +1,109 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Debug" />
-	<File name="src/BulletObject.cpp" open="0" top="0" tabpos="9">
-		<Cursor position="303" topLine="0" />
+	<File name="include/GameObjects/Billboard.h" open="0" top="0" tabpos="0">
+		<Cursor position="529" topLine="0" />
 	</File>
-	<File name="src/Camera.cc" open="1" top="0" tabpos="5">
-		<Cursor position="13493" topLine="321" />
+	<File name="include/GameObjects/Bullet.h" open="0" top="0" tabpos="0">
+		<Cursor position="137" topLine="0" />
 	</File>
-	<File name="src/Character.cpp" open="1" top="0" tabpos="6">
-		<Cursor position="107" topLine="0" />
+	<File name="include/GameObjects/Camera.h" open="0" top="0" tabpos="1">
+		<Cursor position="691" topLine="20" />
 	</File>
-	<File name="src/GameObject.cpp" open="1" top="0" tabpos="2">
-		<Cursor position="2901" topLine="60" />
+	<File name="include/GameObjects/Character.h" open="0" top="0" tabpos="0">
+		<Cursor position="64" topLine="9" />
 	</File>
-	<File name="src/GameObject.h" open="1" top="0" tabpos="1">
-		<Cursor position="11914" topLine="390" />
+	<File name="include/GameObjects/GameObject.h" open="0" top="0" tabpos="6">
+		<Cursor position="3448" topLine="109" />
 	</File>
-	<File name="src/GameState.cpp" open="1" top="1" tabpos="4">
-		<Cursor position="2999" topLine="54" />
+	<File name="include/GameObjects/Particle.h" open="0" top="0" tabpos="0">
+		<Cursor position="273" topLine="4" />
 	</File>
-	<File name="src/GameState.h" open="1" top="0" tabpos="3">
-		<Cursor position="427" topLine="21" />
+	<File name="include/GameObjects/ParticleSource.h" open="1" top="0" tabpos="1">
+		<Cursor position="427" topLine="0" />
 	</File>
-	<File name="src/MenuState.cpp" open="0" top="0" tabpos="6">
-		<Cursor position="6300" topLine="193" />
+	<File name="include/GameObjects/Projectile.h" open="0" top="0" tabpos="2">
+		<Cursor position="354" topLine="0" />
 	</File>
-	<File name="src/MenuState.h" open="0" top="0" tabpos="1">
-		<Cursor position="222" topLine="12" />
+	<File name="include/GameObjects/SkyBox.h" open="0" top="0" tabpos="4">
+		<Cursor position="58" topLine="0" />
 	</File>
-	<File name="src/Particle.cpp" open="0" top="0" tabpos="8">
-		<Cursor position="2006" topLine="15" />
+	<File name="include/GameObjects/StaticObject.h" open="0" top="0" tabpos="0">
+		<Cursor position="70" topLine="0" />
 	</File>
-	<File name="src/ParticleSource.cpp" open="0" top="0" tabpos="7">
-		<Cursor position="1799" topLine="3" />
-	</File>
-	<File name="src/ProjectileObject.cpp" open="0" top="0" tabpos="6">
-		<Cursor position="2782" topLine="27" />
-	</File>
-	<File name="src/Shader.cpp" open="0" top="0" tabpos="8">
-		<Cursor position="1092" topLine="18" />
-	</File>
-	<File name="src/Shader.h" open="0" top="0" tabpos="6">
-		<Cursor position="289" topLine="3" />
-	</File>
-	<File name="src/SkyBox.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="1335" topLine="14" />
-	</File>
-	<File name="src/StaticObject.cpp" open="0" top="0" tabpos="7">
-		<Cursor position="386" topLine="0" />
-	</File>
-	<File name="src/System.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="643" topLine="0" />
-	</File>
-	<File name="src/System.h" open="0" top="0" tabpos="0">
-		<Cursor position="425" topLine="0" />
-	</File>
-	<File name="src/boundary.cc" open="0" top="0" tabpos="3">
+	<File name="include/GameObjects/Weapon.h" open="0" top="0" tabpos="4">
 		<Cursor position="168" topLine="0" />
 	</File>
-	<File name="src/boundary.h" open="0" top="0" tabpos="4">
-		<Cursor position="186" topLine="0" />
+	<File name="include/GameState.h" open="0" top="0" tabpos="2">
+		<Cursor position="665" topLine="24" />
 	</File>
-	<File name="src/main.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="118" topLine="0" />
+	<File name="include/Models/MD5GLBufferUtilities.hpp" open="0" top="0" tabpos="0">
+		<Cursor position="613" topLine="0" />
+	</File>
+	<File name="include/Shader.h" open="0" top="0" tabpos="3">
+		<Cursor position="504" topLine="23" />
+	</File>
+	<File name="include/boundary.h" open="0" top="0" tabpos="0">
+		<Cursor position="1441" topLine="29" />
+	</File>
+	<File name="src/GameObjects/Billboard.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="4583" topLine="125" />
+	</File>
+	<File name="src/GameObjects/Bullet.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="680" topLine="2" />
+	</File>
+	<File name="src/GameObjects/Camera.cpp" open="0" top="0" tabpos="2">
+		<Cursor position="4542" topLine="161" />
+	</File>
+	<File name="src/GameObjects/Character.cpp" open="0" top="0" tabpos="5">
+		<Cursor position="3438" topLine="97" />
+	</File>
+	<File name="src/GameObjects/GameObject.cpp" open="0" top="0" tabpos="4">
+		<Cursor position="684" topLine="57" />
+	</File>
+	<File name="src/GameObjects/Particle.cpp" open="1" top="1" tabpos="3">
+		<Cursor position="854" topLine="18" />
+	</File>
+	<File name="src/GameObjects/ParticleSource.cpp" open="1" top="0" tabpos="2">
+		<Cursor position="3426" topLine="0" />
+	</File>
+	<File name="src/GameObjects/Projectile.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="1339" topLine="12" />
+	</File>
+	<File name="src/GameObjects/SkyBox.cpp" open="0" top="0" tabpos="3">
+		<Cursor position="679" topLine="0" />
+	</File>
+	<File name="src/GameObjects/StaticObject.cpp" open="0" top="0" tabpos="4">
+		<Cursor position="619" topLine="5" />
+	</File>
+	<File name="src/GameObjects/Weapon.cpp" open="0" top="0" tabpos="3">
+		<Cursor position="618" topLine="21" />
+	</File>
+	<File name="src/GameState.cpp" open="0" top="0" tabpos="3">
+		<Cursor position="206" topLine="0" />
+	</File>
+	<File name="src/Menu/MenuState.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="9604" topLine="285" />
+	</File>
+	<File name="src/Models/Armature.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="0" topLine="261" />
+	</File>
+	<File name="src/Models/MD5GLBufferUtilities.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="42" topLine="0" />
+	</File>
+	<File name="src/Models/OBJGLBufferUtilities.cpp" open="0" top="0" tabpos="3">
+		<Cursor position="1471" topLine="28" />
+	</File>
+	<File name="src/Models/tinyobjloader/tiny_obj_loader.cc" open="0" top="0" tabpos="0">
+		<Cursor position="903" topLine="5" />
+	</File>
+	<File name="src/Shader.cpp" open="0" top="0" tabpos="4">
+		<Cursor position="1794" topLine="0" />
+	</File>
+	<File name="src/System.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="1017" topLine="25" />
+	</File>
+	<File name="src/boundary.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="2810" topLine="73" />
 	</File>
 </CodeBlocks_layout_file>

@@ -1,0 +1,10 @@
+include ../../make.inc
+
+all: quaternion_math.o
+	$(AR) $(ARFLAGS) ../../lib/libvectormath.a quaternion_math.o
+
+quaternion_math.o: $(INCLUDES)/vectormath/quaternion_math.h quaternion_math.c
+	$(C) $(CFLAGS) -I$(INCLUDES) quaternion_math.c
+
+clean:
+	rm -f *.o

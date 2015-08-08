@@ -1,0 +1,41 @@
+SHADERS
+
+VS Data/Level1VertexShader.glsl 
+FS Data/Level1FragmentShader.glsl
+
+END
+
+OBJECTDATA
+
+CAMERA Data/Objects/Camera.spec
+
+SKY Data/Objects/SkyBox.spec
+
+GROUND Data/Objects/Ground.spec
+WALLS Data/Objects/Walls.spec
+
+SHEDWALLS Data/Objects/ShedWalls.spec
+SHEDFLOOR Data/Objects/ShedFloor.spec
+SHEDROOF Data/Objects/ShedRoof.spec
+
+GUY Data/Objects/Guy.spec
+
+GUN Data/Objects/Gun.spec
+
+END
+
+OBJECTS
+
+CAMERA camera -4.0 1.0 0.0 0.0
+GUN player_weapon
+
+SKY sky_box
+
+GROUND static_object 0.0 0.0 0.0 0.0
+WALLS static_object 0.0 0.0 0.0 0.0
+
+SHEDWALLS static_object 0.0 0.0 0.0 0.0
+SHEDFLOOR static_object 0.0 0.0 0.0 0.0
+SHEDROOF static_object 0.0 0.0 0.0 0.0
+
+END

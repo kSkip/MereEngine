@@ -1,8 +1,17 @@
 #include "GameState.h"
+#include "GameObjects/GameObject.h"
+#include "GameObjects/Camera.h"
+#include "GameObjects/StaticObject.h"
+#include "GameObjects/Character.h"
+#include "GameObjects/SkyBox.h"
+#include "GameObjects/Bullet.h"
+#include "Models/OBJGLBufferUtilities.hpp"
+#include "Utilities/SplitString.h"
 
 GameState::GameState(){}
 
 GameState::~GameState(){
+
     std::list<GameObject*>::iterator i;
 
     //cleanup everything before exiting program
@@ -21,19 +30,21 @@ GameState::~GameState(){
 GameState::GameState(const GameState & rhs){}
 
 void GameState::init(double maxframes){
+
     vidinfo = SDL_GetVideoInfo();
     maxframerate = maxframes;
 
 	aspectRatio = float(vidinfo->current_w)/float(vidinfo->current_h); //useful quantity
 
 	loaded = false;
+
 }
 
 void GameState::clean(){
+
     std::list<GameObject*>::iterator i;
     std::map<std::string,GLuint>::iterator textureIt;
 
-    //cleanup everything
     delete levelShader;
 
     for(i = levelObjects.begin(); i != levelObjects.end(); i++){
@@ -44,102 +55,320 @@ void GameState::clean(){
     opaqueObjects.clear();
     transparencyObjects.clear();
 
-    for(textureIt = levelTextures.begin(); textureIt != levelTextures.end(); textureIt++){
-        glDeleteTextures(1,&textureIt->second);
-    }
-    levelTextures.clear();
+    std::map<std::string,ObjectData*>::iterator objIt;
 
-    GameObject::clean();
+    for(objIt = objectMap.begin(); objIt != objectMap.end(); objIt++){
+
+        glDeleteBuffers(1,&objIt->second->vertexBuffer);
+        glDeleteBuffers(1,&objIt->second->elementBuffer);
+        glDeleteTextures(1,&objIt->second->diffuseTex);
+        delete objIt->second->objectBounds;
+
+    }
+
+    objectMap.clear();
 
     loaded = false;
+
+}
+
+void GameState::loadObjectData(struct ObjectFiles* files){
+
+    std::map<std::string,std::string>::iterator it;
+    ObjectData* newObjectData = new ObjectData;
+
+    if(!files->boundsFile.empty()){
+
+        newObjectData->objectBounds = new boundary;
+        newObjectData->objectBounds->LoadBoundaries(files->boundsFile);
+
+    }else{
+
+        newObjectData->objectBounds = NULL;
+
+    }
+
+    if(files->type == std::string("OBJ")){
+
+        unsigned int numElements;
+        std::vector<tinyobj::shape_t> shapes;
+        std::vector<tinyobj::material_t> materials;
+
+        std::string err = tinyobj::LoadObj(shapes, materials, files->meshFile.c_str(), files->dir.c_str());
+
+        newObjectData->vertexBuffer  =  OBJCreateVertexBuffer(&shapes);
+        newObjectData->elementBuffer =  OBJCreateElementBuffer(&shapes, &numElements);
+        newObjectData->elementCount  =  3*numElements;
+        newObjectData->diffuseTex    =  OBJCreateTextureBuffer(&materials, files->dir.c_str());
+
+    }else if(files->type == std::string("MD5")){
+
+        unsigned int numElements;
+
+        struct md5meshdata* md5data = getMD5MeshData(files->meshFile.c_str());
+
+        for( it=files->animFiles.begin(); it != files->animFiles.end(); it++){
+
+            struct md5animdata* md5anim = getMD5AnimData(it->second.c_str());
+
+            Armature* newArm = new Armature;
+
+            newArm->buildArmature(md5anim);
+
+            newObjectData->armatures[it->first] = newArm;
+
+            freeMD5AnimData(md5anim);
+
+        }
+
+        newObjectData->vertexBuffer  = MD5CreateVertexBuffer(md5data,&newObjectData->vertices,&newObjectData->unskinned_vertices,&newObjectData->num_vertices);
+        newObjectData->elementBuffer = MD5CreateElementBuffer(md5data,&numElements);
+        newObjectData->elementCount  = 3*numElements;
+        newObjectData->diffuseTex    = MD5CreateTextureBuffer(md5data,files->dir.c_str());
+
+        freeMD5MeshData(md5data);
+
+    }
+
+    newObjectData->name = files->objectName;
+    objectMap[files->objectName] = newObjectData;
+
+}
+
+void GameState::handleObjectDataCommand(std::vector<std::string>& args){
+
+    std::ifstream ifs;
+    std::string line;
+    struct ObjectFiles files;
+
+    if(args.size() > 1){
+
+        files.objectName = args[0];
+
+        ifs.open(args[1].c_str());
+
+        handleObjectSpec(ifs,&files);
+
+        ifs.close();
+
+    }
+
+    loadObjectData(&files);
+
+}
+
+void GameState::handleObjectSpec(std::ifstream& ifs, struct ObjectFiles* files){
+
+    std::string type   = "TYPE";
+    std::string dir = "DIR";
+    std::string mesh   = "MESH";
+    std::string anim   = "ANIM";
+    std::string bounds = "BOUNDS";
+
+    std::string delimiter = " ";
+
+    std::string line;
+    std::vector<std::string> args;
+
+    while(ifs.good()){
+
+        std::getline(ifs,line);
+        SplitString(args,line,delimiter);
+
+        if(args[0] == type && args.size() > 1){
+
+            files->type = args[1];
+
+        }else if(args[0] == mesh && args.size() > 1){
+
+            files->meshFile = args[1];
+
+        }else if(args[0] == anim && args.size() > 2){
+
+            files->animFiles[args[1]] = args[2];
+
+        }else if(args[0] == bounds && args.size() > 1){
+
+            files->boundsFile = args[1];
+
+        }else if(args[0] == dir && args.size() > 1){
+
+            files->dir = args[1];
+
+        }
+
+        args.clear();
+
+    }
+
+}
+
+void GameState::handleObjectCommand(std::vector<std::string>& args){
+
+    std::string camera        = "camera";
+    std::string static_object = "static_object";
+    std::string character     = "character";
+    std::string sky_box       = "sky_box";
+
+    if(args.size() > 1){
+
+        ObjectData* object = objectMap[args[0]];
+
+        std::string objectType = args[1];
+
+        if(objectType == camera){
+
+            float windowSize[2];
+            windowSize[0] = vidinfo->current_w;
+            windowSize[1] = vidinfo->current_h;
+            float position[3];
+            position[0] = atof(args[2].c_str());
+            position[1] = atof(args[3].c_str());
+            position[2] = atof(args[4].c_str());
+            float rotY = atof(args[5].c_str());
+
+            player = new Camera(object->name, windowSize, position, rotY, this);
+
+            insertOpaqueObject(player);
+
+        }else if(objectType == static_object){
+
+            float position[3];
+            position[0] = atof(args[2].c_str());
+            position[1] = atof(args[3].c_str());
+            position[2] = atof(args[4].c_str());
+            float rotY = atof(args[5].c_str());
+
+            StaticObject* newGameObject = new StaticObject(object->name, position, rotY, this);
+
+            insertOpaqueObject(newGameObject);
+
+        }else if(objectType == character){
+
+            float position[3];
+            position[0] = atof(args[2].c_str());
+            position[1] = atof(args[3].c_str());
+            position[2] = atof(args[4].c_str());
+            float rotY = atof(args[5].c_str());
+
+            Character* newGameObject = new Character(object->name, position, rotY, this);
+
+            insertOpaqueObject(newGameObject);
+
+        }else if(objectType == sky_box){
+
+            SkyBox* newGameObject = new SkyBox(object->name, player, this);
+
+            insertOpaqueObject(newGameObject);
+
+        }
+
+    }
+
+}
+
+void GameState::handleStateSection(std::ifstream& ifs, std::string& section){
+
+    std::string shaders    = "SHADERS";
+    std::string objectdata = "OBJECTDATA";
+    std::string objects    = "OBJECTS";
+    std::string end        = "END";
+
+    std::string line, vs, fs;
+    std::string delimiter = " ";
+    std::vector<std::string> args;
+
+
+    if(section == shaders){
+
+        std::getline(ifs,line);
+
+        while(line != end){
+
+            if(!line.empty()){
+
+                SplitString(args,line,delimiter);
+
+                if(args[0] == std::string("VS")){
+                    vs = args[1];
+                    args.clear();
+                }
+                if(args[0] == std::string("FS")){
+                    fs =  args[1];
+                    args.clear();
+                }
+
+            }
+
+            std::getline(ifs,line);
+
+        }
+
+        if(!(vs.empty() || fs.empty())){
+
+            levelShader = new Shader;
+            levelShader->loadShader(vs.c_str(),fs.c_str());
+
+        }
+
+    }else if(section == objectdata){
+
+        std::getline(ifs,line);
+
+        while(line != end){
+
+            if(!line.empty()){
+
+                SplitString(args,line,delimiter);
+                handleObjectDataCommand(args);
+
+                args.clear();
+
+            }
+
+            std::getline(ifs,line);
+
+        }
+
+
+    }else if(section == objects){
+
+        std::getline(ifs,line);
+
+        while(line != end){
+
+            if(!line.empty()){
+
+                SplitString(args,line,delimiter);
+                handleObjectCommand(args);
+
+                args.clear();
+
+            }
+
+            std::getline(ifs,line);
+
+        }
+
+    }
+
 }
 
 void GameState::loadNew(std::string levelfile){
-    char token;
-	char objectfile[100];
-	char boundsfile[100];
-    char vertexfile[100];
-    char fragmentfile[100];
-    char line[100];
-    char action[10];
-    float x, y, z, roty;
-    unsigned int animStart, animStop;
+
     std::ifstream ifs;
-    GameObject* newobject;
+    std::string line;
 
     SDL_ShowCursor(0);
 
-	levelShader = new Shader; //allocate memory for all the data relavent to the shaders
-
     ifs.open(levelfile.c_str());
-
-    ifs.getline(vertexfile,100);
-    ifs.getline(fragmentfile,100);
-
-    levelShader->loadShader(vertexfile,fragmentfile);
 
 	while(ifs.good()){
 
-        token = ifs.get();
-	    switch(token){
-	        case 'p':{
-                ifs.get();
-                ifs.getline(line,100);
-                ifs.getline(boundsfile,100);
-                sscanf(line,"%f %f %f %f",&x,&y,&z,&roty);
-                const SDL_VideoInfo* vidinfo = SDL_GetVideoInfo();
-                player = new Camera(float(vidinfo->current_w),float(vidinfo->current_h),boundsfile,x,y,z,roty,this);
-                levelObjects.push_back(player);
-                transparencyObjects.push_back(player);}
-                break;
-	        case 's':
-                ifs.get();
-                ifs.getline(objectfile,100);
-                ifs.getline(line,100);
-                sscanf(line,"%f %f %f %f",&x,&y,&z,&roty);
-                ifs.getline(boundsfile,100);
-                newobject = new StaticObject(objectfile,boundsfile,x,y,z,roty,this);
-                levelObjects.push_back(newobject);
-                opaqueObjects.push_back(newobject);
-                break;
-            case 'c':{
-                std::map<std::string,AnimBounds> animations;
-                ifs.get();
-                ifs.getline(objectfile,100);
-                ifs.getline(line,100);
-                sscanf(line,"%f %f %f %f",&x,&y,&z,&roty);
-                ifs.getline(boundsfile,100);
-
-                ifs.getline(line,100);
-                sscanf("%s %d %d",action,&animStart,&animStop);
-                animations[std::string(action)] = AnimBounds(animStart,animStop,24.0f);
-
-                ifs.getline(line,100);
-                sscanf("%s %d %d",action,&animStart,&animStop);
-                animations[std::string(action)] = AnimBounds(animStart,animStop,24.0f);
-
-                ifs.getline(line,100);
-                sscanf("%s %d %d",action,&animStart,&animStop);
-                animations[std::string(action)] = AnimBounds(animStart,animStop,24.0f);
-
-                ifs.getline(line,100);
-                sscanf("%s %d %d",action,&animStart,&animStop);
-                animations[std::string(action)] = AnimBounds(animStart,animStop,24.0f);
-
-                newobject = new Character(objectfile,boundsfile,x,y,z,roty,this);
-                levelObjects.push_back(newobject);
-                opaqueObjects.push_back(newobject);}
-                break;
-            case 'b':
-                ifs.get();
-                ifs.getline(objectfile,100);
-                newobject = new SkyBox(objectfile,player,this);
-                levelObjects.push_back(newobject);
-                opaqueObjects.push_back(newobject);
-                break;
-            default:
-                break;
-	    }
+        std::getline(ifs,line);
+        if(!line.empty()){
+            handleStateSection(ifs,line);
+        }
 
 	}
 
@@ -149,12 +378,12 @@ void GameState::loadNew(std::string levelfile){
 
 }
 
-void GameState::loadSave(std::string savefile){
-}
+void GameState::loadSave(std::string savefile){}
 
 void GameState::save(){}
 
 bool GameState::loop(){
+
     double deltatime = 0.0f;
     double inittime;
 
@@ -165,7 +394,9 @@ bool GameState::loop(){
     while(eventHandler()){ //handle inputs like mouse movements and key presses, if returns 0 then escape to menu loop
 
         inittime = double(SDL_GetTicks());
+
         move(deltatime); //move the gamestate through time
+
         render(); //preform ogl rendering
         deltatime = (double(SDL_GetTicks()) - inittime) / 1000.0f; //get the next time step
 
@@ -180,10 +411,12 @@ bool GameState::loop(){
     }
 
     return true;
+
 }
 
 //handles user inputs like mouse movements and key presses
 bool GameState::eventHandler(){
+
     SDL_Event event;
 
     while(SDL_PollEvent(&event)){
@@ -241,18 +474,21 @@ bool GameState::eventHandler(){
                     switch(event.button.button){
 						case SDL_BUTTON_LEFT:{
                                 if(!player->playerIsFiring){
-                                    GameObject* newobject = new BulletObject(player->getHead()+0.1f*glm::normalize(player->getOrigin()-player->getHead()),player->getHead()+100.0f*glm::normalize(player->getOrigin()-player->getHead()),player);
+
+                                    GameObject* newobject = new Bullet(player->getHead()+0.1f*glm::normalize(player->getOrigin()-player->getHead()),player->getHead()+100.0f*glm::normalize(player->getOrigin()-player->getHead()),player);
 
                                     /*char meshFile[50];
                                     char boundsFile[50];
                                     sprintf(meshFile,"Data/bullet.3ds");
                                     sprintf(boundsFile,"Data/bullet.dat");
-                                    GameObject* newobject = new ProjectileObject(meshFile,boundsFile,player->getHead()+2.0f*glm::normalize(player->getOrigin()-player->getHead()),5.0f*glm::normalize(player->getOrigin()-player->getHead()),glm::normalize(player->getOrigin()-player->getHead()),0.0f,this);*/
+                                    GameObject* newobject = new ProjectileObject(meshFile,boundsFile,player->getHead()+2.0f*glm::normalize(player->getOrigin()-player->getHead()),5.0f*glm::normalize(player->getOrigin()-player->getHead()),glm::normalize(player->getOrigin()-player->getHead()),0.0f,this);
+                                    */
 
                                     levelObjects.push_back(newobject);
                                     opaqueObjects.push_back(newobject);
 
-                                    player->Fire();
+                                    player->fire();
+
                                 }
                             }
 							break;
@@ -271,10 +507,12 @@ bool GameState::eventHandler(){
 			}
 		}
 		return true;
+
 }
 
 //moves the game objects through time
 void GameState::move(double deltatime){
+
     std::list<GameObject*>::iterator i, j;
 
     for(i = levelObjects.begin(); i != levelObjects.end(); i++){
@@ -305,7 +543,7 @@ void GameState::move(double deltatime){
 
 //renders everything
 void GameState::render(){
-    GLuint currentTex;
+
     std::map<std::string,GLuint>::iterator textureIt;
     std::list<GameObject*>::iterator i;
     glm::mat4 MV, P;
@@ -316,7 +554,7 @@ void GameState::render(){
     P = glm::perspective(60.0f,aspectRatio,0.1f,1000.0f);
     MV = glm::lookAt(player->getHead(),player->getOrigin(),glm::vec3(0.0f,1.0f,0.0f));
 
-    levelShader->activate(); //enable all attributes
+    levelShader->activate(ENABLE_POSITION | ENABLE_NORMAL | ENABLE_TEXCOORD); //enable all attributes
 
     //pass MVP to shader
     glUniformMatrix4fv(levelShader->modelView,1, GL_FALSE,glm::value_ptr(MV));
@@ -326,37 +564,60 @@ void GameState::render(){
     glActiveTexture(GL_TEXTURE0);
     glUniform1i(levelShader->texture, 0);
 
-    for(textureIt = levelTextures.begin(); textureIt != levelTextures.end(); textureIt++){ //we want to render everything in groups of their textures to minimize texture switching
-
-        currentTex = textureIt->second;
-        glBindTexture(GL_TEXTURE_2D,currentTex);
-
-        for(i = opaqueObjects.begin(); i != opaqueObjects.end(); i++){
-            if((*i)->SameTexId(currentTex) && (*i) != player){
-                    (*i)->render(this);
-            }
+    for(i = opaqueObjects.begin(); i != opaqueObjects.end(); i++){
+        if((*i) != player){
+                (*i)->render(this);
         }
-
     }
 
     transparencyObjects.sort(GameObject::pGameObjectComp);
-    for(textureIt = levelTextures.begin(); textureIt != levelTextures.end(); textureIt++){ //we want to render everything in groups of their textures to minimize texture switching
 
-        currentTex = textureIt->second;
-        glBindTexture(GL_TEXTURE_2D,currentTex);
-
-        for(i = transparencyObjects.begin(); i != transparencyObjects.end(); i++){
-            if((*i)->SameTexId(currentTex) && (*i) != player){
-                    (*i)->render(this);
-            }
+    for(i = transparencyObjects.begin(); i != transparencyObjects.end(); i++){
+        if((*i) != player){
+                (*i)->render(this);
         }
-
     }
+
 
     glClear(GL_DEPTH_BUFFER_BIT);
     player->render(this);
 
-    levelShader->deactivate(); //disable all attributes
+    levelShader->deactivate(ENABLE_POSITION | ENABLE_NORMAL | ENABLE_TEXCOORD); //disable all attributes
 
     SDL_GL_SwapBuffers(); //swap the buffers
+
+}
+
+void GameState::insertOpaqueObject(GameObject* newGameObject){
+
+    levelObjects.push_back(newGameObject);
+
+    GLuint newDiffuseTex = newGameObject->data->diffuseTex;
+
+    std::list<GameObject*>::iterator it;
+
+    it = opaqueObjects.begin();
+
+    while(it != opaqueObjects.end()){
+
+        if( newDiffuseTex < (*it)->data->diffuseTex ){
+
+            opaqueObjects.insert(it,newGameObject);
+            return;
+
+        }
+
+        it++;
+    }
+
+    opaqueObjects.push_back(newGameObject);
+
+}
+
+void GameState::insertTransparencyObject(GameObject* newGameObject){
+
+    levelObjects.push_back(newGameObject);
+
+    transparencyObjects.push_back(newGameObject);
+
 }

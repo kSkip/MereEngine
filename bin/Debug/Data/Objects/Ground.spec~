@@ -1,0 +1,3 @@
+TYPE OBJ
+MESH Data/Objects/Ground.obj
+BOUNDS Data/Objects/Ground.bounds

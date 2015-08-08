@@ -7,6 +7,7 @@ System::~System(){}
 System::System(const System & rhs){}
 
 bool System::init(){
+
     SDL_Init(SDL_INIT_EVERYTHING);
 
 	vidinfo = SDL_GetVideoInfo();
@@ -30,7 +31,7 @@ bool System::init(){
 	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
-	state.init(300.0f); //initialize the GameState at 200fps max
+	state.init(300.0f); //initialize the GameState at 300fps max
     mainmenu.init(200.0f); //initialize the menuObject at 200fps max
 
     return true;
@@ -45,7 +46,7 @@ bool System::loop(){
             if(state.loaded){
                 state.clean();
             }
-            state.loadNew(std::string("Data/Chapter1.level")); //load the new level data for the state
+            state.loadNew(std::string("Data/Test.level")); //load the new level data for the state
         }
 
         state.loop();

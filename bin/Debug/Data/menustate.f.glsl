@@ -6,7 +6,7 @@ uniform mat4 scale;
 uniform sampler2D tex;
 uniform bool mouseOver;
 
-in vec2 frag_texcoord;
+layout(location = 3) in vec2 frag_texcoord;
 
 out vec4 fragColor;
 

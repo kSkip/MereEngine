@@ -8,21 +8,23 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="bin/Debug/Game" prefix_auto="1" extension_auto="1" />
+				<Option output="bin/Debug/Demo" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Debug/" />
-				<Option type="1" />
+				<Option type="0" />
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
+					<Add directory="/home/kane/MereEngine/include" />
+					<Add directory="/home/kane/MereEngine/include/Models/tinyobjloader" />
 				</Compiler>
 				<Linker>
-					<Add option="-lSDL -lGL -lGLU -lSOIL -lassimp -lSDL_ttf" />
+					<Add option="`sdl-config --static-libs` -lGL -lGLU -lSOIL -lSDL_ttf" />
 				</Linker>
 			</Target>
 			<Target title="Release">
-				<Option output="Linux/bin/Release/Game" prefix_auto="1" extension_auto="1" />
+				<Option output="Linux/bin/Release/Demo" prefix_auto="1" extension_auto="1" />
 				<Option object_output="Linux/obj/Release/" />
-				<Option type="1" />
+				<Option type="0" />
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-O2" />
@@ -35,26 +37,66 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="src/BulletObject.cpp" />
-		<Unit filename="src/Camera.cc" />
-		<Unit filename="src/Character.cpp" />
-		<Unit filename="src/GameObject.cpp" />
-		<Unit filename="src/GameObject.h" />
+		<Unit filename="include/GameObjects/Billboard.h" />
+		<Unit filename="include/GameObjects/Bullet.h" />
+		<Unit filename="include/GameObjects/Camera.h" />
+		<Unit filename="include/GameObjects/Character.h" />
+		<Unit filename="include/GameObjects/GameObject.h" />
+		<Unit filename="include/GameObjects/Particle.h" />
+		<Unit filename="include/GameObjects/ParticleSource.h" />
+		<Unit filename="include/GameObjects/Projectile.h" />
+		<Unit filename="include/GameObjects/SkyBox.h" />
+		<Unit filename="include/GameObjects/StaticObject.h" />
+		<Unit filename="include/GameObjects/Weapon.h" />
+		<Unit filename="include/GameState.h" />
+		<Unit filename="include/MenuState.h" />
+		<Unit filename="include/Models/Armature.hpp" />
+		<Unit filename="include/Models/MD5AnimUtilities.h" />
+		<Unit filename="include/Models/MD5CommonUtilities.h" />
+		<Unit filename="include/Models/MD5GLBufferUtilities.hpp" />
+		<Unit filename="include/Models/MD5MeshUtilities.h" />
+		<Unit filename="include/Models/OBJGLBufferUtilities.hpp" />
+		<Unit filename="include/Models/tinyobjloader/tiny_obj_loader.h" />
+		<Unit filename="include/Shader.h" />
+		<Unit filename="include/System.h" />
+		<Unit filename="include/Utilities/SplitString.h" />
+		<Unit filename="include/Utilities/TextToTexture.h" />
+		<Unit filename="include/VectorMath/quaternion_math.h" />
+		<Unit filename="include/boundary.h" />
+		<Unit filename="src/GameObjects/Billboard.cpp" />
+		<Unit filename="src/GameObjects/Bullet.cpp" />
+		<Unit filename="src/GameObjects/Camera.cpp" />
+		<Unit filename="src/GameObjects/Character.cpp" />
+		<Unit filename="src/GameObjects/GameObject.cpp" />
+		<Unit filename="src/GameObjects/Particle.cpp" />
+		<Unit filename="src/GameObjects/ParticleSource.cpp" />
+		<Unit filename="src/GameObjects/Projectile.cpp" />
+		<Unit filename="src/GameObjects/SkyBox.cpp" />
+		<Unit filename="src/GameObjects/StaticObject.cpp" />
+		<Unit filename="src/GameObjects/Weapon.cpp" />
 		<Unit filename="src/GameState.cpp" />
-		<Unit filename="src/GameState.h" />
-		<Unit filename="src/MenuState.cpp" />
-		<Unit filename="src/MenuState.h" />
-		<Unit filename="src/Particle.cpp" />
-		<Unit filename="src/ParticleSource.cpp" />
-		<Unit filename="src/ProjectileObject.cpp" />
+		<Unit filename="src/Menu/MenuState.cpp" />
+		<Unit filename="src/Models/Armature.cpp" />
+		<Unit filename="src/Models/MD5AnimUtilities.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/Models/MD5CommonUtilities.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/Models/MD5GLBufferUtilities.cpp" />
+		<Unit filename="src/Models/MD5MeshUtilities.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/Models/OBJGLBufferUtilities.cpp" />
+		<Unit filename="src/Models/tinyobjloader/tiny_obj_loader.cc" />
 		<Unit filename="src/Shader.cpp" />
-		<Unit filename="src/Shader.h" />
-		<Unit filename="src/SkyBox.cpp" />
-		<Unit filename="src/StaticObject.cpp" />
 		<Unit filename="src/System.cpp" />
-		<Unit filename="src/System.h" />
-		<Unit filename="src/boundary.cc" />
-		<Unit filename="src/boundary.h" />
+		<Unit filename="src/Utilities/SplitString.cpp" />
+		<Unit filename="src/Utilities/TextToTexture.cpp" />
+		<Unit filename="src/VectorMath/quaternion_math.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/boundary.cpp" />
 		<Unit filename="src/main.cpp" />
 		<Extensions>
 			<code_completion />

@@ -12,9 +12,7 @@ Shader::~Shader(){
 
 Shader::Shader(const Shader & rhs){}
 
-bool Shader::loadShader(char* vertexfile, char* fragmentfile){
-    int i;
-    char name[32];
+bool Shader::loadShader(const char* vertexfile, const char* fragmentfile){
 
     vertexShader = makeShader(GL_VERTEX_SHADER,vertexfile);
 	if (vertexShader == 0)
@@ -33,45 +31,46 @@ bool Shader::loadShader(char* vertexfile, char* fragmentfile){
 	translation = glGetUniformLocation(program,"translation");
 	rotation = glGetUniformLocation(program,"rotation");
 	scale = glGetUniformLocation(program,"scale");
+
 	modelView = glGetUniformLocation(program,"MV");
 	projection = glGetUniformLocation(program,"P");
-	skipBones = glGetUniformLocation(program,"skipBones");
+
 	skipMVP = glGetUniformLocation(program,"skipMVP");
 	skipLighting = glGetUniformLocation(program,"skipLighting");
 
-	fades = glGetUniformLocation(program,"fades");
-	life = glGetUniformLocation(program,"life");
 	mouseOver = glGetUniformLocation(program,"mouseOver");
-
-	for(i=0;i<20;i++){
-	    sprintf(name,"boneMat[%d]",i);
-        boneTransformations[i] = glGetUniformLocation(program,name);
-	}
-
-	position  = glGetAttribLocation(program, "position");
-	normal = glGetAttribLocation(program, "normal");
-	texcoord  = glGetAttribLocation(program, "texcoord");
-	boneIds  = glGetAttribLocation(program, "boneIds");
-	boneWeights  = glGetAttribLocation(program, "boneWeights");
 
     return true;
 }
 
-void Shader::activate(){
+void Shader::activate(unsigned short atrribs){
+
     glUseProgram(program);
-	glEnableVertexAttribArray(position);
-	glEnableVertexAttribArray(texcoord);
-	glEnableVertexAttribArray(normal);
-	glEnableVertexAttribArray(boneIds);
-	glEnableVertexAttribArray(boneWeights);
+
+    if(atrribs & ENABLE_POSITION){
+        glEnableVertexAttribArray(LOCATION_POSITION);
+    }
+    if(atrribs & ENABLE_NORMAL){
+        glEnableVertexAttribArray(LOCATION_NORMAL);
+    }
+    if(atrribs & ENABLE_TEXCOORD){
+        glEnableVertexAttribArray(LOCATION_TEXCOORD);
+    }
+
 }
 
-void Shader::deactivate(){
-    glDisableVertexAttribArray(position);
-	glDisableVertexAttribArray(texcoord);
-	glDisableVertexAttribArray(normal);
-	glDisableVertexAttribArray(boneIds);
-	glDisableVertexAttribArray(boneWeights);
+void Shader::deactivate(unsigned short atrribs){
+
+    if(atrribs & ENABLE_POSITION){
+        glDisableVertexAttribArray(LOCATION_POSITION);
+    }
+    if(atrribs & ENABLE_NORMAL){
+        glDisableVertexAttribArray(LOCATION_NORMAL);
+    }
+    if(atrribs & ENABLE_TEXCOORD){
+        glDisableVertexAttribArray(LOCATION_TEXCOORD);
+    }
+
 }
 
 GLuint Shader::makeShader(GLenum type, const char *filename){
@@ -81,8 +80,7 @@ GLuint Shader::makeShader(GLenum type, const char *filename){
     GLuint shader;
     GLint shader_ok;
 
-    if (!source)
-        return 0;
+    if (!source) return 0;
 
 	shader = glCreateShader(type);
     glShaderSource(shader, 1, (const GLchar**)&source, &length);
