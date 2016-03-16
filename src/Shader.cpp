@@ -12,19 +12,19 @@ Shader::~Shader(){
 
 Shader::Shader(const Shader & rhs){}
 
-bool Shader::loadShader(const char* vertexfile, const char* fragmentfile){
+bool Shader::loadShader(const std::string& vertexFile, const std::string& fragmentFile){
 
-    vertexShader = makeShader(GL_VERTEX_SHADER,vertexfile);
+    vertexShader = makeShader(GL_VERTEX_SHADER,vertexFile.c_str());
 	if (vertexShader == 0)
-	    return 0;
+	    throw std::runtime_error("Failed to create vertexShader");
 
-	fragmentShader = makeShader(GL_FRAGMENT_SHADER,fragmentfile);
+	fragmentShader = makeShader(GL_FRAGMENT_SHADER,fragmentFile.c_str());
 	if (fragmentShader == 0)
-	    return 0;
+	    throw std::runtime_error("Failed to create fragmentShader");
 
 	program = makeProgram(vertexShader,fragmentShader);
 	if (program == 0)
-	    return 0;
+	    throw std::runtime_error("Failed to compile Shader program");
 
 
 	texture  = glGetUniformLocation(program, "tex");
@@ -141,9 +141,15 @@ void* Shader::file_contents(const char *filename, GLint *length)
     FILE *f = fopen(filename, "r");
     void *buffer;
 
-    if (!f) {
-        fprintf(stderr, "Unable to open %s for reading\n", filename);
+    if (!f)
+    {
+
+        std::stringstream ss;
+        ss << "Unable to open " << filename << " for reading";
+
+        throw std::runtime_error(ss.str());
         return NULL;
+
     }
 
     fseek(f, 0, SEEK_END);

@@ -8,6 +8,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <stdexcept>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -34,6 +35,8 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Shader.h"
+#include "Utilities/FileToString.h"
+#include "Utilities/SplitString.h"
 
 #ifndef STRUCT_VERTEX
 #define STRUCT_VERTEX
@@ -71,8 +74,11 @@ struct vertex{
 #define MENU_ACTION_SAVEGAME 3
 #define MENU_ACTION_QUIT 4
 
-class MenuItem{
+class MenuItem
+{
+
     public:
+
         glm::mat4 translation;
         glm::mat4 scale;
         GLuint vertexBuffer;
@@ -82,19 +88,27 @@ class MenuItem{
         bool mouseOver;
 
         void handleMouseMove(int mouseX, int mouseY, const SDL_VideoInfo* vidinfo);
+
 };
 
-class MenuState{
+class MenuState
+{
+
     public:
+
         MenuState();
         ~MenuState();
         MenuState(const MenuState & rhs);
 
-        void init(double maxframerate);
+        bool init(std::string rootDir, double maxframerate);
         bool loop();
 
         unsigned int currentAction;
+
     private:
+
+        std::string rootDir;
+
         const SDL_VideoInfo* vidinfo;
         double maxframerate;
 
@@ -106,6 +120,7 @@ class MenuState{
         MenuItem* makeMenuItem(const char* name, const char* action, float x, float y, float yscale);
         void handleMouseMove(int mouseX, int mouseY, const SDL_VideoInfo* vidinfo);
         void renderMenu();
+
 };
 
 #endif

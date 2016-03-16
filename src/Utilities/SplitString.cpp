@@ -1,22 +1,32 @@
 #include "Utilities/SplitString.h"
 
-void SplitString(std::vector<std::string>& arguments, std::string& line, const std::string& delimiter){
+#include <algorithm>
+#include <functional>
+#include <iostream>
 
-    size_t pos = 0;
-    std::string argument;
+strvec SplitString(const std::string& str, char delim){
 
-    while((pos = line.find(delimiter)) != std::string::npos){
+    std::stringstream ss(str);
+    std::string item;
 
-        argument = line.substr(0,pos);
+    strvec tokens;
 
-        arguments.push_back(argument);
+    while(std::getline(ss,item,delim)) /* the "line" is a string ending in delim */
+    {
 
-        line.erase(0,pos+delimiter.length());
+        item.erase(item.begin(),
+                   std::find_if(item.begin(),
+                                item.end(),
+                                std::not1(std::ptr_fun<int, int>(std::isspace))) );
+
+        item.erase(std::find_if(item.rbegin(),
+                                item.rend(),
+                                std::not1(std::ptr_fun<int, int>(std::isspace))).base(), item.end());
+
+        if(!item.empty()) tokens.push_back(item);
 
     }
 
-    arguments.push_back(line);
-
-    line.clear();
+    return tokens;
 
 }

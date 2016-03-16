@@ -60,7 +60,7 @@ class GameState{
         ~GameState();
         GameState(const GameState & rhs);
 
-        void init(double maxframerate);
+        bool init(std::string rootDir, double maxframerate);
         void clean();
 
         void loadNew(std::string levelfile);
@@ -75,6 +75,8 @@ class GameState{
         bool loaded;
 
     private:
+
+        std::string rootDir;
 
         std::list<GameObject*> levelObjects; //contains all objects
 

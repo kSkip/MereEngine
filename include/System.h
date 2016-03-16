@@ -22,18 +22,26 @@
 #include "MenuState.h"
 
 class System{
+
     public:
+
         System();
         ~System();
         System(const System & rhs);
 
-        bool init();
+        bool init(std::string& rootDir);
         bool loop();
+
     private:
+
         SDL_Surface* win;
         const SDL_VideoInfo* vidinfo;
+
         GameState state;
         MenuState mainmenu;
+
+        std::string rootDir;
+
 };
 
 #endif

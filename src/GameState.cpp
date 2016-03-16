@@ -10,7 +10,8 @@
 
 GameState::GameState(){}
 
-GameState::~GameState(){
+GameState::~GameState()
+{
 
     std::list<GameObject*>::iterator i;
 
@@ -29,18 +30,27 @@ GameState::~GameState(){
 
 GameState::GameState(const GameState & rhs){}
 
-void GameState::init(double maxframes){
+bool GameState::init(std::string dir, double maxframes)
+{
+
+    rootDir = dir;
 
     vidinfo = SDL_GetVideoInfo();
     maxframerate = maxframes;
 
-	aspectRatio = float(vidinfo->current_w)/float(vidinfo->current_h); //useful quantity
+	aspectRatio = float(vidinfo->current_w)/float(vidinfo->current_h);
 
+    /*
+     * Indicate no state has been loaded yet
+     */
 	loaded = false;
+
+	return true;
 
 }
 
-void GameState::clean(){
+void GameState::clean()
+{
 
     std::list<GameObject*>::iterator i;
     std::map<std::string,GLuint>::iterator textureIt;
@@ -72,7 +82,8 @@ void GameState::clean(){
 
 }
 
-void GameState::loadObjectData(struct ObjectFiles* files){
+void GameState::loadObjectData(struct ObjectFiles* files)
+{
 
     std::map<std::string,std::string>::iterator it;
     ObjectData* newObjectData = new ObjectData;
@@ -135,7 +146,8 @@ void GameState::loadObjectData(struct ObjectFiles* files){
 
 }
 
-void GameState::handleObjectDataCommand(std::vector<std::string>& args){
+void GameState::handleObjectDataCommand(std::vector<std::string>& args)
+{
 
     std::ifstream ifs;
     std::string line;
@@ -157,7 +169,8 @@ void GameState::handleObjectDataCommand(std::vector<std::string>& args){
 
 }
 
-void GameState::handleObjectSpec(std::ifstream& ifs, struct ObjectFiles* files){
+void GameState::handleObjectSpec(std::ifstream& ifs, struct ObjectFiles* files)
+{
 
     std::string type   = "TYPE";
     std::string dir = "DIR";
@@ -165,15 +178,13 @@ void GameState::handleObjectSpec(std::ifstream& ifs, struct ObjectFiles* files){
     std::string anim   = "ANIM";
     std::string bounds = "BOUNDS";
 
-    std::string delimiter = " ";
-
     std::string line;
     std::vector<std::string> args;
 
     while(ifs.good()){
 
         std::getline(ifs,line);
-        SplitString(args,line,delimiter);
+        args = SplitString(line,' ');
 
         if(args[0] == type && args.size() > 1){
 
@@ -203,7 +214,8 @@ void GameState::handleObjectSpec(std::ifstream& ifs, struct ObjectFiles* files){
 
 }
 
-void GameState::handleObjectCommand(std::vector<std::string>& args){
+void GameState::handleObjectCommand(std::vector<std::string>& args)
+{
 
     std::string camera        = "camera";
     std::string static_object = "static_object";
@@ -267,7 +279,8 @@ void GameState::handleObjectCommand(std::vector<std::string>& args){
 
 }
 
-void GameState::handleStateSection(std::ifstream& ifs, std::string& section){
+void GameState::handleStateSection(std::ifstream& ifs, std::string& section)
+{
 
     std::string shaders    = "SHADERS";
     std::string objectdata = "OBJECTDATA";
@@ -275,8 +288,7 @@ void GameState::handleStateSection(std::ifstream& ifs, std::string& section){
     std::string end        = "END";
 
     std::string line, vs, fs;
-    std::string delimiter = " ";
-    std::vector<std::string> args;
+    strvec args;
 
 
     if(section == shaders){
@@ -287,7 +299,7 @@ void GameState::handleStateSection(std::ifstream& ifs, std::string& section){
 
             if(!line.empty()){
 
-                SplitString(args,line,delimiter);
+                args = SplitString(line,' ');
 
                 if(args[0] == std::string("VS")){
                     vs = args[1];
@@ -306,6 +318,9 @@ void GameState::handleStateSection(std::ifstream& ifs, std::string& section){
 
         if(!(vs.empty() || fs.empty())){
 
+            vs = rootDir + vs;
+            fs = rootDir + fs;
+
             levelShader = new Shader;
             levelShader->loadShader(vs.c_str(),fs.c_str());
 
@@ -319,7 +334,7 @@ void GameState::handleStateSection(std::ifstream& ifs, std::string& section){
 
             if(!line.empty()){
 
-                SplitString(args,line,delimiter);
+                args = SplitString(line,' ');
                 handleObjectDataCommand(args);
 
                 args.clear();
@@ -339,7 +354,7 @@ void GameState::handleStateSection(std::ifstream& ifs, std::string& section){
 
             if(!line.empty()){
 
-                SplitString(args,line,delimiter);
+                args = SplitString(line,' ');
                 handleObjectCommand(args);
 
                 args.clear();
@@ -354,7 +369,8 @@ void GameState::handleStateSection(std::ifstream& ifs, std::string& section){
 
 }
 
-void GameState::loadNew(std::string levelfile){
+void GameState::loadNew(std::string levelfile)
+{
 
     std::ifstream ifs;
     std::string line;
@@ -382,7 +398,8 @@ void GameState::loadSave(std::string savefile){}
 
 void GameState::save(){}
 
-bool GameState::loop(){
+bool GameState::loop()
+{
 
     double deltatime = 0.0f;
     double inittime;
@@ -415,7 +432,8 @@ bool GameState::loop(){
 }
 
 //handles user inputs like mouse movements and key presses
-bool GameState::eventHandler(){
+bool GameState::eventHandler()
+{
 
     SDL_Event event;
 
@@ -511,7 +529,8 @@ bool GameState::eventHandler(){
 }
 
 //moves the game objects through time
-void GameState::move(double deltatime){
+void GameState::move(double deltatime)
+{
 
     std::list<GameObject*>::iterator i, j;
 
@@ -542,7 +561,8 @@ void GameState::move(double deltatime){
 }
 
 //renders everything
-void GameState::render(){
+void GameState::render()
+{
 
     std::map<std::string,GLuint>::iterator textureIt;
     std::list<GameObject*>::iterator i;
@@ -588,7 +608,8 @@ void GameState::render(){
 
 }
 
-void GameState::insertOpaqueObject(GameObject* newGameObject){
+void GameState::insertOpaqueObject(GameObject* newGameObject)
+{
 
     levelObjects.push_back(newGameObject);
 
@@ -614,7 +635,8 @@ void GameState::insertOpaqueObject(GameObject* newGameObject){
 
 }
 
-void GameState::insertTransparencyObject(GameObject* newGameObject){
+void GameState::insertTransparencyObject(GameObject* newGameObject)
+{
 
     levelObjects.push_back(newGameObject);
 

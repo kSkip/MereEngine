@@ -6,56 +6,93 @@ MenuState::~MenuState(){}
 
 MenuState::MenuState(const MenuState & rhs){}
 
-void MenuState::init(double maxframes){
-    char vertexFile[50];
-    char fragmentFile[50];
-    char menulistFile[50];
-    char line[50], text[50], action[50];
-    std::ifstream ifs;
-	char t;
-	float values[6];
+bool MenuState::init(std::string dir, double maxframes)
+{
+
+    rootDir = dir;
+
+    std::string vertexFile, fragmentFile, menulistFile;
 
     vidinfo = SDL_GetVideoInfo();
     maxframerate = maxframes;
 
-    menuShader = new Shader;
-    sprintf(vertexFile,"Data/menustate.v.glsl");
-    sprintf(fragmentFile,"Data/menustate.f.glsl");
-    menuShader->loadShader(vertexFile,fragmentFile);
+    vertexFile   = rootDir + "Data/menustate.v.glsl";
+    fragmentFile = rootDir + "Data/menustate.f.glsl";
+
+    try
+    {
+
+        menuShader = new Shader;
+
+        menuShader->loadShader(vertexFile,fragmentFile);
+
+    }
+    catch(std::exception& e)
+    {
+        std::cerr << e.what();
+        throw std::runtime_error("Failed to init menu shader");
+    }
 
     TTF_Init();
 
-    sprintf(menulistFile,"Data/MenuList");
-    ifs.open(menulistFile);
+    menulistFile = rootDir + "Data/MenuList";
 
-	while(ifs >> t){
-		switch(t){
-			case 't': //the title
-                ifs.get();
-                ifs.getline(text,100);
-                ifs.getline(line,100);
-                sscanf(line,"%f %f %f",&values[0],&values[1],&values[2]); //x, y, and y scale factor
-				MenuList.push_back(makeMenuItem(text,NULL,values[0],values[1],values[2]));
+    std::string menulistContents = FileToString(menulistFile.c_str());
+    strvec menuCommands = SplitString(menulistContents,';');
+    unsigned int i;
+
+    /**
+      * Now we handle all the of the Menu defining commands
+      * in the configuration file
+      */
+	for(i=0;i<menuCommands.size();++i)
+	{
+
+        strvec sections = SplitString(menuCommands[i],',');
+        char t = sections[0][0];
+        float values[3];
+
+		switch(t)
+		{
+			case 't': //Title
+
+                if(sections.size() != 5)
+                    throw std::runtime_error("Menu Title definition requires 4 arguments");
+
+                values[0] = atof(sections[2].c_str());
+                values[1] = atof(sections[3].c_str());
+                values[2] = atof(sections[4].c_str());
+
+				MenuList.push_back( makeMenuItem(sections[1].c_str(),NULL,
+				                                 values[0],values[1],values[2]) );
+
 				break;
-            case 'e': //a clickable entry
-                ifs.get();
-                ifs.getline(text,100);
-                ifs.getline(action,100);
-                ifs.getline(line,100);
-                sscanf(line,"%f %f %f",&values[0],&values[1],&values[2]); //x, y, and y scale factor
-                MenuList.push_back(makeMenuItem(text,action,values[0],values[1],values[2]));
+
+            case 'e': //Clickable entry
+
+                if(sections.size() != 6)
+                    throw std::runtime_error("Menu Item definition requires 5 arguments");
+
+                values[0] = atof(sections[3].c_str());
+                values[1] = atof(sections[4].c_str());
+                values[2] = atof(sections[5].c_str());
+
+                MenuList.push_back( makeMenuItem(sections[1].c_str(),sections[2].c_str(),
+                                                          values[0],values[1],values[2]) );
+
 				break;
 		}
+
 	}
 
-	ifs.close();
 
-    //MenuList.push_back(makeMenuItem("New Game","loadnew",0,0));
-    //MenuList.push_back(makeMenuItem("Quit","quit",0,100));
+    return true;
 
 }
 
-MenuItem* MenuState::makeMenuItem(const char* name, const char* action, float x, float y, float yscale){
+MenuItem* MenuState::makeMenuItem(const char* name, const char* action, float x, float y, float yscale)
+{
+
     GLuint vertexbuffer, elementbuffer;
     MenuItem* newItem = new MenuItem;
 
@@ -118,7 +155,9 @@ MenuItem* MenuState::makeMenuItem(const char* name, const char* action, float x,
 
         newItem->elementBuffer = elementbuffer;
 
-        TTF_Font* font = TTF_OpenFont("Data/Fonts/carbon.ttf", 20);
+        std::string trueTypeFile = rootDir+"Data/Fonts/carbon.ttf";
+
+        TTF_Font* font = TTF_OpenFont(trueTypeFile.c_str(), 20);
         GLuint texture;
         GLuint texture_format;
 
@@ -150,21 +189,22 @@ MenuItem* MenuState::makeMenuItem(const char* name, const char* action, float x,
 
         newItem->mouseOver = false;
 
-        if(action == NULL){
-            newItem->action = MENU_ACTION_NULL;
-        }else if(!strcmp(action,"loadnew")){
-            newItem->action = MENU_ACTION_NEWGAME;
-        }else if(!strcmp(action,"quit")){
-            newItem->action = MENU_ACTION_QUIT;
-        }
+        if(action == NULL)                 newItem->action = MENU_ACTION_NULL;
+
+        else if(!strcmp(action,"loadnew")) newItem->action = MENU_ACTION_NEWGAME;
+
+        else if(!strcmp(action,"quit"))    newItem->action = MENU_ACTION_QUIT;
 
         SDL_FreeSurface(surface);
         TTF_CloseFont(font);
 
     return newItem;
+
 }
 
-bool MenuState::loop(){
+bool MenuState::loop()
+{
+
     unsigned int i;
     double deltatime = 0.0f;
     double inittime;
@@ -249,7 +289,8 @@ bool MenuState::loop(){
 
 }
 
-void MenuState::renderMenu(){
+void MenuState::renderMenu()
+{
 
     unsigned int i;
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -310,10 +351,10 @@ void MenuItem::handleMouseMove(int mouseX, int mouseY, const SDL_VideoInfo* vidi
     float yscaled = -2.0f*(float(mouseY) / float(vidinfo->current_h))+1.0f;
 
     float yHigh = (this->translation * this->scale * glm::vec4(0.0f,1.0f,0.0f,1.0f)).y;
-    float yLow = (this->translation * this->scale * glm::vec4(0.0f,-1.0f,0.0f,1.0f)).y;
+    float yLow  = (this->translation * this->scale * glm::vec4(0.0f,-1.0f,0.0f,1.0f)).y;
 
     float xHigh = (this->translation * this->scale * glm::vec4(1.0f,0.0f,0.0f,1.0f)).x;
-    float xLow = (this->translation * this->scale * glm::vec4(-1.0f,0.0f,0.0f,1.0f)).x;
+    float xLow  = (this->translation * this->scale * glm::vec4(-1.0f,0.0f,0.0f,1.0f)).x;
 
     if(xscaled > xLow && xscaled < xHigh && yscaled > yLow && yscaled < yHigh){
         this->mouseOver = true;

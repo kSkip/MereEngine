@@ -6,47 +6,78 @@ System::~System(){}
 
 System::System(const System & rhs){}
 
-bool System::init(){
+bool System::init(std::string& dir)
+{
+
+    rootDir = dir;
 
     SDL_Init(SDL_INIT_EVERYTHING);
 
 	vidinfo = SDL_GetVideoInfo();
 
-	SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL,0); //Disable VSYNC
-	win = SDL_SetVideoMode(vidinfo->current_w,vidinfo->current_h,32,SDL_OPENGL | SDL_FULLSCREEN); //create window and ogl context
+    /*
+     * Disable VSYNC; should be user specified in the future
+     */
+	SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL,0);
+
+	/*
+	 * Create window with OGL context
+	 */
+	win = SDL_SetVideoMode(vidinfo->current_w,
+	                       vidinfo->current_h,
+	                       32,
+	                       SDL_OPENGL | SDL_FULLSCREEN);
 
 	#ifdef WIN32
 	GLenum err = glewInit(); //required for win32
 	#endif // WIN32
 
-    //some SDL initializations for eliminating cursor, and grabbing input
+    /*
+     * Eliminate Cursor & Grab Input
+     */
 	SDL_ShowCursor(1);
 	SDL_WM_GrabInput(SDL_GRAB_ON);
 
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);              // Set out clear color to black, no alpha
-	glEnable(GL_DEPTH_TEST);                           // Enable the depth buffer
-	glClearDepth(1.0f);                                // Clear the entire depth of the depth buffer
-	glDepthFunc(GL_LEQUAL);		                       // Set our depth function to overwrite if new value less than or equal to current value
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Clear color to black, no alpha
+	glEnable(GL_DEPTH_TEST);              // Enable the depth buffer
+	glClearDepth(1.0f);                   // Clear all of the depth buffer
+	glDepthFunc(GL_LEQUAL);		          // Depth function; Overwrite if new value <= current value
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
-	state.init(300.0f); //initialize the GameState at 300fps max
-    mainmenu.init(200.0f); //initialize the menuObject at 200fps max
+    if(!mainmenu.init(rootDir,200.0f))
+        return false; //initialize the menuObject at 200fps max
+
+	if(!state.init(rootDir,200.0f))
+        return false; //initialize the GameState at 300fps max
 
     return true;
+
 }
 
-bool System::loop(){
+bool System::loop()
+{
 
-    //here we switch between the menu loop and the game loop
-    while(mainmenu.loop()){ //if returns 1 then escape the gamestate's loop, if returns 0 then the we are quiting the program and sys loop returns
+    std::string firstLevel = std::string("Data/Test.level");
 
-        if(mainmenu.currentAction == MENU_ACTION_NEWGAME){
-            if(state.loaded){
-                state.clean();
-            }
-            state.loadNew(std::string("Data/Test.level")); //load the new level data for the state
+    /*
+     * Switch between Menu loop and Game loop
+     */
+    while(mainmenu.loop()) //If return 0, exit program
+    {
+
+        if(mainmenu.currentAction == MENU_ACTION_NEWGAME)
+        {
+
+            if(state.loaded) state.clean();
+
+            state.loadNew(rootDir+firstLevel); //load the new level data for the state
+
+        }
+        if(mainmenu.currentAction == MENU_ACTION_NULL)
+        {
+            break;
         }
 
         state.loop();
@@ -54,4 +85,5 @@ bool System::loop(){
     }
 
     return true;
+
 }

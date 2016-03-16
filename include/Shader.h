@@ -6,6 +6,9 @@
 #endif
 
 #include <iostream>
+#include <stdexcept>
+#include <sstream>
+
 #include <cstdio>
 #include <cstdlib>
 
@@ -37,7 +40,7 @@ class Shader{
         ~Shader();
         Shader(const Shader & rhs);
 
-        bool loadShader(const char* vertexfile, const char* fragmentfile);
+        bool loadShader(const std::string& vertexFile, const std::string& fragmentFile);
 
         void activate(unsigned short atrribs);
         void deactivate(unsigned short atrribs);
