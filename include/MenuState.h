@@ -35,8 +35,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Shader.h"
-#include "Utilities/FileToString.h"
-#include "Utilities/SplitString.h"
+#include "Utilities/TextManipulation.h"
 
 #ifndef STRUCT_VERTEX
 #define STRUCT_VERTEX

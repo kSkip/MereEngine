@@ -37,8 +37,8 @@ bool MenuState::init(std::string dir, double maxframes)
 
     menulistFile = rootDir + "Data/MenuList";
 
-    std::string menulistContents = FileToString(menulistFile.c_str());
-    strvec menuCommands = SplitString(menulistContents,';');
+    std::string menulistContents = f2str(menulistFile.c_str());
+    strvec menuCommands = split(menulistContents,';');
     unsigned int i;
 
     /**
@@ -48,7 +48,7 @@ bool MenuState::init(std::string dir, double maxframes)
 	for(i=0;i<menuCommands.size();++i)
 	{
 
-        strvec sections = SplitString(menuCommands[i],',');
+        strvec sections = split(menuCommands[i],',');
         char t = sections[0][0];
         float values[3];
 

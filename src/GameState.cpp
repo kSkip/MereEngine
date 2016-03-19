@@ -6,7 +6,7 @@
 #include "GameObjects/SkyBox.h"
 #include "GameObjects/Bullet.h"
 #include "Models/OBJGLBufferUtilities.hpp"
-#include "Utilities/SplitString.h"
+#include "Utilities/TextManipulation.h"
 
 GameState::GameState(){}
 
@@ -112,13 +112,16 @@ void GameState::loadObjectData(struct ObjectFiles* files)
         newObjectData->elementCount  =  3*numElements;
         newObjectData->diffuseTex    =  OBJCreateTextureBuffer(&materials, files->dir.c_str());
 
-    }else if(files->type == std::string("MD5")){
+    }
+    else if(files->type == std::string("MD5"))
+    {
 
         unsigned int numElements;
 
         struct md5meshdata* md5data = getMD5MeshData(files->meshFile.c_str());
 
-        for( it=files->animFiles.begin(); it != files->animFiles.end(); it++){
+        for( it=files->animFiles.begin(); it != files->animFiles.end(); it++)
+        {
 
             struct md5animdata* md5anim = getMD5AnimData(it->second.c_str());
 
@@ -173,7 +176,7 @@ void GameState::handleObjectSpec(std::ifstream& ifs, struct ObjectFiles* files)
 {
 
     std::string type   = "TYPE";
-    std::string dir = "DIR";
+    std::string dir    = "DIR";
     std::string mesh   = "MESH";
     std::string anim   = "ANIM";
     std::string bounds = "BOUNDS";
@@ -184,7 +187,7 @@ void GameState::handleObjectSpec(std::ifstream& ifs, struct ObjectFiles* files)
     while(ifs.good()){
 
         std::getline(ifs,line);
-        args = SplitString(line,' ');
+        args = split(line,' ');
 
         if(args[0] == type && args.size() > 1){
 
@@ -299,7 +302,7 @@ void GameState::handleStateSection(std::ifstream& ifs, std::string& section)
 
             if(!line.empty()){
 
-                args = SplitString(line,' ');
+                args = split(line,' ');
 
                 if(args[0] == std::string("VS")){
                     vs = args[1];
@@ -334,7 +337,7 @@ void GameState::handleStateSection(std::ifstream& ifs, std::string& section)
 
             if(!line.empty()){
 
-                args = SplitString(line,' ');
+                args = split(line,' ');
                 handleObjectDataCommand(args);
 
                 args.clear();
@@ -354,7 +357,7 @@ void GameState::handleStateSection(std::ifstream& ifs, std::string& section)
 
             if(!line.empty()){
 
-                args = SplitString(line,' ');
+                args = split(line,' ');
                 handleObjectCommand(args);
 
                 args.clear();
