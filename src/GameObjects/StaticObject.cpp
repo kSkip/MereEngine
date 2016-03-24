@@ -22,6 +22,7 @@ StaticObject::StaticObject(ObjectData* objectData, DataBlock& def, GameState* st
     pos_init[2] = atof(pos[2].c_str());
 
     rotY  = atof(pos[3].c_str());
+    rotY  = -rotY * 2.0f * PI / 360.0f;
 
     position = glm::vec3(pos_init[0],pos_init[1],pos_init[2]);
     translation = glm::translate(glm::mat4(1.0f),position);

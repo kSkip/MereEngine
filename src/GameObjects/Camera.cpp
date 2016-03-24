@@ -20,10 +20,11 @@ Camera::Camera(ObjectData* objectData, float windowSize[2], DataBlock& def, Game
     pos_init[2] = atof(pos[2].c_str());
 
     rotY  = atof(pos[3].c_str());
+    rotY  = -rotY * 2.0f * PI / 360.0f;
 
 	position = glm::vec3(pos_init[0],pos_init[1],pos_init[2]);
 	head     = position + glm::vec3(0.0f,0.3f,0.0f);
-	origin   = head + glm::vec3(0.0f,0.0f,1000.0f);
+	origin   = head     + glm::vec3(0.0f,0.0f,1000.0f);
 
 	origin = glm::rotateY(origin-head,-1*rotY);
 	origin = origin + head;
@@ -86,11 +87,11 @@ Camera::~Camera(){}
 void Camera::initCamera(){
 
 	position = glm::vec3(0.0f,0.0f,0.0f);
-	head = glm::vec3(0.0f,0.0f,0.0f);
-	origin = glm::vec3(0.0f,0.0f,0.0f);
-	front = glm::vec3(0.0f,0.0f,1.0f);
-	right = glm::vec3(-1.0f,0.0f,0.0f);
-	up = glm::vec3(0.0f, 1.0f, 0.0f);
+	head     = glm::vec3(0.0f,0.0f,0.0f);
+	origin   = glm::vec3(0.0f,0.0f,0.0f);
+	front    = glm::vec3(0.0f,0.0f,1.0f);
+	right    = glm::vec3(-1.0f,0.0f,0.0f);
+	up       = glm::vec3(0.0f, 1.0f, 0.0f);
 	velocity = glm::vec3(0.0f,0.0f,0.0f);
 
     rotHorizontal = 0.0f;
@@ -98,8 +99,8 @@ void Camera::initCamera(){
 
 	movementSpeedFactor = 1.2f;
 
-	pitchSensitivity = 0.1;
-	yawSensitivity   = 0.1;
+	pitchSensitivity = 0.01;
+	yawSensitivity   = 0.01;
 
 	ground = false;
 
@@ -123,14 +124,14 @@ void Camera::handleMouseMove(int mouseX, int mouseY){
 
 	// Apply the mouse movement to vector indicating our view direction
 	rotHorizontal -= horizMovement;
-	if(rotHorizontal <= 360.0f) rotHorizontal += 360.0f;
-	if(rotHorizontal >= 360.0f) rotHorizontal -= 360.0f;
+	if(rotHorizontal <= 2.0f*PI) rotHorizontal += 2.0f*PI;
+	if(rotHorizontal >= 2.0f*PI) rotHorizontal -= 2.0f*PI;
 	origin = glm::rotateY(origin-head,-1*horizMovement);
 	origin = origin + head;
 
 	front = glm::rotateY(front,-1*horizMovement);
 	right = glm::rotateY(right,-1*horizMovement);
-	up = glm::rotateY(right,-1*horizMovement);
+	up    = glm::rotateY(right,-1*horizMovement);
 
     temp = glm::rotate(origin-head,-1*vertMovement,right);
 
@@ -138,8 +139,8 @@ void Camera::handleMouseMove(int mouseX, int mouseY){
 
         origin = temp + head;
         rotVertical -= vertMovement;
-        if(rotVertical <= 360.0f) rotVertical += 360.0f;
-        if(rotVertical >= 360.0f) rotVertical -= 360.0f;
+        if(rotVertical <= 2.0f*PI) rotVertical += 2.0f*PI;
+        if(rotVertical >= 2.0f*PI) rotVertical -= 2.0f*PI;
 
     }
 

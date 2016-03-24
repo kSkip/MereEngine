@@ -252,7 +252,7 @@ bool GameState::loop()
             SDL_Delay(1000.0f*((1.0f/maxframerate) - deltatime));
             deltatime = (1.0f/maxframerate);
         }
-        //std::cout << "frame rate: " << 1.0f / deltatime << "\n";
+        std::cout << "frame rate: " << 1.0f / deltatime << "\n";
 
         //end of frame
     }
@@ -401,7 +401,7 @@ void GameState::render()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     //get Model View Projection Matrix
-    P = glm::perspective(60.0f,aspectRatio,0.1f,1000.0f);
+    P = glm::perspective(1.04f/*60.0f*/,aspectRatio,0.1f,1000.0f);
     MV = glm::lookAt(player->getHead(),player->getOrigin(),glm::vec3(0.0f,1.0f,0.0f));
 
     levelShader->activate(ENABLE_POSITION | ENABLE_NORMAL | ENABLE_TEXCOORD); //enable all attributes
