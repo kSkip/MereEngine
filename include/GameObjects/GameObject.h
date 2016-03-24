@@ -42,26 +42,7 @@
 #include "Models/Armature.hpp"
 #include "boundary.h"
 
-struct ObjectData{
-
-    std::string name;
-    std::string type;
-
-    GLuint vertexBuffer;
-    GLuint elementBuffer;
-    GLsizei elementCount;
-
-    std::map<std::string,Armature*> armatures;
-    unsigned int num_vertices;
-    UnskinnedVertex* unskinned_vertices;
-    vertex* vertices;
-
-
-    GLuint diffuseTex, normalTex, displacementTex, occlusionTex;
-
-    boundary* objectBounds;
-
-};
+#include "GameObjects/ObjectData.h"
 
 enum Primative {PTYPE_TRIANGLES, PTYPE_POINTS};
 

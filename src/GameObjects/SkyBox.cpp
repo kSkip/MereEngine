@@ -2,11 +2,11 @@
 #include <iostream>
 SkyBox::SkyBox(){}
 
-SkyBox::SkyBox(std::string objectName, Camera* p, GameState* state){
+SkyBox::SkyBox(ObjectData* objectData, Camera* p, GameState* state){
 
     player = p;
 
-    data = getObjectData(objectName,state);
+    data = objectData;
 
     translation = glm::translate(glm::mat4(1.0f),player->getPosition());
 

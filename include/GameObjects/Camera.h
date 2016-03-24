@@ -19,7 +19,7 @@ class Camera : public GameObject{
 
     public:
 
-        Camera(std::string& objectName, float windowSize[2], float position[3], float rotY, GameState* state);
+        Camera(ObjectData* objectData, float windowSize[2], DataBlock& def, GameState* state);
         ~Camera();
 
         bool holdingForward;

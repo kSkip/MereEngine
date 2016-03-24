@@ -24,7 +24,23 @@ void DataBlock::load(const char* filename)
 
 }
 
-DataBlock DataBlock::operator[](const char* label)
+DataBlock DataBlock::operator[](const char* label) const
+{
+
+    std::string key(label);
+
+    const_block_it it = childBlocks.find(key);
+
+    DataBlock block;
+
+    if(it != childBlocks.end())
+        block = it->second;
+
+    return block;
+
+}
+
+DataBlock & DataBlock::operator[](const char*  label)
 {
 
     std::string key(label);
@@ -33,7 +49,23 @@ DataBlock DataBlock::operator[](const char* label)
 
 }
 
-std::string DataBlock::operator()(const char* label)
+std::string DataBlock::operator()(const char* label) const
+{
+
+    std::string key(label);
+
+    const_value_it it = values.find(key);
+
+    std::string data;
+
+    if(it != values.end())
+        data = it->second;
+
+    return data;
+
+}
+
+std::string & DataBlock::operator()(const char* label)
 {
 
     std::string key(label);

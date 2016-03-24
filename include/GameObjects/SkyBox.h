@@ -9,7 +9,7 @@ class SkyBox : public GameObject{
     public:
 
         SkyBox();
-        SkyBox(std::string objectName, Camera* player, GameState* state);
+        SkyBox(ObjectData* objectData, Camera* player, GameState* state);
         ~SkyBox();
         SkyBox(const SkyBox & rhs);
 

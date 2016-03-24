@@ -18,9 +18,11 @@ GameState::~GameState()
     //cleanup everything before exiting program
     delete levelShader;
 
-    for(i = levelObjects.begin(); i != levelObjects.end(); i++){
+    for(i = levelObjects.begin(); i != levelObjects.end(); i++)
+    {
         delete (*i);
     }
+
     levelObjects.clear();
 
     opaqueObjects.clear();
@@ -30,7 +32,7 @@ GameState::~GameState()
 
 GameState::GameState(const GameState & rhs){}
 
-bool GameState::init(std::string dir, double maxframes)
+void GameState::init(std::string dir, double maxframes)
 {
 
     rootDir = dir;
@@ -38,14 +40,12 @@ bool GameState::init(std::string dir, double maxframes)
     vidinfo = SDL_GetVideoInfo();
     maxframerate = maxframes;
 
-	aspectRatio = float(vidinfo->current_w)/float(vidinfo->current_h);
+	aspectRatio = float(vidinfo->current_w) / float(vidinfo->current_h);
 
     /*
      * Indicate no state has been loaded yet
      */
 	loaded = false;
-
-	return true;
 
 }
 
@@ -82,291 +82,74 @@ void GameState::clean()
 
 }
 
-void GameState::loadObjectData(struct ObjectFiles* files)
+void GameState::loadObjectData(DataBlock & objectDataBlock)
 {
 
-    std::map<std::string,std::string>::iterator it;
-    ObjectData* newObjectData = new ObjectData;
+    block_it it = objectDataBlock.beginBlocks();
 
-    if(!files->boundsFile.empty()){
-
-        newObjectData->objectBounds = new boundary;
-        newObjectData->objectBounds->LoadBoundaries(files->boundsFile);
-
-    }else{
-
-        newObjectData->objectBounds = NULL;
-
-    }
-
-    if(files->type == std::string("OBJ")){
-
-        unsigned int numElements;
-        std::vector<tinyobj::shape_t> shapes;
-        std::vector<tinyobj::material_t> materials;
-
-        std::string err = tinyobj::LoadObj(shapes, materials, files->meshFile.c_str(), files->dir.c_str());
-
-        newObjectData->vertexBuffer  =  OBJCreateVertexBuffer(&shapes);
-        newObjectData->elementBuffer =  OBJCreateElementBuffer(&shapes, &numElements);
-        newObjectData->elementCount  =  3*numElements;
-        newObjectData->diffuseTex    =  OBJCreateTextureBuffer(&materials, files->dir.c_str());
-
-    }
-    else if(files->type == std::string("MD5"))
+    while(it != objectDataBlock.endBlocks())
     {
 
-        unsigned int numElements;
+        std::string name      = it->first;
+        DataBlock& objectData = it->second;
 
-        struct md5meshdata* md5data = getMD5MeshData(files->meshFile.c_str());
+        objectData("rootdir") = rootDir;
 
-        for( it=files->animFiles.begin(); it != files->animFiles.end(); it++)
-        {
+        objectMap[name] = new ObjectData(objectData);
 
-            struct md5animdata* md5anim = getMD5AnimData(it->second.c_str());
-
-            Armature* newArm = new Armature;
-
-            newArm->buildArmature(md5anim);
-
-            newObjectData->armatures[it->first] = newArm;
-
-            freeMD5AnimData(md5anim);
-
-        }
-
-        newObjectData->vertexBuffer  = MD5CreateVertexBuffer(md5data,&newObjectData->vertices,&newObjectData->unskinned_vertices,&newObjectData->num_vertices);
-        newObjectData->elementBuffer = MD5CreateElementBuffer(md5data,&numElements);
-        newObjectData->elementCount  = 3*numElements;
-        newObjectData->diffuseTex    = MD5CreateTextureBuffer(md5data,files->dir.c_str());
-
-        freeMD5MeshData(md5data);
-
-    }
-
-    newObjectData->name = files->objectName;
-    objectMap[files->objectName] = newObjectData;
-
-}
-
-void GameState::handleObjectDataCommand(std::vector<std::string>& args)
-{
-
-    std::ifstream ifs;
-    std::string line;
-    struct ObjectFiles files;
-
-    if(args.size() > 1){
-
-        files.objectName = args[0];
-
-        ifs.open(args[1].c_str());
-
-        handleObjectSpec(ifs,&files);
-
-        ifs.close();
-
-    }
-
-    loadObjectData(&files);
-
-}
-
-void GameState::handleObjectSpec(std::ifstream& ifs, struct ObjectFiles* files)
-{
-
-    std::string type   = "TYPE";
-    std::string dir    = "DIR";
-    std::string mesh   = "MESH";
-    std::string anim   = "ANIM";
-    std::string bounds = "BOUNDS";
-
-    std::string line;
-    std::vector<std::string> args;
-
-    while(ifs.good()){
-
-        std::getline(ifs,line);
-        args = split(line,' ');
-
-        if(args[0] == type && args.size() > 1){
-
-            files->type = args[1];
-
-        }else if(args[0] == mesh && args.size() > 1){
-
-            files->meshFile = args[1];
-
-        }else if(args[0] == anim && args.size() > 2){
-
-            files->animFiles[args[1]] = args[2];
-
-        }else if(args[0] == bounds && args.size() > 1){
-
-            files->boundsFile = args[1];
-
-        }else if(args[0] == dir && args.size() > 1){
-
-            files->dir = args[1];
-
-        }
-
-        args.clear();
+        ++it;
 
     }
 
 }
 
-void GameState::handleObjectCommand(std::vector<std::string>& args)
+void GameState::loadObjects(DataBlock & objectBlock)
 {
 
-    std::string camera        = "camera";
-    std::string static_object = "static_object";
-    std::string character     = "character";
-    std::string sky_box       = "sky_box";
+    block_it it = objectBlock.beginBlocks();
 
-    if(args.size() > 1){
+    while(it != objectBlock.endBlocks())
+    {
 
-        ObjectData* object = objectMap[args[0]];
+        DataBlock& objectData = it->second;
 
-        std::string objectType = args[1];
+        ObjectData* object = objectMap[it->first];
 
-        if(objectType == camera){
+        std::string objectType = objectData("obj_type");
+
+        objectData("rootdir") = rootDir;
+
+        if(objectType == "camera"){
 
             float windowSize[2];
             windowSize[0] = vidinfo->current_w;
             windowSize[1] = vidinfo->current_h;
-            float position[3];
-            position[0] = atof(args[2].c_str());
-            position[1] = atof(args[3].c_str());
-            position[2] = atof(args[4].c_str());
-            float rotY = atof(args[5].c_str());
 
-            player = new Camera(object->name, windowSize, position, rotY, this);
+            player = new Camera(object, windowSize, objectData, this);
 
             insertOpaqueObject(player);
 
-        }else if(objectType == static_object){
+        }else if(objectType == "static_object"){
 
-            float position[3];
-            position[0] = atof(args[2].c_str());
-            position[1] = atof(args[3].c_str());
-            position[2] = atof(args[4].c_str());
-            float rotY = atof(args[5].c_str());
-
-            StaticObject* newGameObject = new StaticObject(object->name, position, rotY, this);
+            StaticObject* newGameObject = new StaticObject(object, objectData, this);
 
             insertOpaqueObject(newGameObject);
 
-        }else if(objectType == character){
+        }else if(objectType == "character"){
 
-            float position[3];
-            position[0] = atof(args[2].c_str());
-            position[1] = atof(args[3].c_str());
-            position[2] = atof(args[4].c_str());
-            float rotY = atof(args[5].c_str());
-
-            Character* newGameObject = new Character(object->name, position, rotY, this);
+            Character* newGameObject = new Character(object, objectData, this);
 
             insertOpaqueObject(newGameObject);
 
-        }else if(objectType == sky_box){
+        }else if(objectType == "sky_box"){
 
-            SkyBox* newGameObject = new SkyBox(object->name, player, this);
+            SkyBox* newGameObject = new SkyBox(object, player, this);
 
             insertOpaqueObject(newGameObject);
 
         }
 
-    }
-
-}
-
-void GameState::handleStateSection(std::ifstream& ifs, std::string& section)
-{
-
-    std::string shaders    = "SHADERS";
-    std::string objectdata = "OBJECTDATA";
-    std::string objects    = "OBJECTS";
-    std::string end        = "END";
-
-    std::string line, vs, fs;
-    strvec args;
-
-
-    if(section == shaders){
-
-        std::getline(ifs,line);
-
-        while(line != end){
-
-            if(!line.empty()){
-
-                args = split(line,' ');
-
-                if(args[0] == std::string("VS")){
-                    vs = args[1];
-                    args.clear();
-                }
-                if(args[0] == std::string("FS")){
-                    fs =  args[1];
-                    args.clear();
-                }
-
-            }
-
-            std::getline(ifs,line);
-
-        }
-
-        if(!(vs.empty() || fs.empty())){
-
-            vs = rootDir + vs;
-            fs = rootDir + fs;
-
-            levelShader = new Shader;
-            levelShader->loadShader(vs.c_str(),fs.c_str());
-
-        }
-
-    }else if(section == objectdata){
-
-        std::getline(ifs,line);
-
-        while(line != end){
-
-            if(!line.empty()){
-
-                args = split(line,' ');
-                handleObjectDataCommand(args);
-
-                args.clear();
-
-            }
-
-            std::getline(ifs,line);
-
-        }
-
-
-    }else if(section == objects){
-
-        std::getline(ifs,line);
-
-        while(line != end){
-
-            if(!line.empty()){
-
-                args = split(line,' ');
-                handleObjectCommand(args);
-
-                args.clear();
-
-            }
-
-            std::getline(ifs,line);
-
-        }
+        ++it;
 
     }
 
@@ -375,23 +158,67 @@ void GameState::handleStateSection(std::ifstream& ifs, std::string& section)
 void GameState::loadNew(std::string levelfile)
 {
 
-    std::ifstream ifs;
-    std::string line;
-
     SDL_ShowCursor(0);
 
-    ifs.open(levelfile.c_str());
+    DataBlock leveldef;
 
-	while(ifs.good()){
+    leveldef.load(levelfile.c_str());
 
-        std::getline(ifs,line);
-        if(!line.empty()){
-            handleStateSection(ifs,line);
-        }
+    try{
 
-	}
+        /*
+         * load shaders
+         */
+        std::string vs = rootDir + leveldef["shaders"]("vs");
 
-    ifs.close();
+        std::string fs = rootDir + leveldef["shaders"]("fs");
+
+        levelShader = new Shader;
+
+        levelShader->loadShader(vs.c_str(),fs.c_str());
+
+    }
+    catch(std::exception& e)
+    {
+
+        std::cerr << e.what() << "\n";
+        delete levelShader;
+        throw std::runtime_error("Failed to init shaders");
+
+    }
+
+    try{
+
+        /*
+         * load shared data and GPU buffers
+         */
+        loadObjectData(leveldef["objectdata"]);
+
+    }
+    catch(std::exception& e)
+    {
+
+        std::cerr << e.what() << "\n";
+        throw std::runtime_error("Failed to load shared and GPU buffer");
+
+    }
+
+    try{
+
+        /*
+         * load object instances
+         */
+        loadObjects(leveldef["objects"]);
+
+    }
+    catch(std::exception& e)
+    {
+
+        std::cerr << e.what() << "\n";
+        throw std::runtime_error("Failed to load object instances");
+
+    }
+
 
     loaded = true;
 
@@ -425,7 +252,7 @@ bool GameState::loop()
             SDL_Delay(1000.0f*((1.0f/maxframerate) - deltatime));
             deltatime = (1.0f/maxframerate);
         }
-        std::cout << "frame rate: " << 1.0f / deltatime << "\n";
+        //std::cout << "frame rate: " << 1.0f / deltatime << "\n";
 
         //end of frame
     }

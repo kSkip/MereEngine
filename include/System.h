@@ -5,6 +5,8 @@
 #include <windows.h>
 #endif
 
+#include <stdexcept>
+
 #include <SDL/SDL.h>
 
 #ifdef _WIN32

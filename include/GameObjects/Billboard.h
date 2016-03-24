@@ -8,7 +8,7 @@ class Billboard : public GameObject{
     public:
 
         Billboard();
-        Billboard(const char* directory, const char* texturefile, float position[2], float scale[2], GameState* state);
+        Billboard(const char* texturefile, float position[2], float scale[2], GameState* state);
         Billboard(GLuint texture, float position[2], float scale[2], GameState* state);
         ~Billboard();
         Billboard(const Billboard & rhs);

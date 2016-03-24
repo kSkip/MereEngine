@@ -456,6 +456,7 @@ struct md5meshdata* getMD5MeshData(const char* filename){
 	md5file = fopen(filename,"r");
 	if(!md5file){
 		printf("Error opening file\n");
+		return NULL;
 	}
 
 	md5data = (struct md5meshdata*)malloc(sizeof(struct md5meshdata));

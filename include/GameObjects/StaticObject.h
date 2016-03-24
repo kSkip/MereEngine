@@ -8,7 +8,7 @@ class StaticObject : public GameObject{
     public:
 
         StaticObject();
-        StaticObject(std::string objectName, float position[3], float rotY, GameState* state);
+        StaticObject(ObjectData* objectData, DataBlock& def, GameState* state);
         ~StaticObject();
         StaticObject(const StaticObject & rhs);
 

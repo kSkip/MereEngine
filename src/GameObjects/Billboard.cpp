@@ -2,13 +2,11 @@
 
 Billboard::Billboard(){}
 
-Billboard::Billboard(const char* directory, const char* texturefile, float position[2], float scale[2], GameState* state){
+Billboard::Billboard(const char* texturefile, float position[2], float scale[2], GameState* state){
 
     data = new ObjectData;
 
-    std::string path = std::string(directory) + std::string(texturefile);
-
-    GLuint texture = SOIL_load_OGL_texture(path.c_str(),SOIL_LOAD_RGBA,SOIL_CREATE_NEW_ID,SOIL_FLAG_TEXTURE_REPEATS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_COMPRESS_TO_DXT);
+    GLuint texture = SOIL_load_OGL_texture(texturefile,SOIL_LOAD_RGBA,SOIL_CREATE_NEW_ID,SOIL_FLAG_TEXTURE_REPEATS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_COMPRESS_TO_DXT);
 
     vertex *vertex_data = (vertex*) malloc(4 * sizeof(vertex));
 

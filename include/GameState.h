@@ -32,20 +32,11 @@
 #include "Shader.h"
 #include "boundary.h"
 
-struct ObjectFiles{
-
-    std::string objectName; //Reference for object creation
-    std::string type; //MD5 or OBJ
-    std::string dir;
-    std::string meshFile;
-    std::map<std::string,std::string> animFiles;
-    std::string boundsFile;
-
-};
+#include "Utilities/DataBlock.h"
 
 class GameObject;
 
-struct ObjectData;
+class ObjectData;
 
 class Camera;
 
@@ -60,7 +51,7 @@ class GameState{
         ~GameState();
         GameState(const GameState & rhs);
 
-        bool init(std::string rootDir, double maxframerate);
+        void init(std::string rootDir, double maxframerate);
         void clean();
 
         void loadNew(std::string levelfile);
@@ -98,11 +89,8 @@ class GameState{
         double maxframerate;
         float aspectRatio;
 
-        void loadObjectData(struct ObjectFiles* files);
-        void handleStateSection(std::ifstream& ifs, std::string& section);
-        void handleObjectDataCommand(std::vector<std::string>& args);
-        void handleObjectSpec(std::ifstream& ifs, struct ObjectFiles* files);
-        void handleObjectCommand(std::vector<std::string>& args);
+        void loadObjectData(DataBlock & objectDataBlock);
+        void loadObjects(DataBlock & objectBlock);
 
 };
 

@@ -46,11 +46,25 @@ bool System::init(std::string& dir)
 	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
-    if(!mainmenu.init(rootDir,200.0f))
-        return false; //initialize the menuObject at 200fps max
+    try
+    {
+        mainmenu.init(rootDir,200.0f);
+    }
+    catch (std::exception & e)
+    {
+        std::cerr << e.what() << "\n";
+        return false;
+    }
 
-	if(!state.init(rootDir,200.0f))
-        return false; //initialize the GameState at 300fps max
+    try
+    {
+        state.init(rootDir,200.0f);
+    }
+    catch (std::exception & e)
+    {
+        std::cerr << e.what() << "\n";
+        return false;
+    }
 
     return true;
 
@@ -59,6 +73,7 @@ bool System::init(std::string& dir)
 bool System::loop()
 {
 
+    //firstlevel string will be determined by game files
     std::string firstLevel = std::string("Data/Test.level");
 
     /*
@@ -70,9 +85,24 @@ bool System::loop()
         if(mainmenu.currentAction == MENU_ACTION_NEWGAME)
         {
 
+            /*
+             * create a new game from beginning
+             */
+
             if(state.loaded) state.clean();
 
-            state.loadNew(rootDir+firstLevel); //load the new level data for the state
+            try{
+
+                state.loadNew(rootDir+firstLevel);
+
+            }
+            catch(std::exception& e)
+            {
+
+                std::cerr << e.what() << "\n";
+                return false;
+
+            }
 
         }
         if(mainmenu.currentAction == MENU_ACTION_NULL)

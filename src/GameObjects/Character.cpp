@@ -1,20 +1,33 @@
 #include "GameObjects/Character.h"
 #include "GameObjects/Camera.h"
 #include "Models/Armature.hpp"
+#include "Utilities/TextManipulation.h"
+#include "Utilities/DataBlock.h"
 
 Character::Character(){}
 
-Character::Character(std::string objectName, float position_in[3], float rotY_in, GameState* state){
+Character::Character(ObjectData* objectData, DataBlock& def, GameState* state){
 
-    data = getObjectData(objectName,state);
+    data = objectData;
 
-    position    = glm::vec3(position_in[0],position_in[1],position_in[2]);
+    strvec pos = split(def("position"),',');
+
+    if(pos.size() != 4)
+        throw std::runtime_error("Position requires 4 values");
+
+    float pos_init[3];
+    pos_init[0] = atof(pos[0].c_str());
+    pos_init[1] = atof(pos[1].c_str());
+    pos_init[2] = atof(pos[2].c_str());
+
+    rotY  = atof(pos[3].c_str());
+
+    position    = glm::vec3(pos_init[0],pos_init[1],pos_init[2]);
     translation = glm::translate(glm::mat4(1.0f),position);
-    rotation    = glm::rotate(glm::mat4(1.0f),rotY_in,glm::vec3(0.0,1.0,0.0));
-    rotY        = rotY_in;
+    rotation    = glm::rotate(glm::mat4(1.0f),rotY,glm::vec3(0.0,1.0,0.0));
 
-    front    = glm::rotateY(glm::vec3(0.0f,0.0f,1.0f),rotY_in);
-    right    = glm::rotateY(glm::vec3(1.0f,0.0f,0.0f),rotY_in);
+    front    = glm::rotateY(glm::vec3(0.0f,0.0f,1.0f),rotY);
+    right    = glm::rotateY(glm::vec3(1.0f,0.0f,0.0f),rotY);
     velocity = glm::vec3(0.0f,0.0f,0.0f);
 
     movementSpeedFactor = 0.5f;

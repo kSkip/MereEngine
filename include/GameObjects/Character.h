@@ -8,7 +8,7 @@ class Character : public GameObject{
     public:
 
         Character();
-        Character(std::string objectName, float position[3], float rotY, GameState* state);
+        Character(ObjectData* objectData, DataBlock& def, GameState* state);
         ~Character();
         Character(const Character & rhs);
 

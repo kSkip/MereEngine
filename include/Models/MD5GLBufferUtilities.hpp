@@ -13,6 +13,7 @@
 #ifndef STRUCT_UNSKINNEDVERTEX
 #define STRUCT_UNSKINNEDVERTEX
 struct UnskinnedVertex{
+
 	float normal[4][3];
 	float texcoord[2];
 	unsigned int countWeight;
@@ -20,16 +21,19 @@ struct UnskinnedVertex{
 	float weightPosition[4][3];
 	float weightNormal[4][3];
 	unsigned int jointId[4];
+
 };
 #endif
 
 #ifndef STRUCT_VERTEX
 #define STRUCT_VERTEX
 struct vertex{
+
 	float position[3];
 	float normal[3];
 	float texcoord[2];
 	float color[3];
+
 };
 #endif
 

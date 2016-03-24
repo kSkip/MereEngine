@@ -1,23 +1,37 @@
 #include "GameObjects/Camera.h"
 #include "Utilities/TextToTexture.h"
+#include "Utilities/TextManipulation.h"
+#include "Utilities/DataBlock.h"
 
 #include <SDL/SDL.h>
 
-Camera::Camera(std::string& objectName, float windowSize[2], float position_in[3], float rotY_in, GameState* state){
+Camera::Camera(ObjectData* objectData, float windowSize[2], DataBlock& def, GameState* state){
 
 	initCamera();
 
-	position = glm::vec3(position_in[0],position_in[1],position_in[2]);
+    strvec pos = split(def("position"),',');
+
+    if(pos.size() != 4)
+        throw std::runtime_error("Position requires 4 values");
+
+    float pos_init[3];
+    pos_init[0] = atof(pos[0].c_str());
+    pos_init[1] = atof(pos[1].c_str());
+    pos_init[2] = atof(pos[2].c_str());
+
+    rotY  = atof(pos[3].c_str());
+
+	position = glm::vec3(pos_init[0],pos_init[1],pos_init[2]);
 	head     = position + glm::vec3(0.0f,0.3f,0.0f);
 	origin   = head + glm::vec3(0.0f,0.0f,1000.0f);
 
-	origin = glm::rotateY(origin-head,-1*rotY_in);
+	origin = glm::rotateY(origin-head,-1*rotY);
 	origin = origin + head;
 
-	front = glm::rotateY(front,-1*rotY_in);
-	right = glm::rotateY(right,-1*rotY_in);
+	front = glm::rotateY(front,-1*rotY);
+	right = glm::rotateY(right,-1*rotY);
 
-	data = getObjectData(objectName,state);
+	data = objectData;
 
     float crossPos[2];
     crossPos[0] = 0.0f;
@@ -25,14 +39,19 @@ Camera::Camera(std::string& objectName, float windowSize[2], float position_in[3
     float crossScale[2];
     crossScale[0] = 0.05f * windowSize[1] / windowSize[0];
     crossScale[1] = 0.05f;
-    crosshairs = new Billboard("Data/Objects/", "crosshairs.tga", crossPos, crossScale, state);
 
-    nameCurrentWeapon = "GUN";
-    currentWeapon = new Weapon("GUN",state);
+    std::string crossTexFile = def("rootdir") + def("crosshairs");
+
+    crosshairs = new Billboard(crossTexFile.c_str(), crossPos, crossScale, state);
+
+    nameCurrentWeapon = "gun";
+    currentWeapon = new Weapon("gun",state);
+
+    std::string healthFontFile = def("rootdir") + def("healthfont");
 
     GLuint healthMeterTexture;
     SDL_Color text_color = {0, 127, 0};
-    healthMeterFont = TTF_OpenFont("Data/Fonts/carbon.ttf", 32);
+    healthMeterFont = TTF_OpenFont(healthFontFile.c_str(), 32);
     glGenTextures(1, &healthMeterTexture);
     glBindTexture(GL_TEXTURE_2D, healthMeterTexture);
     TextToTexture("100",healthMeterFont,text_color);
