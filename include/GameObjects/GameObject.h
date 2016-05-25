@@ -67,7 +67,7 @@ class GameObject{
     public:
 
         GameObject();
-        ~GameObject();
+        virtual ~GameObject();
         GameObject(const GameObject & rhs);
 
         virtual void move(double deltatime, Camera* player, std::list<GameObject*>* levelObjects);

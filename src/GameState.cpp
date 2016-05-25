@@ -19,9 +19,7 @@ GameState::~GameState()
     delete levelShader;
 
     for(i = levelObjects.begin(); i != levelObjects.end(); i++)
-    {
         delete (*i);
-    }
 
     levelObjects.clear();
 
@@ -57,9 +55,9 @@ void GameState::clean()
 
     delete levelShader;
 
-    for(i = levelObjects.begin(); i != levelObjects.end(); i++){
+    for(i = levelObjects.begin(); i != levelObjects.end(); i++)
         delete (*i);
-    }
+
     levelObjects.clear();
 
     opaqueObjects.clear();
@@ -238,21 +236,23 @@ bool GameState::loop()
 
     SDL_ShowCursor(0);
 
-    while(eventHandler()){ //handle inputs like mouse movements and key presses, if returns 0 then escape to menu loop
+    while(eventHandler()){ //Returns 0 on Escape key
 
         inittime = double(SDL_GetTicks());
 
-        move(deltatime); //move the gamestate through time
+        move(deltatime); //move the GameState through time
 
         render(); //preform ogl rendering
+
         deltatime = (double(SDL_GetTicks()) - inittime) / 1000.0f; //get the next time step
 
-        //Swap control
+        //Manual swap control
         if(deltatime < (1.0f/maxframerate)){
             SDL_Delay(1000.0f*((1.0f/maxframerate) - deltatime));
             deltatime = (1.0f/maxframerate);
         }
-        std::cout << "frame rate: " << 1.0f / deltatime << "\n";
+
+        //std::cout << "frame rate: " << 1.0f / deltatime << "\n";
 
         //end of frame
     }
@@ -321,9 +321,13 @@ bool GameState::eventHandler()
                 case SDL_MOUSEBUTTONDOWN:
                     switch(event.button.button){
 						case SDL_BUTTON_LEFT:{
+                                /*
+                                 * This case handles the player's use
+                                 * of a weapon
+                                 */
                                 if(!player->playerIsFiring){
 
-                                    GameObject* newobject = new Bullet(player->getHead()+0.1f*glm::normalize(player->getOrigin()-player->getHead()),player->getHead()+100.0f*glm::normalize(player->getOrigin()-player->getHead()),player);
+                                    //GameObject* newobject = new Bullet(player->getHead()+0.1f*glm::normalize(player->getOrigin()-player->getHead()),player->getHead()+100.0f*glm::normalize(player->getOrigin()-player->getHead()),player);
 
                                     /*char meshFile[50];
                                     char boundsFile[50];
@@ -332,10 +336,10 @@ bool GameState::eventHandler()
                                     GameObject* newobject = new ProjectileObject(meshFile,boundsFile,player->getHead()+2.0f*glm::normalize(player->getOrigin()-player->getHead()),5.0f*glm::normalize(player->getOrigin()-player->getHead()),glm::normalize(player->getOrigin()-player->getHead()),0.0f,this);
                                     */
 
-                                    levelObjects.push_back(newobject);
-                                    opaqueObjects.push_back(newobject);
+                                    //levelObjects.push_back(newobject);
+                                    //opaqueObjects.push_back(newobject);
 
-                                    player->fire();
+                                    //player->fire();
 
                                 }
                             }
@@ -364,28 +368,32 @@ void GameState::move(double deltatime)
 
     std::list<GameObject*>::iterator i, j;
 
-    for(i = levelObjects.begin(); i != levelObjects.end(); i++){
+    for(i = levelObjects.begin(); i != levelObjects.end(); i++)
         (*i)->move(deltatime,this->player,&levelObjects);
-    }
 
-    for(i = levelObjects.begin(); i != levelObjects.end(); i++){
-        for(j = i; j != levelObjects.end(); j++){
-            if(i != j){
-                GameObject::testResolveCollision((*i),(*j)); //detect and resolve collisions
-            }
+
+    for(i = levelObjects.begin(); i != levelObjects.end(); i++)
+    {
+        for(j = i; j != levelObjects.end(); j++)
+        {
+            if(i != j) GameObject::testResolveCollision((*i),(*j)); //detect and resolve collisions
         }
     }
 
-    for(i = levelObjects.begin(); i != levelObjects.end();){
+    for(i = levelObjects.begin(); i != levelObjects.end();)
+
+    {
         (*i)->commitMovement(this); //commit to the new changes to the objects
+
         if((*i)->isDestroyed()){ //deallocate and remove objects that no longer exist
+
             delete *i;
             opaqueObjects.remove(*i);
             transparencyObjects.remove(*i);
             i = levelObjects.erase(i);
-        }else{
-            i++;
-        }
+
+        }else i++;
+
     }
 
 }
@@ -411,21 +419,31 @@ void GameState::render()
     glUniformMatrix4fv(levelShader->projection,1, GL_FALSE,glm::value_ptr(P));
 
 
+    //Use of the only the first texture only for now
     glActiveTexture(GL_TEXTURE0);
     glUniform1i(levelShader->texture, 0);
 
-    for(i = opaqueObjects.begin(); i != opaqueObjects.end(); i++){
-        if((*i) != player){
-                (*i)->render(this);
-        }
+    /*
+     * Render the opaque objects first t ofill the depth buffer
+     * Then the transparent obejcts will go next
+     */
+    for(i = opaqueObjects.begin(); i != opaqueObjects.end(); i++)
+    {
+
+        if((*i) != player) (*i)->render(this);
+
     }
 
+    /*
+     * Sort transparent objects so blending works correctly
+     */
     transparencyObjects.sort(GameObject::pGameObjectComp);
 
-    for(i = transparencyObjects.begin(); i != transparencyObjects.end(); i++){
-        if((*i) != player){
-                (*i)->render(this);
-        }
+    for(i = transparencyObjects.begin(); i != transparencyObjects.end(); i++)
+    {
+
+        if((*i) != player) (*i)->render(this);
+
     }
 
 

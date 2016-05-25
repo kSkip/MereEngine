@@ -16,9 +16,9 @@ bool System::init(std::string& dir)
 	vidinfo = SDL_GetVideoInfo();
 
     /*
-     * Disable VSYNC; should be user specified in the future
+     * Enable/Disable VSYNC; should be user specified in the future
      */
-	SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL,0);
+	SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL,1); //enabled
 
 	/*
 	 * Create window with OGL context
