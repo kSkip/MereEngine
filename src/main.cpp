@@ -8,7 +8,7 @@ int main(){
     /*
      * This is changed to the directory root of the game data
      */
-    std::string root = "/home/kane/MereEngineData/";
+    std::string root = "/home/kane/MereEngineDemo/";
 
     if(!sys.init(root))
         return 0;

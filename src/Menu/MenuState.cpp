@@ -22,7 +22,12 @@ void MenuState::init(std::string dir, double maxframes)
 
     std::string menulistFile;
 
-    menulistFile = rootDir + "Data/MenuList";
+    /*
+     * Should be changed in the future
+     * to be any filename
+     */
+    menulistFile = rootDir + "Data/Main.menu";
+    std::cout << menulistFile << "\n";
 
     /*
      * Now load the menu data
@@ -243,7 +248,7 @@ MenuState::MenuItem::MenuItem(DataBlock & def)
     float y = atof(valueStr.at(1).c_str());
     float yscale = atof(valueStr.at(2).c_str());
 
-    /* strings need quotes removed */
+    /* strings need their quotes removed */
     std::string itemLabel = trim(def("label"),'\"');
     const char* label = itemLabel.c_str();
 

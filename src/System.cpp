@@ -73,7 +73,7 @@ bool System::init(std::string& dir)
 bool System::loop()
 {
 
-    //firstlevel string will be determined by game files
+    //first level string will be determined by game files
     std::string firstLevel = std::string("Data/Test.level");
 
     /*
