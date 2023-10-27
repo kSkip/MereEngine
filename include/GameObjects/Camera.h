@@ -8,10 +8,10 @@
 
 #include <iostream>
 #include <cmath>
+
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/rotate_vector.hpp>
-#include <SDL/SDL.h>
 
 class Weapon;
 
@@ -92,7 +92,7 @@ class Camera : public GameObject{
         Billboard* crosshairs;
         Billboard* healthMeter;
 
-        TTF_Font* healthMeterFont;
+        //TTF_Font* healthMeterFont;
 
         std::string nameCurrentWeapon;
         Weapon* currentWeapon;

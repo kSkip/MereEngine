@@ -1,33 +1,13 @@
 #ifndef GAMESTATE_H
 #define GAMESTATE_H
 
-#ifndef GL_GLEXT_PROTOTYPES
-#define GL_GLEXT_PROTOTYPES
-#endif
-
 #include <string>
 #include <vector>
 #include <list>
 #include <map>
 #include <fstream>
 
-#ifdef _WIN32
-#include <windows.h>
-#ifndef GLEW_H
-#define GLEW_H
-#include <GL/glew.h>
-#endif // GLEW_H
-#endif // WIN32
-
-#include <GL/gl.h>
-#include <GL/glu.h>
-
-#ifndef _WIN32
-#include <GL/glext.h>
-#endif // WIN32
-
-#include <SDL/SDL.h>
-#include <SDL/SDL_ttf.h>
+#include "Platform.h"
 
 #include "Shader.h"
 #include "boundary.h"
@@ -51,17 +31,24 @@ class GameState{
         ~GameState();
         GameState(const GameState & rhs);
 
-        void init(std::string rootDir, double maxframerate);
+        void init(std::string rootDir, int width, int height);
         void clean();
 
         void loadNew(std::string levelfile);
         void loadSave(std::string savefile);
         void save();
 
-        bool loop();
-        bool eventHandler();
         void move(double deltatime);
         void render();
+
+        void movingForward(bool);
+        void movingBackward(bool);
+        void movingLeft(bool);
+        void movingRight(bool);
+
+        void handleSpacebar();
+
+        void handleMouseMove(int, int);
 
         bool loaded;
 
@@ -85,8 +72,8 @@ class GameState{
         Shader* levelShader;
         Camera* player;
 
-        const SDL_VideoInfo* vidinfo;
-        double maxframerate;
+        int screenwidth;
+        int screenheight;
         float aspectRatio;
 
         void loadObjectData(DataBlock & objectDataBlock);

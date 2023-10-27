@@ -1,15 +1,9 @@
 #ifndef OBJGLBUFFERUTILITIES_HPP
 #define OBJGLBUFFERUTILITIES_HPP
 
-#ifndef GL_GLEXT_PROTOTYPES
-#define GL_GLEXT_PROTOTYPES
-#endif
+#include "Platform.h"
 
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <GL/glext.h>
-
-#include "tiny_obj_loader.h"
+#include "../third-party/tiny_obj_loader.h"
 
 #ifndef STRUCT_STATICVERTEX
 #define STRUCT_STATICVERTEX

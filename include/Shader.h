@@ -1,10 +1,6 @@
 #ifndef SHADER_H
 #define SHADER_H
 
-#ifndef GL_GLEXT_PROTOTYPES
-#define GL_GLEXT_PROTOTYPES
-#endif
-
 #include <iostream>
 #include <stdexcept>
 #include <sstream>
@@ -12,18 +8,7 @@
 #include <cstdio>
 #include <cstdlib>
 
-#ifdef _WIN32
-#ifndef GLEW_H
-#define GLEW_H
-#include <GL/glew.h>
-#endif // GLEW_H
-#endif
-
-#include <GL/gl.h>
-
-#ifndef _WIN32
-#include <GL/glext.h>
-#endif // WIN32
+#include "Platform.h"
 
 #define LOCATION_POSITION 0
 #define LOCATION_NORMAL 1

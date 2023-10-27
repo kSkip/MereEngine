@@ -27,9 +27,6 @@
     <ClCompile Include="src\Shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\System.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\gameobjects\Billboard.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -96,9 +93,6 @@
     <ClCompile Include="src\utilities\TextManipulation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\utilities\TextToTexture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\vectormath\quaternion_math.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -117,9 +111,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Shader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\System.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\gameobjects\Billboard.h">
@@ -185,13 +176,13 @@
     <ClInclude Include="include\utilities\TextManipulation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\utilities\TextToTexture.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\vectormath\quaternion_math.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="third-party\tiny_obj_loader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Platform.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

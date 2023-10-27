@@ -1,13 +1,7 @@
 #ifndef GLBUFFERUTILITIES_H
 #define GLBUFFERUTILITIES_H
 
-#ifndef GL_GLEXT_PROTOTYPES
-#define GL_GLEXT_PROTOTYPES
-#endif
-
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <GL/glext.h>
+#include "Platform.h"
 #include "MD5MeshUtilities.h"
 
 #ifndef STRUCT_UNSKINNEDVERTEX

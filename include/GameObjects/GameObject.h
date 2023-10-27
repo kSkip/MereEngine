@@ -1,10 +1,6 @@
 #ifndef GAMEOBJECT_H
 #define GAMEOBJECT_H
 
-#ifndef GL_GLEXT_PROTOTYPES
-#define GL_GLEXT_PROTOTYPES
-#endif
-
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
@@ -15,19 +11,7 @@
 #include <list>
 #include <map>
 
-#ifdef _WIN32 // WIN32
-#include <windows.h>
-#ifndef GLEW_H // GLEW_H
-#define GLEW_H
-#include <GL/glew.h>
-#endif // GLEW_H
-#endif // WIN32
-
-#include <GL/gl.h>
-
-#ifndef _WIN32
-#include <GL/glext.h>
-#endif // WIN32
+#include "Platform.h"
 
 #include <SOIL/SOIL.h>
 

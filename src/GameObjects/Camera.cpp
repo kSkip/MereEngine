@@ -1,9 +1,6 @@
 #include "GameObjects/Camera.h"
-#include "Utilities/TextToTexture.h"
 #include "Utilities/TextManipulation.h"
 #include "Utilities/DataBlock.h"
-
-#include <SDL/SDL.h>
 
 Camera::Camera(ObjectData* objectData, float windowSize[2], DataBlock& def, GameState* state){
 
@@ -51,17 +48,17 @@ Camera::Camera(ObjectData* objectData, float windowSize[2], DataBlock& def, Game
     std::string healthFontFile = def("rootdir") + def("healthfont");
 
     GLuint healthMeterTexture;
-    SDL_Color text_color = {0, 127, 0};
+    /*SDL_Color text_color = {0, 127, 0};
     healthMeterFont = TTF_OpenFont(healthFontFile.c_str(), 32);
     glGenTextures(1, &healthMeterTexture);
     glBindTexture(GL_TEXTURE_2D, healthMeterTexture);
-    TextToTexture("100",healthMeterFont,text_color);
+    TextToTexture("100",healthMeterFont,text_color);*/
 
     float healthMeterPos[2] = {-0.8f,-0.8f};
     float healthMeterScale[2];
     healthMeterScale[0] = 0.1f * 1.75f * (windowSize[1] / windowSize[0]);
     healthMeterScale[1] = 0.1f;
-    healthMeter = new Billboard(healthMeterTexture,healthMeterPos,healthMeterScale,state);
+    //healthMeter = new Billboard(healthMeterTexture,healthMeterPos,healthMeterScale,state);
 
     destroy = false;
 
@@ -71,15 +68,6 @@ Camera::Camera(ObjectData* objectData, float windowSize[2], DataBlock& def, Game
     cDistance = 0.0f;
 
     collisionTypeValue = COLLIDER_COLLIDEE;
-
-	windowWidth  = windowSize[0];
-	windowHeight = windowSize[1];
-
-	windowMidX = windowWidth  / 2.0f;
-	windowMidY = windowHeight / 2.0f;
-
-	SDL_WarpMouse(windowMidX,windowMidY);
-
 }
 
 Camera::~Camera(){}
@@ -99,8 +87,8 @@ void Camera::initCamera(){
 
 	movementSpeedFactor = 1.2f;
 
-	pitchSensitivity = 0.01;
-	yawSensitivity   = 0.01;
+	pitchSensitivity = 0.001;
+	yawSensitivity   = 0.001;
 
 	ground = false;
 
@@ -119,8 +107,8 @@ void Camera::handleMouseMove(int mouseX, int mouseY){
     glm::vec3 temp;
 
 	// Calculate our horizontal and vertical mouse movement from middle of the window
-	float horizMovement = (mouseX - windowMidX) * yawSensitivity;
-	float vertMovement  = (mouseY - windowMidY) * pitchSensitivity;
+	float horizMovement = mouseX * yawSensitivity;
+	float vertMovement  = mouseY * pitchSensitivity;
 
 	// Apply the mouse movement to vector indicating our view direction
 	rotHorizontal -= horizMovement;
@@ -145,9 +133,6 @@ void Camera::handleMouseMove(int mouseX, int mouseY){
     }
 
 	up = glm::rotate(up,-1*vertMovement,right);
-
-	SDL_WarpMouse(windowMidX,windowMidY);
-
 }
 
 // Function to calculate which direction we need to move the camera and by what amount
@@ -202,7 +187,7 @@ void Camera::render(GameState* state){
 
     crosshairs->render(state);
 
-    healthMeter->render(state);
+    //healthMeter->render(state);
 
     glClear(GL_DEPTH_BUFFER_BIT);
 

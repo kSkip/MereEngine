@@ -1,7 +1,15 @@
 #include "GameObjects/GameObject.h"
 #include "GameObjects/Bullet.h"
 
-GameObject::GameObject(){}
+GameObject::GameObject() :
+    position(0.0f, 0.0f, 0.0f),
+    rotY(0.0f),
+    movement(0.0f, 0.0f, 0.0f),
+    velocity(0.0f, 0.0f, 0.0f),
+    translation(glm::mat4(1.0f)),
+    rotation(glm::mat4(1.0f))
+{
+}
 
 GameObject::~GameObject(){}
 
@@ -133,7 +141,7 @@ void GameObject::testResolveCollision(GameObject* object1, GameObject* object2){
     unsigned int i, j, k;
     glm::vec3 axes[12];
     glm::vec3 smallest, totalCorrection1, totalCorrection2;
-    float overlap;
+    float overlap = 0.0;
     bool collision;
 
     if(object1->collisionType() != NONE && object2->collisionType() != NONE){

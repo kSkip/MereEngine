@@ -1,15 +1,7 @@
 #ifndef BASICGLBUFFERUTILITIES_H
 #define BASICGLBUFFERUTILITIES_H
 
-#ifndef GL_GLEXT_PROTOTYPES
-#define GL_GLEXT_PROTOTYPES
-#endif
-
-#include <GL/gl.h>
-
-#ifndef _WIN32
-#include <GL/glext.h>
-#endif // NOT WIN32
+#include "Platform.h"
 
 #ifndef STRUCT_VERTEX
 #define STRUCT_VERTEX

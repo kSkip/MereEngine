@@ -30,15 +30,14 @@ GameState::~GameState()
 
 GameState::GameState(const GameState & rhs){}
 
-void GameState::init(std::string dir, double maxframes)
+void GameState::init(std::string dir, int width, int height)
 {
 
     rootDir = dir;
 
-    vidinfo = SDL_GetVideoInfo();
-    maxframerate = maxframes;
-
-	aspectRatio = float(vidinfo->current_w) / float(vidinfo->current_h);
+    screenwidth = width;
+    screenheight = height;
+	aspectRatio = float(screenwidth) / float(screenheight);
 
     /*
      * Indicate no state has been loaded yet
@@ -120,8 +119,8 @@ void GameState::loadObjects(DataBlock & objectBlock)
         if(objectType == "camera"){
 
             float windowSize[2];
-            windowSize[0] = vidinfo->current_w;
-            windowSize[1] = vidinfo->current_h;
+            windowSize[0] = screenwidth;
+            windowSize[1] = screenheight;
 
             player = new Camera(object, windowSize, objectData, this);
 
@@ -155,8 +154,6 @@ void GameState::loadObjects(DataBlock & objectBlock)
 
 void GameState::loadNew(std::string levelfile)
 {
-
-    SDL_ShowCursor(0);
 
     DataBlock leveldef;
 
@@ -226,140 +223,39 @@ void GameState::loadSave(std::string savefile){}
 
 void GameState::save(){}
 
-bool GameState::loop()
+void GameState::movingForward(bool isMoving)
 {
-
-    double deltatime = 0.0f;
-    double inittime;
-
-    deltatime = 0.0f;
-
-    SDL_ShowCursor(0);
-
-    while(eventHandler()){ //Returns 0 on Escape key
-
-        inittime = double(SDL_GetTicks());
-
-        move(deltatime); //move the GameState through time
-
-        render(); //preform ogl rendering
-
-        deltatime = (double(SDL_GetTicks()) - inittime) / 1000.0f; //get the next time step
-
-        //Manual swap control
-        if(deltatime < (1.0f/maxframerate)){
-            SDL_Delay(1000.0f*((1.0f/maxframerate) - deltatime));
-            deltatime = (1.0f/maxframerate);
-        }
-
-        //std::cout << "frame rate: " << 1.0f / deltatime << "\n";
-
-        //end of frame
-    }
-
-    return true;
-
+    player->holdingForward = isMoving;
 }
 
-//handles user inputs like mouse movements and key presses
-bool GameState::eventHandler()
+void GameState::movingBackward(bool isMoving)
 {
+    player->holdingBackward = isMoving;
+}
 
-    SDL_Event event;
+void GameState::movingLeft(bool isMoving)
+{
+    player->holdingLeftStrafe = isMoving;
+}
 
-    while(SDL_PollEvent(&event)){
-			switch(event.type){
-				case SDL_KEYDOWN:
-					switch(event.key.keysym.sym){
-						case SDLK_ESCAPE:
-							return false;
-						case SDLK_w:
-							player->holdingForward = true;
-							break;
-						case SDLK_s:
-							player->holdingBackward = true;
-							break;
-						case SDLK_a:
-							player->holdingLeftStrafe = true;
-							break;
-						case SDLK_d:
-							player->holdingRightStrafe = true;
-							break;
-						case SDLK_SPACE:
-							if(player->onGround()){
-								player->setYSpeed(1.5f);
-								player->isNotGrounded();
-							}
-							break;
-                        case SDLK_PRINT:
-                            const SDL_VideoInfo* vidinfo;
-                            vidinfo = SDL_GetVideoInfo();
-                            SOIL_save_screenshot("screenshot.bmp",SOIL_SAVE_TYPE_BMP,0, 0, vidinfo->current_w, vidinfo->current_h);
-                            break;
-                        default:
-                            break;
-					}
-					break;
-				case SDL_KEYUP:
-					switch(event.key.keysym.sym){
-						case SDLK_w:
-							player->holdingForward = false;
-							break;
-						case SDLK_s:
-							player->holdingBackward = false;
-							break;
-						case SDLK_a:
-							player->holdingLeftStrafe = false;
-							break;
-						case SDLK_d:
-							player->holdingRightStrafe = false;
-							break;
-                        default:
-							break;
-					}
-					break;
-                case SDL_MOUSEBUTTONDOWN:
-                    switch(event.button.button){
-						case SDL_BUTTON_LEFT:{
-                                /*
-                                 * This case handles the player's use
-                                 * of a weapon
-                                 */
-                                if(!player->playerIsFiring){
+void GameState::movingRight(bool isMoving)
+{
+    player->holdingRightStrafe = isMoving;
+}
 
-                                    //GameObject* newobject = new Bullet(player->getHead()+0.1f*glm::normalize(player->getOrigin()-player->getHead()),player->getHead()+100.0f*glm::normalize(player->getOrigin()-player->getHead()),player);
+void GameState::handleMouseMove(int x, int y)
+{
+    if (x || y) {
+        player->handleMouseMove(x, y);
+    }
+}
 
-                                    /*char meshFile[50];
-                                    char boundsFile[50];
-                                    sprintf(meshFile,"Data/bullet.3ds");
-                                    sprintf(boundsFile,"Data/bullet.dat");
-                                    GameObject* newobject = new ProjectileObject(meshFile,boundsFile,player->getHead()+2.0f*glm::normalize(player->getOrigin()-player->getHead()),5.0f*glm::normalize(player->getOrigin()-player->getHead()),glm::normalize(player->getOrigin()-player->getHead()),0.0f,this);
-                                    */
-
-                                    //levelObjects.push_back(newobject);
-                                    //opaqueObjects.push_back(newobject);
-
-                                    //player->fire();
-
-                                }
-                            }
-							break;
-                        default:
-							break;
-					}
-					break;
-				case SDL_MOUSEMOTION:
-					player->handleMouseMove(event.motion.x,event.motion.y);
-					break;
-				case SDL_QUIT:
-					return false;
-				default:
-                    return true;
-					break;
-			}
-		}
-		return true;
-
+void GameState::handleSpacebar()
+{
+    if (player->onGround()) {
+        player->setYSpeed(1.5f);
+        player->isNotGrounded();
+    }
 }
 
 //moves the game objects through time
@@ -451,8 +347,6 @@ void GameState::render()
     player->render(this);
 
     levelShader->deactivate(ENABLE_POSITION | ENABLE_NORMAL | ENABLE_TEXCOORD); //disable all attributes
-
-    SDL_GL_SwapBuffers(); //swap the buffers
 
 }
 

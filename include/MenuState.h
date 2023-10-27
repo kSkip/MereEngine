@@ -1,34 +1,12 @@
 #ifndef MENU_H
 #define MENU_H
 
-#ifndef GL_GLEXT_PROTOTYPES
-#define GL_GLEXT_PROTOTYPES
-#endif
-
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <stdexcept>
 
-#ifdef _WIN32
-#include <windows.h>
-#endif
-
-#include <SDL/SDL.h>
-#include <SDL/SDL_ttf.h>
-
-#ifdef _WIN32
-#ifndef GLEW_H
-#define GLEW_H
-#include <GL/glew.h>
-#endif // GLEW_H
-#endif // WIN32
-
-#include <GL/gl.h>
-
-#ifndef _WIN32
-#include <GL/glext.h>
-#endif // NOT WIN32
+#include "Platform.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
@@ -54,8 +32,11 @@ class MenuState
         ~MenuState();
         MenuState(const MenuState & rhs);
 
-        void init(std::string rootDir, double maxframerate);
-        bool loop();
+        void init(std::string rootDir, int width, int height);
+        void renderMenu();
+
+        void handleButtonDown();
+        void handleMouseMove(int, int);
 
         unsigned int currentAction;
 
@@ -77,7 +58,7 @@ class MenuState
                 unsigned int action;
                 bool mouseOver;
 
-                void handleMouseMove(int mouseX, int mouseY, const SDL_VideoInfo* vidinfo);
+                void handleMouseMove(int mouseX, int mouseY, int width, int height);
 
         };
 
@@ -85,17 +66,13 @@ class MenuState
 
         std::string defaultFont;
 
-        const SDL_VideoInfo* vidinfo;
-        double maxframerate;
+        int screenwidth;
+        int screenheight;
 
         glm::mat4 MV, P;
 
         Shader* menuShader;
         std::vector<MenuItem*> MenuList;
-
-        void handleMouseMove(int mouseX, int mouseY, const SDL_VideoInfo* vidinfo);
-        void renderMenu();
-
 
 };
 

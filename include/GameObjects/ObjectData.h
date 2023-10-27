@@ -1,7 +1,7 @@
 #ifndef OBJECTDATA_H
 #define OBJECTDATA_H
 
-#include <GL/gl.h>
+#include "Platform.h"
 
 #include "Utilities/DataBlock.h"
 #include "Models/Armature.hpp"

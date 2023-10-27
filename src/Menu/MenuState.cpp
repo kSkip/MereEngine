@@ -2,7 +2,6 @@
 
 #include "Utilities/DataBlock.h"
 #include "Models/BasicGLBufferUtilities.h"
-#include "Utilities/TextToTexture.h"
 
 MenuState::MenuState(){}
 
@@ -10,13 +9,13 @@ MenuState::~MenuState(){}
 
 MenuState::MenuState(const MenuState & rhs){}
 
-void MenuState::init(std::string dir, double maxframes)
+void MenuState::init(std::string dir, int width, int height)
 {
 
-    vidinfo = SDL_GetVideoInfo();
-    maxframerate = maxframes;
+    int screenwidth = width;
+    int screenheight = height;
 
-    TTF_Init();
+    //TTF_Init();
 
     rootDir = dir;
 
@@ -95,93 +94,6 @@ void MenuState::init(std::string dir, double maxframes)
 
 }
 
-bool MenuState::loop()
-{
-
-    unsigned int i;
-    double deltatime = 0.0f;
-    double inittime;
-    SDL_Event event;
-
-    SDL_ShowCursor(1);
-    SDL_WM_GrabInput(SDL_GRAB_ON);
-    SDL_WarpMouse(vidinfo->current_w / 2.0f,vidinfo->current_h / 2.0f);
-
-    while(true){
-
-        inittime = double(SDL_GetTicks());
-
-        while(SDL_PollEvent(&event)){
-                switch(event.type){
-
-                    case SDL_KEYDOWN:
-                        switch(event.key.keysym.sym){
-                            case SDLK_ESCAPE:
-                                currentAction = MENU_ACTION_NULL;
-                                return true;
-                            default:
-                                break;
-                        }
-                        break;
-
-                    case SDL_KEYUP:
-                        switch(event.key.keysym.sym){
-                            case SDLK_w:
-                                break;
-                            default:
-                                break;
-                        }
-                        break;
-
-                    case SDL_MOUSEBUTTONDOWN:
-                        switch(event.button.button){
-                            case SDL_BUTTON_LEFT:
-                            for(i=0;i<MenuList.size();i++){
-                                if(MenuList[i]->mouseOver){
-                                    switch(MenuList[i]->action){
-                                        case MENU_ACTION_NULL:
-                                            break;
-                                        case MENU_ACTION_NEWGAME:
-                                            currentAction = MENU_ACTION_NEWGAME;
-                                            return true;
-                                        case MENU_ACTION_QUIT:
-                                            currentAction = MENU_ACTION_QUIT;
-                                            return false;
-                                        default:
-                                            break;
-                                    }
-                                }
-                            }
-							break;
-                        default:
-							break;
-                        }
-					break;
-
-                    case SDL_MOUSEMOTION:
-                        for(i=0;i<MenuList.size();i++){
-                            MenuList[i]->handleMouseMove(event.motion.x,event.motion.y,vidinfo);
-                        }
-                        break;
-                    case SDL_QUIT:
-                        return false;
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-        renderMenu();
-        deltatime = (double(SDL_GetTicks()) - inittime) / 1000.0f; //get the next time step
-        if(deltatime < (1.0f/maxframerate)) {
-            SDL_Delay( 1000.0f*((1.0f/maxframerate) - deltatime));
-            deltatime = (1.0f/maxframerate);
-        }
-
-    }
-
-}
-
 void MenuState::renderMenu()
 {
 
@@ -231,8 +143,33 @@ void MenuState::renderMenu()
 
     menuShader->deactivate(ENABLE_POSITION | ENABLE_NORMAL | ENABLE_TEXCOORD);
 
-    SDL_GL_SwapBuffers();
+}
 
+void MenuState::handleButtonDown()
+{
+    for (int i = 0; i < MenuList.size(); i++) {
+        if (MenuList[i]->mouseOver) {
+            switch (MenuList[i]->action) {
+            case MENU_ACTION_NULL:
+                break;
+            case MENU_ACTION_NEWGAME:
+                currentAction = MENU_ACTION_NEWGAME;
+                break;
+            case MENU_ACTION_QUIT:
+                currentAction = MENU_ACTION_QUIT;
+                break;
+            default:
+                break;
+            }
+        }
+    }
+}
+
+void MenuState::handleMouseMove(int x, int y)
+{
+    for (int i = 0; i < MenuList.size(); i++) {
+        MenuList[i]->handleMouseMove(x, y, screenwidth, screenheight);
+    }
 }
 
 MenuState::MenuItem::MenuItem(){}
@@ -264,14 +201,18 @@ MenuState::MenuItem::MenuItem(DataBlock & def)
      * create the texture containing
      * the specified string
      */
+    float aspect = 0.0f;
+    //TODO: Re-implement the text
+    /*
     TTF_Font* font = TTF_OpenFont(trueTypeFile.c_str(), 20);
-    float aspect;
+    
 
     SDL_Color text_color = {127, 0, 0};
 
     tex = GenTextToTexture(label,font,text_color,&aspect);
 
     TTF_CloseFont(font);
+    */
 
     scale = glm::scale(glm::mat4(1.0f),glm::vec3( aspect * yscale, yscale, 0.0f));
 
@@ -294,12 +235,12 @@ MenuState::MenuItem::MenuItem(DataBlock & def)
 
 }
 
-void MenuState::MenuItem::handleMouseMove(int mouseX, int mouseY, const SDL_VideoInfo* vidinfo){
+void MenuState::MenuItem::handleMouseMove(int mouseX, int mouseY, int width, int height){
 
     if(this->action == 0) return;
 
-    float xscaled = -2.0f*(float(mouseX) / float(vidinfo->current_w))+1.0f;
-    float yscaled = -2.0f*(float(mouseY) / float(vidinfo->current_h))+1.0f;
+    float xscaled = -2.0f*(float(mouseX) / float(width))+1.0f;
+    float yscaled = -2.0f*(float(mouseY) / float(height))+1.0f;
 
     float yHigh = (this->translation * this->scale * glm::vec4(0.0f,1.0f,0.0f,1.0f)).y;
     float yLow  = (this->translation * this->scale * glm::vec4(0.0f,-1.0f,0.0f,1.0f)).y;
