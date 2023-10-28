@@ -31,34 +31,8 @@ Camera::Camera(ObjectData* objectData, float windowSize[2], DataBlock& def, Game
 
 	data = objectData;
 
-    float crossPos[2];
-    crossPos[0] = 0.0f;
-    crossPos[1] = 0.0f;
-    float crossScale[2];
-    crossScale[0] = 0.05f * windowSize[1] / windowSize[0];
-    crossScale[1] = 0.05f;
-
-    std::string crossTexFile = def("rootdir") + def("crosshairs");
-
-    crosshairs = new Billboard(crossTexFile.c_str(), crossPos, crossScale, state);
-
     nameCurrentWeapon = "gun";
     currentWeapon = new Weapon("gun",state);
-
-    std::string healthFontFile = def("rootdir") + def("healthfont");
-
-    GLuint healthMeterTexture;
-    /*SDL_Color text_color = {0, 127, 0};
-    healthMeterFont = TTF_OpenFont(healthFontFile.c_str(), 32);
-    glGenTextures(1, &healthMeterTexture);
-    glBindTexture(GL_TEXTURE_2D, healthMeterTexture);
-    TextToTexture("100",healthMeterFont,text_color);*/
-
-    float healthMeterPos[2] = {-0.8f,-0.8f};
-    float healthMeterScale[2];
-    healthMeterScale[0] = 0.1f * 1.75f * (windowSize[1] / windowSize[0]);
-    healthMeterScale[1] = 0.1f;
-    //healthMeter = new Billboard(healthMeterTexture,healthMeterPos,healthMeterScale,state);
 
     destroy = false;
 
@@ -185,14 +159,11 @@ void Camera::fire(){
 
 void Camera::render(GameState* state){
 
-    crosshairs->render(state);
-
-    //healthMeter->render(state);
-
     glClear(GL_DEPTH_BUFFER_BIT);
 
-    glm::mat4 trans = glm::translate(glm::mat4(1.0f),position + 0.2f*right);
-    glm::mat4 rot = glm::rotate(glm::mat4(1.0f),rotVertical,right) * glm::rotate(glm::mat4(1.0f),rotHorizontal+2.0f,glm::vec3(0.0f,1.0f,0.0f));
+    glm::mat4 trans = glm::translate(glm::mat4(1.0f), position + 0.1f * front + 0.2f * right);
+	glm::mat4 rot = glm::rotate(glm::mat4(1.0f), rotHorizontal + 0.05f, glm::vec3(0.0f, 1.0f, 0.0f));
+    rot = glm::rotate(glm::mat4(1.0f), rotVertical, right) * rot;
     currentWeapon->setTransformations(trans,rot);
 
     currentWeapon->render(state);

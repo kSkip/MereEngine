@@ -109,7 +109,7 @@ void Character::move(double deltatime, Camera* player, std::list<GameObject*>* l
 
     if(data){
 
-        arm = data->armatures[std::string("RUN")];
+        arm = data->armatures[std::string("run")];
 
     }
 

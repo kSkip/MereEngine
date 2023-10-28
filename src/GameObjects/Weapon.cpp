@@ -28,7 +28,7 @@ void Weapon::move(double deltaTime, Camera* player, std::list<GameObject*>* leve
 
     if(data){
 
-        arm = data->armatures[std::string("FIRE")];
+        arm = data->armatures[std::string("fire")];
 
     }
 

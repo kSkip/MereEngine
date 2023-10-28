@@ -342,12 +342,31 @@ void GameState::render()
 
     }
 
-
-    glClear(GL_DEPTH_BUFFER_BIT);
     player->render(this);
 
-    levelShader->deactivate(ENABLE_POSITION | ENABLE_NORMAL | ENABLE_TEXCOORD); //disable all attributes
+    levelShader->deactivate(ENABLE_POSITION | ENABLE_NORMAL | ENABLE_TEXCOORD);
 
+    // Render health meter
+    glColor3f(0.0f, 0.7f, 0.0f);
+    float top = ((float)screenheight - 12.0f) / (float)screenheight;
+    float left = ((float)screenwidth - 12.0f) / (float)screenwidth;
+    glRasterPos3f(-left, -top, 1.0f);
+    glCallLists(3, GL_UNSIGNED_BYTE, "100");
+
+    // Render crosshairs
+    glLineWidth(2.0f);
+    glBegin(GL_LINES);
+    glColor3f(0.5f, 0.5f, 0.0f);
+    glVertex2f(0.0, 10.0f / screenheight);
+    glVertex2f(0.0, 30.0f / screenheight);
+    glVertex2f(0.0, -10.0f / screenheight);
+    glVertex2f(0.0, -30.0f / screenheight);
+
+    glVertex2f(10.0f / screenwidth, 0.0);
+    glVertex2f(30.0f / screenwidth, 0.0);
+    glVertex2f(-10.0f / screenwidth, 0.0);
+    glVertex2f(-30.0f / screenwidth, 0.0);
+    glEnd();
 }
 
 void GameState::insertOpaqueObject(GameObject* newGameObject)

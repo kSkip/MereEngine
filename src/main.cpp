@@ -128,6 +128,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		return 1;
 	}
 
+	wglUseFontBitmaps(hdc, 0, 256, 1000);
+	glListBase(1000);
+
 	Init(hWnd);
 
 	MSG msg;
@@ -202,6 +205,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		deltatime = ((double)elapsed.QuadPart) / 1000000.0;
 		lastCounter = counter;
 	}
+
+	glDeleteLists(1000, 256);
 
 	wglMakeCurrent(NULL, NULL);
 

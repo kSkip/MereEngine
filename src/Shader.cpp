@@ -70,7 +70,7 @@ void Shader::deactivate(unsigned short atrribs){
     if(atrribs & ENABLE_TEXCOORD){
         glDisableVertexAttribArray(LOCATION_TEXCOORD);
     }
-
+    glUseProgram(0);
 }
 
 GLuint Shader::makeShader(GLenum type, const char *filename){
