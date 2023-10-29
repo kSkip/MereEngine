@@ -1,8 +1,11 @@
 #include "GameObjects/Weapon.h"
 
-Weapon::Weapon(){}
+Weapon::Weapon() : animTime(0.0) {}
 
-Weapon::Weapon(std::string objectName, GameState* state){
+Weapon::Weapon(std::string objectName, GameState* state) :
+    animTime(0.0),
+    isFiring(0)
+{
 
     data = getObjectData(objectName,state);
 
@@ -22,21 +25,23 @@ void Weapon::setTransformations(glm::mat4& translation_in, glm::mat4& rotation_i
 
 }
 
-void Weapon::move(double deltaTime, Camera* player, std::list<GameObject*>* levelObjects){
-
-    Armature* arm;
-
+void Weapon::move(double deltatime, Camera* player, std::list<GameObject*>* levelObjects)
+{    
     if(data){
-
-        arm = data->armatures[std::string("fire")];
-
-    }
-
-    if(arm){
-
-        arm->buildFrame(0.0f,NULL);
-        arm->setVertices(data->vertices,data->unskinned_vertices,data->num_vertices);
-
+        if (Armature* arm = data->armatures["fire"]) {
+            if (isFiring) {
+                animTime += deltatime;
+                if (animTime > arm->getTotalTime()) {
+                    animTime = 0.0;
+                    isFiring = 0;
+                }
+            }
+            else {
+                animTime = 0.0;
+            }
+            arm->buildFrame(animTime, NULL);
+            arm->setVertices(data->vertices, data->unskinned_vertices, data->num_vertices);
+        }
     }
 
 }

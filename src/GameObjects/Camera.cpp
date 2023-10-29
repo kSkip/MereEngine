@@ -31,8 +31,7 @@ Camera::Camera(ObjectData* objectData, float windowSize[2], DataBlock& def, Game
 
 	data = objectData;
 
-    nameCurrentWeapon = "gun";
-    currentWeapon = new Weapon("gun",state);
+    currentWeapon = new Weapon("gun", state);
 
     destroy = false;
 
@@ -71,8 +70,6 @@ void Camera::initCamera(){
 	holdingBackward    = false;
 	holdingLeftStrafe  = false;
 	holdingRightStrafe = false;
-
-	playerIsFiring = false;
 
 }
 
@@ -147,14 +144,7 @@ void Camera::move(double deltatime, Camera* player, std::list<GameObject*>* leve
     movement.y = deltatime * velocity.y;
     movement.z = movementSpeedFactor * deltatime * movement.z;
 
-
-}
-
-void Camera::fire(){
-
-    playerIsFiring = true;
-    //flashLife = 1.0f;
-
+	currentWeapon->move(deltatime, player, levelObjects);
 }
 
 void Camera::render(GameState* state){

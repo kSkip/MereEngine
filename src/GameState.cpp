@@ -258,6 +258,22 @@ void GameState::handleSpacebar()
     }
 }
 
+void GameState::FirePrimaryWeapon()
+{
+    Weapon & weapon = player->GetWeapon();
+    if (!weapon.isFiring) {
+
+        glm::vec3 Begin = player->getHead() + 0.1f * glm::normalize(player->getOrigin() - player->getHead());
+        glm::vec3 End = player->getHead() + 100.0f * glm::normalize(player->getOrigin() - player->getHead());
+        GameObject* newobject = new Bullet(Begin, End, player);
+
+        levelObjects.push_back(newobject);
+        opaqueObjects.push_back(newobject);
+
+        weapon.fire();
+    }
+}
+
 //moves the game objects through time
 void GameState::move(double deltatime)
 {

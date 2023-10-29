@@ -27,9 +27,7 @@ class Camera : public GameObject{
         bool holdingLeftStrafe;
         bool holdingRightStrafe;
 
-        bool playerIsFiring;
-
-        void fire();
+        Weapon & GetWeapon() { return *currentWeapon; }
 
         void handleMouseMove(int mouseX, int mouseY);
         void move(double deltaTime, Camera* player, std::list<GameObject*>* levelObjects);
@@ -89,12 +87,6 @@ class Camera : public GameObject{
 
         float rotHorizontal, rotVertical;
 
-        Billboard* crosshairs;
-        Billboard* healthMeter;
-
-        //TTF_Font* healthMeterFont;
-
-        std::string nameCurrentWeapon;
         Weapon* currentWeapon;
 
         double movementSpeedFactor;

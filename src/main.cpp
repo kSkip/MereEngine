@@ -352,27 +352,7 @@ LRESULT CALLBACK GameProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			}
 			break;
 		case WM_LBUTTONDOWN:
-			/*
-			 * This case handles the player's use
-			 * of a weapon
-			 */
-			//if (!player->playerIsFiring) {
-
-				//GameObject* newobject = new Bullet(player->getHead()+0.1f*glm::normalize(player->getOrigin()-player->getHead()),player->getHead()+100.0f*glm::normalize(player->getOrigin()-player->getHead()),player);
-
-				/*char meshFile[50];
-				char boundsFile[50];
-				sprintf(meshFile,"Data/bullet.3ds");
-				sprintf(boundsFile,"Data/bullet.dat");
-				GameObject* newobject = new ProjectileObject(meshFile,boundsFile,player->getHead()+2.0f*glm::normalize(player->getOrigin()-player->getHead()),5.0f*glm::normalize(player->getOrigin()-player->getHead()),glm::normalize(player->getOrigin()-player->getHead()),0.0f,this);
-				*/
-
-				//levelObjects.push_back(newobject);
-				//opaqueObjects.push_back(newobject);
-
-				//player->fire();
-
-			//}
+			state.FirePrimaryWeapon();
 			break;
 		case WM_MOUSEMOVE:
 			POINT pt;

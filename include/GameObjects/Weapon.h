@@ -23,6 +23,10 @@ class Weapon : public GameObject{
 
         }
 
+        void fire() { isFiring = 1; animTime = 0.0; }
+
+        double animTime;
+        int isFiring;
 };
 
 #endif

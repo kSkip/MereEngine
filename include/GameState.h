@@ -50,6 +50,8 @@ class GameState{
 
         void handleMouseMove(int, int);
 
+        void FirePrimaryWeapon();
+
         bool loaded;
 
     private:

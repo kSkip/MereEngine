@@ -19,6 +19,8 @@ class Armature{
 
 		void setVertices(struct vertex* vertices, struct UnskinnedVertex* unskinned, unsigned int numVertices);
 
+		double getTotalTime() { return double(numFrames) / double(frameRate); }
+
 	private:
 		class Node{
 			friend class Armature;

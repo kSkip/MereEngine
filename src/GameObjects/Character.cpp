@@ -105,7 +105,7 @@ void Character::move(double deltatime, Camera* player, std::list<GameObject*>* l
 
     AIDecision(deltatime, player, levelObjects);
 
-    Armature* arm;
+    Armature* arm = nullptr;
 
     if(data){
 
@@ -135,10 +135,10 @@ void Character::render(GameState* state){
 
 }
 
-void Character::damage(float magnitude, glm::vec3 damageLocation, GameState* state){
-
-  /*  health -= magnitude;
-    GameObject* newobject = new ParticleSource("Data/BloodDrop.3ds", damageLocation, glm::vec3(1.0f,1.0f,1.0f), 100, 0.5f,false,0, true, state);
+void Character::damage(float magnitude, glm::vec3 damageLocation, GameState* state)
+{
+    health -= magnitude;
+    /*GameObject* newobject = new ParticleSource("Data/BloodDrop.3ds", damageLocation, glm::vec3(1.0f, 1.0f, 1.0f), 100, 0.5f, false, 0, true, state);
     addOpaqueObject(newobject,state);*/
 
 }
