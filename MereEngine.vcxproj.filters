@@ -96,9 +96,6 @@
     <ClCompile Include="src\vectormath\quaternion_math.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="third-party\tiny_obj_loader.cc">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\boundary.h">
@@ -177,9 +174,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\vectormath\quaternion_math.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="third-party\tiny_obj_loader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Platform.h">

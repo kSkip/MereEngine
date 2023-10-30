@@ -42,19 +42,19 @@
   <PropertyGroup Label="UserMacros" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\kane\source\repos\MereEngine\soil\inc;$(SolutionDir)\third-party;$(SolutionDir)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\soil\inc;$(SolutionDir)\tinyobjloader;$(SolutionDir)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>soil.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>soil.lib;tinyobjloader.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutputPath);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\kane\source\repos\MereEngine\soil\inc;$(SolutionDir)\third-party;$(SolutionDir)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\soil\inc;$(SolutionDir)\tinyobjloader;$(SolutionDir)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>soil.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>soil.lib;tinyobjloader.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutputPath);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -86,7 +86,6 @@
     <ClCompile Include="src\utilities\DataBlock.cpp" />
     <ClCompile Include="src\utilities\TextManipulation.cpp" />
     <ClCompile Include="src\vectormath\quaternion_math.c" />
-    <ClCompile Include="third-party\tiny_obj_loader.cc" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\boundary.h" />
@@ -116,7 +115,6 @@
     <ClInclude Include="include\utilities\DataBlock.h" />
     <ClInclude Include="include\utilities\TextManipulation.h" />
     <ClInclude Include="include\vectormath\quaternion_math.h" />
-    <ClInclude Include="third-party\tiny_obj_loader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
