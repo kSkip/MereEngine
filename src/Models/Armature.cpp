@@ -1,4 +1,4 @@
-#include "Models/Armature.hpp"
+#include "Models/Armature.h"
 #include "VectorMath/quaternion_math.h"
 #include <iostream>
 #include <cmath>

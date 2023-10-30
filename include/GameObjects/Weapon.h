@@ -3,7 +3,7 @@
 
 #include "GameObjects/GameObject.h"
 #include "GameObjects/Camera.h"
-#include "Models/Armature.hpp"
+#include "Models/Armature.h"
 
 class Weapon : public GameObject{
 

@@ -42,7 +42,7 @@
   <PropertyGroup Label="UserMacros" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\soil\inc;$(SolutionDir)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\third-party;$(SolutionDir)\..\soil\inc;$(SolutionDir)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SolutionDir)\..\soil\build\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -51,7 +51,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\soil\inc;$(SolutionDir)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\third-party;$(SolutionDir)\..\soil\inc;$(SolutionDir)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SolutionDir)\..\soil\build\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -104,13 +104,13 @@
     <ClInclude Include="include\gameobjects\Weapon.h" />
     <ClInclude Include="include\GameState.h" />
     <ClInclude Include="include\Menu.h" />
-    <ClInclude Include="include\models\Armature.hpp" />
+    <ClInclude Include="include\models\Armature.h" />
     <ClInclude Include="include\models\BasicGLBufferUtilities.h" />
     <ClInclude Include="include\models\MD5AnimUtilities.h" />
     <ClInclude Include="include\models\MD5CommonUtilities.h" />
-    <ClInclude Include="include\models\MD5GLBufferUtilities.hpp" />
+    <ClInclude Include="include\models\MD5GLBufferUtilities.h" />
     <ClInclude Include="include\models\MD5MeshUtilities.h" />
-    <ClInclude Include="include\models\OBJGLBufferUtilities.hpp" />
+    <ClInclude Include="include\models\OBJGLBufferUtilities.h" />
     <ClInclude Include="include\Platform.h" />
     <ClInclude Include="include\Shader.h" />
     <ClInclude Include="include\utilities\DataBlock.h" />

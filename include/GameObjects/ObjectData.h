@@ -4,7 +4,7 @@
 #include "Platform.h"
 
 #include "Utilities/DataBlock.h"
-#include "Models/Armature.hpp"
+#include "Models/Armature.h"
 #include "boundary.h"
 
 class ObjectData{

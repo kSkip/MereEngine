@@ -4,7 +4,7 @@
 #include "GameObjects/GameObject.h"
 #include "GameObjects/Billboard.h"
 #include "GameObjects/Weapon.h"
-#include "Models/Armature.hpp"
+#include "Models/Armature.h"
 
 #include <iostream>
 #include <cmath>

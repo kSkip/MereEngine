@@ -1,10 +1,10 @@
-#ifndef ARMATURE_HPP
-#define ARMATURE_HPP
+#ifndef ARMATURE_H
+#define ARMATURE_H
 
 #define MAXCHILDREN 20
 #define MAXNODES 20
 
-#include "MD5GLBufferUtilities.hpp"
+#include "MD5GLBufferUtilities.h"
 #include "MD5AnimUtilities.h"
 
 class Armature{

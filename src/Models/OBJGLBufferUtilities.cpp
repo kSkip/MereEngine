@@ -1,5 +1,5 @@
-#include "Models/OBJGLBufferUtilities.hpp"
-#include "Models/MD5GLBufferUtilities.hpp"
+#include "Models/OBJGLBufferUtilities.h"
+#include "Models/MD5GLBufferUtilities.h"
 #include <SOIL/SOIL.h>
 #include <iostream>
 

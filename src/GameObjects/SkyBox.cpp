@@ -1,5 +1,6 @@
 #include "GameObjects/SkyBox.h"
 #include <iostream>
+
 SkyBox::SkyBox(){}
 
 SkyBox::SkyBox(ObjectData* objectData, Camera* p, GameState* state){

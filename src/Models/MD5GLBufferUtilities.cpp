@@ -1,4 +1,4 @@
-#include "Models/MD5GLBufferUtilities.hpp"
+#include "Models/MD5GLBufferUtilities.h"
 #include <string>
 #include "VectorMath/quaternion_math.h"
 #include <math.h>

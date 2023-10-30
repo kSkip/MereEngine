@@ -1,6 +1,6 @@
 #include "GameObjects/Character.h"
 #include "GameObjects/Camera.h"
-#include "Models/Armature.hpp"
+#include "Models/Armature.h"
 #include "Utilities/TextManipulation.h"
 #include "Utilities/DataBlock.h"
 

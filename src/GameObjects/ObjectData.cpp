@@ -1,7 +1,7 @@
 #include "GameObjects/ObjectData.h"
 #include "Utilities/TextManipulation.h"
-#include "Models/OBJGLBufferUtilities.hpp"
-#include "Models/MD5GLBufferUtilities.hpp"
+#include "Models/OBJGLBufferUtilities.h"
+#include "Models/MD5GLBufferUtilities.h"
 
 ObjectData::ObjectData(){}
 

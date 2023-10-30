@@ -1,9 +1,9 @@
-#ifndef OBJGLBUFFERUTILITIES_HPP
-#define OBJGLBUFFERUTILITIES_HPP
+#ifndef OBJGLBUFFERUTILITIES_H
+#define OBJGLBUFFERUTILITIES_H
 
 #include "Platform.h"
 
-#include "../third-party/tiny_obj_loader.h"
+#include "tiny_obj_loader.h"
 
 #ifndef STRUCT_STATICVERTEX
 #define STRUCT_STATICVERTEX
