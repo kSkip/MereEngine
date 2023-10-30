@@ -3,23 +3,22 @@
 #include <SOIL/SOIL.h>
 
 #include "GameState.h"
-#include "MenuState.h"
+#include "Menu.h"
 
 class Camera;
 
 GameState state;
-MenuState mainmenu;
+Menu menu;
 int paused = 0;
+RECT rt;
+int width, height;
 
 class MouseState {
 public:
 
 	void SetCenter() {
-		int width = GetSystemMetrics(SM_CXSCREEN);
-		int height = GetSystemMetrics(SM_CYSCREEN);
-
-		xMid = width / 2;
-		yMid = height / 2;
+		xMid = GetSystemMetrics(SM_CXSCREEN) / 2;
+		yMid = GetSystemMetrics(SM_CYSCREEN) / 2;
 		xPos = xMid;
 		yPos = yMid;
 		SetCursorPos(xMid, yMid);
@@ -55,12 +54,8 @@ public:
 	}
 
 private:
-	int left;
-	int top;
 	int xMid;
 	int yMid;
-	int xPrevPos;
-	int yPrevPos;
 	int xPos;
 	int yPos;
 };
@@ -131,6 +126,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	wglUseFontBitmaps(hdc, 0, 256, 1000);
 	glListBase(1000);
 
+	GetClientRect(hWnd, &rt);
 	Init(hWnd);
 
 	MSG msg;
@@ -162,25 +158,19 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 				cursorVisible = 1;
 			}
 
-			/*if (mainmenu.currentAction == MENU_ACTION_NEWGAME)
-			{
-				// create a new game from beginning
+			switch (menu.getSelection()) {
+			case MENU_ACTION_NEWGAME:
 				if (state.loaded) state.clean();
-
-				try {
-					state.loadNew(rootDir + firstLevel);
-				}
-				catch (std::exception& e)
-				{
-					std::cerr << e.what() << "\n";
-					return false;
-				}
-			}
-			if (mainmenu.currentAction == MENU_ACTION_NULL)
-			{
+				state.loadNew(rootDir + firstLevel);
+				paused = 0;
+				break;
+			case MENU_ACTION_EXIT:
+				running = 0;
+				break;
+			default:
 				break;
 			}
-			mainmenu.renderMenu();*/
+			menu.render(width, height);
 		}
 		else {
 			if (cursorVisible) {
@@ -229,21 +219,9 @@ bool Init(HWND hWnd)
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
-	RECT rt;
-	GetClientRect(hWnd, &rt);
-	int width = rt.right - rt.left;
-	int height = rt.bottom - rt.top;
+	width = rt.right - rt.left;
+	height = rt.bottom - rt.top;
 	mouse.SetCenter();
-	/*
-	try
-	{
-		mainmenu.init(rootDir, width, height);
-	}
-	catch (std::exception & e)
-	{
-		std::cerr << e.what() << "\n";
-		return false;
-	}*/
 
 	try
 	{
@@ -290,17 +268,15 @@ LRESULT CALLBACK MenuProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		case WM_KEYDOWN:
 			switch (wParam) {
 				case VK_ESCAPE:
-					//mainmenu.currentAction = MENU_ACTION_NULL;
 					paused = 0;
 					break;
 			}
 			break;
 		case WM_LBUTTONDOWN:
-			mainmenu.handleButtonDown();
+			menu.handleButtonDown();
 			break;
 		case WM_MOUSEMOVE:
-			//mouse.Update(lParam);
-			//mainmenu.handleMouseMove(mouse.MotionX(), mouse.MotionY());
+			menu.handleMouseMove(LOWORD(lParam), HIWORD(lParam));
 			break;
 	}
 	return DefWindowProc(hWnd, message, wParam, lParam);

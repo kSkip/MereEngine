@@ -74,7 +74,7 @@
     <ClCompile Include="src\gameobjects\Weapon.cpp" />
     <ClCompile Include="src\GameState.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\menu\MenuState.cpp" />
+    <ClCompile Include="src\menu\Menu.cpp" />
     <ClCompile Include="src\models\Armature.cpp" />
     <ClCompile Include="src\models\BasicGLBufferUtilities.cpp" />
     <ClCompile Include="src\models\MD5AnimUtilities.c" />
@@ -103,7 +103,7 @@
     <ClInclude Include="include\gameobjects\StaticObject.h" />
     <ClInclude Include="include\gameobjects\Weapon.h" />
     <ClInclude Include="include\GameState.h" />
-    <ClInclude Include="include\MenuState.h" />
+    <ClInclude Include="include\Menu.h" />
     <ClInclude Include="include\models\Armature.hpp" />
     <ClInclude Include="include\models\BasicGLBufferUtilities.h" />
     <ClInclude Include="include\models\MD5AnimUtilities.h" />
