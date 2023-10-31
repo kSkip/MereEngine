@@ -7,16 +7,23 @@
 
 class Camera;
 
+HDC hdc = NULL;
+HGLRC hglrc = NULL;
+BOOL contextIsCurrent = FALSE;
+
 GameState state;
 Menu menu;
 int paused = 0;
-RECT rt;
-int width, height;
+int width = 0;
+int height = 0;
 
-class MouseState {
-public:
+struct mouse {
+	int xMid;
+	int yMid;
+	int xPos;
+	int yPos;
 
-	void SetCenter() {
+	void setCenter() {
 		xMid = GetSystemMetrics(SM_CXSCREEN) / 2;
 		yMid = GetSystemMetrics(SM_CYSCREEN) / 2;
 		xPos = xMid;
@@ -24,7 +31,7 @@ public:
 		SetCursorPos(xMid, yMid);
 	}
 
-	void Reset() {
+	void reset() {
 		if (xPos != xMid && yPos != yMid) {
 			xPos = xMid;
 			yPos = yMid;
@@ -32,41 +39,16 @@ public:
 		}
 	}
 
-	void Update(POINT & pt) {
-		xPos = pt.x;
-		yPos = pt.y;
-	}
-
-	int PosX() {
-		return xPos;
-	}
-
-	int PosY() {
-		return yPos;
-	}
-
-	int MotionX() {
+	int motionX() {
 		return xPos - xMid;
 	}
 
-	int MotionY() {
+	int motionY() {
 		return yPos - yMid;
 	}
 
-private:
-	int xMid;
-	int yMid;
-	int xPos;
-	int yPos;
-};
+} Mouse;
 
-MouseState mouse;
-
-std::string rootDir = "C:\\Users\\kane\\source\\repos\\MereEngineDemo\\";
-std::string firstLevel = "Data\\Test.level";
-#define MAX_FRAME_RATE 200.0f
-
-bool Init(HWND);
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK MenuProc(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK GameProc(HWND, UINT, WPARAM, LPARAM);
@@ -80,54 +62,30 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	wc.hInstance = hInstance;
 	wc.lpszClassName = L"GameWindow";
 
-	RegisterClass(&wc);
-
-	PIXELFORMATDESCRIPTOR pfd = {
-		sizeof(PIXELFORMATDESCRIPTOR),
-		1,
-		PFD_DRAW_TO_WINDOW |
-		PFD_SUPPORT_OPENGL |
-		PFD_DOUBLEBUFFER |
-		PFD_TYPE_RGBA,
-		24,
-		0, 0, 0, 0, 0, 0,
-		0,
-		0,
-		0,
-		0, 0, 0, 0,
-		32,
-		0,
-		0,
-		PFD_MAIN_PLANE,
-		0,
-		0, 0, 0
-	};
+	if (!RegisterClass(&wc)) {
+		return 1;
+	}
 
 	HWND hWnd = CreateWindow(L"GameWindow", L"MereEngine",
 		WS_OVERLAPPEDWINDOW | WS_VISIBLE,
 		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
 		NULL, NULL, hInstance, NULL);
 
-	HDC hdc = GetDC(hWnd);
-
-	int pixel_format = ChoosePixelFormat(hdc, &pfd);
-
-	SetPixelFormat(hdc, pixel_format, &pfd);
-
-	HGLRC hglrc = wglCreateContext(hdc);
-
-	BOOL is_current = wglMakeCurrent(hdc, hglrc);
-
-	GLenum err = glewInit();
-	if (err != GLEW_OK) {
+	if (!hWnd) {
 		return 1;
 	}
 
 	wglUseFontBitmaps(hdc, 0, 256, 1000);
 	glListBase(1000);
 
-	GetClientRect(hWnd, &rt);
-	Init(hWnd);
+	// TODO: Validate command line arguments
+	std::string commandLine = pCmdLine;
+	size_t split = commandLine.find(' ');
+	std::string rootDir = commandLine.substr(0, split);
+	std::string firstLevel = commandLine.substr(split + 1);
+
+	state.init(rootDir, width, height);
+	state.loadNew(rootDir + firstLevel);
 
 	MSG msg;
 	int running = 1;
@@ -198,52 +156,89 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	glDeleteLists(1000, 256);
 
-	wglMakeCurrent(NULL, NULL);
-
-	ReleaseDC(hWnd, hdc);
-
-	wglDeleteContext(hglrc);
-
 	DestroyWindow(hWnd);
 
 	return 0;
-}
-
-bool Init(HWND hWnd)
-{
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Clear color to black, no alpha
-	glEnable(GL_DEPTH_TEST);              // Enable the depth buffer
-	glClearDepth(1.0f);                   // Clear all of the depth buffer
-	glDepthFunc(GL_LEQUAL);		          // Depth function; Overwrite if new value <= current value
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-
-	width = rt.right - rt.left;
-	height = rt.bottom - rt.top;
-	mouse.SetCenter();
-
-	try
-	{
-		state.init(rootDir, width, height);
-	}
-	catch (std::exception & e)
-	{
-		std::cerr << e.what() << "\n";
-		return false;
-	}
-
-	state.loadNew(rootDir + firstLevel);
-
-	return true;
 }
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message) {
 		case WM_CREATE:
+			{
+				PIXELFORMATDESCRIPTOR pfd = {
+					sizeof(PIXELFORMATDESCRIPTOR),
+					1,
+					PFD_DRAW_TO_WINDOW |
+					PFD_SUPPORT_OPENGL |
+					PFD_DOUBLEBUFFER |
+					PFD_TYPE_RGBA,
+					24,
+					0, 0, 0, 0, 0, 0,
+					0,
+					0,
+					0,
+					0, 0, 0, 0,
+					32,
+					0,
+					0,
+					PFD_MAIN_PLANE,
+					0,
+					0, 0, 0
+				};
+
+				if ((hdc = GetDC(hWnd)) == NULL) {
+					return -1;
+				}
+
+				int pixelFormat = ChoosePixelFormat(hdc, &pfd);
+
+				if (!SetPixelFormat(hdc, pixelFormat, &pfd)) {
+					return -1;
+				}
+
+				if ((hglrc = wglCreateContext(hdc)) == NULL) {
+					return -1;
+				}
+
+				contextIsCurrent = wglMakeCurrent(hdc, hglrc);
+				if (!contextIsCurrent) {
+					return -1;
+				}
+
+				if (glewInit() != GLEW_OK) {
+					return -1;
+				}
+
+				RECT rt;
+				GetClientRect(hWnd, &rt);
+				width = rt.right - rt.left;
+				height = rt.bottom - rt.top;
+
+				glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+				glEnable(GL_DEPTH_TEST);
+				glClearDepth(1.0f);
+				glDepthFunc(GL_LEQUAL);
+				glEnable(GL_BLEND);
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+				glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+
+				Mouse.setCenter();
+			}
+			return 0;
+		case WM_DESTROY:
+			if (contextIsCurrent) {
+				wglMakeCurrent(NULL, NULL);
+			}
+			if (hdc) {
+				ReleaseDC(hWnd, hdc);
+			}
+			if (hglrc) {
+				wglDeleteContext(hglrc);
+			}
 			return 0;
 		case WM_CLOSE:
+			PostQuitMessage(0);
 			return 0;
 		case WM_KEYDOWN:
 		case WM_KEYUP:
@@ -335,9 +330,10 @@ LRESULT CALLBACK GameProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			pt.x = LOWORD(lParam);
 			pt.y = HIWORD(lParam);
 			ClientToScreen(hWnd, &pt);
-			mouse.Update(pt);
-			state.handleMouseMove(mouse.MotionX(), mouse.MotionY());
-			mouse.Reset();
+			Mouse.xPos = pt.x;
+			Mouse.yPos = pt.y;
+			state.handleMouseMove(Mouse.motionX(), Mouse.motionY());
+			Mouse.reset();
 			break;
 	}
 	return 0;
