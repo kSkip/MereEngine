@@ -47,7 +47,7 @@ Character::~Character(){}
 
 Character::Character(const Character & rhs){}
 
-void Character::AIDecision(double deltatime, Camera* player, std::list<GameObject*>* levelObjects){
+void Character::trackPlayer(double deltatime, Camera* player, std::list<GameObject*>* levelObjects){
 
     glm::vec4 allowed, temp;
 
@@ -58,66 +58,54 @@ void Character::AIDecision(double deltatime, Camera* player, std::list<GameObjec
     currentTarget = player->getPosition();
 
     glm::vec3 vectorToTarget = currentTarget - position;
-    vectorToTarget           = glm::vec3(vectorToTarget.x,0.0f,vectorToTarget.z);
-    double frontDotProduct  = glm::dot(vectorToTarget,front)/glm::length(vectorToTarget);
-    double rightDotProduct  = glm::dot(vectorToTarget,right)/glm::length(vectorToTarget);
+    float length = glm::length(vectorToTarget);
+    vectorToTarget = glm::vec3(vectorToTarget.x, 0.0f, vectorToTarget.z);
+    float frontDotProduct = glm::dot(vectorToTarget, front) / length;
+    float rightDotProduct = glm::dot(vectorToTarget, right) / length;
 
-    if(frontDotProduct > 1.0f){
-        frontDotProduct = 1.0f;
+    frontDotProduct = std::min(frontDotProduct, 1.0f);
+    frontDotProduct = std::max(frontDotProduct, -1.0f);
+
+    rightDotProduct = std::min(rightDotProduct, 1.0f);
+    rightDotProduct = std::max(rightDotProduct, -1.0f);
+
+    float deltaRot = 0.1f * acos(frontDotProduct) / (length + 1);
+    float twoPI = 2.0 * PI;
+    if (rightDotProduct > 0.0) {
+        rotY += deltaRot;
+        if (rotY <= 0.0) {
+            rotY += twoPI;
+        }
     }
-    if(frontDotProduct < -1.0f){
-        frontDotProduct = -1.0f;
+    else if (rightDotProduct < 0.0) {
+        rotY -= deltaRot;
+        if (rotY >= twoPI) {
+            rotY -= twoPI;
+        }
     }
-    if(rightDotProduct > 1.0f){
-        rightDotProduct = 1.0f;
-    }
-    if(rightDotProduct < -1.0f){
-        rightDotProduct = -1.0f;
-    }
-
-    if(rightDotProduct > 0){
-
-        rotY += 0.1f*(180.0f/PI)*acos(frontDotProduct)/(glm::length(vectorToTarget)+1);
-        if(rotY <= 0){rotY += 360.0f;}
-
-    }else if(rightDotProduct < 0){
-
-        rotY -= 0.1f*(180.0f/PI)*acos(frontDotProduct)/(glm::length(vectorToTarget)+1);
-        if(rotY >= 360){rotY -= 360.0f;}
-
-    }
-
-    rotation = glm::rotate(glm::mat4(1.0f),rotY,glm::vec3(0.0,1.0,0.0));
-    front    = glm::rotateY(glm::vec3(0.0f,0.0f,1.0f),rotY);
-    right    = glm::rotateY(glm::vec3(1.0f,0.0f,0.0f),rotY);
-
-    velocity.y -= GRAVITATIONAL_ACCELERATION*deltatime;
-
-    movement.x = movementSpeedFactor * deltatime * front.x;
-    movement.y = deltatime * velocity.y;
-    movement.z = movementSpeedFactor * deltatime * front.z;
-
 }
 
 void Character::move(double deltatime, Camera* player, std::list<GameObject*>* levelObjects){
 
     charAnimTime += deltatime;
 
-    AIDecision(deltatime, player, levelObjects);
+    trackPlayer(deltatime, player, levelObjects);
 
-    Armature* arm = nullptr;
+    rotation = glm::rotate(glm::mat4(1.0f), rotY, glm::vec3(0.0, 1.0, 0.0));
+    front = glm::rotateY(glm::vec3(0.0f, 0.0f, 1.0f), rotY);
+    right = glm::rotateY(glm::vec3(1.0f, 0.0f, 0.0f), rotY);
+
+    velocity.y -= GRAVITATIONAL_ACCELERATION * deltatime;
+
+    movement.x = movementSpeedFactor * deltatime * front.x;
+    movement.y = deltatime * velocity.y;
+    movement.z = movementSpeedFactor * deltatime * front.z;
 
     if(data){
-
-        arm = data->armatures[std::string("run")];
-
-    }
-
-    if(arm){
-
-        arm->buildFrame(charAnimTime,NULL);
-        arm->setVertices(data->vertices,data->unskinned_vertices,data->num_vertices);
-
+        if (Armature* arm = data->armatures["run"]) {
+            arm->buildFrame(charAnimTime, NULL);
+            arm->setVertices(data->vertices, data->unskinned_vertices, data->num_vertices);
+        }
     }
 
 }

@@ -37,7 +37,7 @@ class Character : public GameObject{
         glm::vec3 currentTarget;
         double charAnimTime;
 
-        void AIDecision(double deltatime, Camera* player, std::list<GameObject*>* levelObjects);
+        void trackPlayer(double deltatime, Camera* player, std::list<GameObject*>* levelObjects);
 
 };
 
