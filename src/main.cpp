@@ -5,6 +5,9 @@
 #include "GameState.h"
 #include "Menu.h"
 
+typedef BOOL(WINAPI * PFNWGLSWAPINTERVALEXTPROC) (int interval);
+typedef int (WINAPI * PFNWGLGETSWAPINTERVALEXTPROC) (void);
+
 HDC hdc = NULL;
 HGLRC hglrc = NULL;
 BOOL contextIsCurrent = FALSE;
@@ -81,6 +84,7 @@ int ParseCmdLine(cmd_line_args & args, char *cmdLine)
 	}
 }
 
+void EnableVSync();
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK MenuProc(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK GameProc(HWND, UINT, WPARAM, LPARAM);
@@ -175,10 +179,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 		SwapBuffers(hdc);
 
-		// Manual swap control
-		// TODO: utilize vertical sync
-		Sleep(7);
-
 		QueryPerformanceCounter(&counter);
 		elapsed.QuadPart = counter.QuadPart - lastCounter.QuadPart;
 		elapsed.QuadPart *= 1000000;
@@ -242,6 +242,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				if (glewInit() != GLEW_OK) {
 					return -1;
 				}
+
+				EnableVSync(); // Sets the swap interval to 1 if not already set
 
 				RECT rt;
 				GetClientRect(hWnd, &rt);
@@ -370,4 +372,18 @@ LRESULT CALLBACK GameProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			break;
 	}
 	return 0;
+}
+
+void EnableVSync()
+{
+	PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT = \
+		(PFNWGLSWAPINTERVALEXTPROC)wglGetProcAddress("wglSwapIntervalEXT");
+	PFNWGLGETSWAPINTERVALEXTPROC wglGetSwapIntervalEXT = \
+		(PFNWGLGETSWAPINTERVALEXTPROC)wglGetProcAddress("wglGetSwapIntervalEXT");
+
+	int swapInterval = wglGetSwapIntervalEXT();
+	if (swapInterval == 0) {
+		// Enable vertical sync
+		wglSwapIntervalEXT(1);
+	}
 }
