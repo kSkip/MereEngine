@@ -5,8 +5,6 @@
 #include "GameState.h"
 #include "Menu.h"
 
-class Camera;
-
 HDC hdc = NULL;
 HGLRC hglrc = NULL;
 BOOL contextIsCurrent = FALSE;
