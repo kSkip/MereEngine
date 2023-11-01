@@ -49,6 +49,40 @@ struct mouse {
 
 } Mouse;
 
+#define NUM_ARGS 2
+
+union cmd_line_args {
+	struct {
+		char *root;
+		char *level;
+	};
+	char *argv[NUM_ARGS];
+};
+
+// The windows API does not provide a CommandLineToArgvA.
+// This parser is used instead of adding WideCharToMultiByte.
+// It expects to find exactly NUM_ARGS number of arguments.
+int ParseCmdLine(cmd_line_args & args, char *cmdLine)
+{
+	char *str = cmdLine;
+	int i = 0, j = 0;
+	while (cmdLine[i] && j < NUM_ARGS) {
+		if (cmdLine[i] == ' ') {
+			cmdLine[i++] = 0;
+			args.argv[j++] = str;
+			str += i;
+		}
+		i++;
+	}
+	if (j == NUM_ARGS - 1) {
+		args.argv[j] = str;
+		return 0;
+	}
+	else {
+		return 1;
+	}
+}
+
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK MenuProc(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK GameProc(HWND, UINT, WPARAM, LPARAM);
@@ -56,6 +90,13 @@ LRESULT CALLBACK GameProc(HWND, UINT, WPARAM, LPARAM);
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	PSTR pCmdLine, int nCmdShow)
 {
+	cmd_line_args args;
+	if (ParseCmdLine(args, pCmdLine)) {
+		return 1;
+	}
+	std::string rootDir = args.root;
+	std::string firstLevel = args.level;
+
 	WNDCLASS wc = {};
 	wc.style = CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
 	wc.lpfnWndProc = WndProc;
@@ -77,12 +118,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	wglUseFontBitmaps(hdc, 0, 256, 1000);
 	glListBase(1000);
-
-	// TODO: Validate command line arguments
-	std::string commandLine = pCmdLine;
-	size_t split = commandLine.find(' ');
-	std::string rootDir = commandLine.substr(0, split);
-	std::string firstLevel = commandLine.substr(split + 1);
 
 	state.init(rootDir, width, height);
 	state.loadNew(rootDir + firstLevel);
