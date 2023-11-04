@@ -41,16 +41,8 @@ struct md5animdata{
 	struct md5frame* frames;
 };
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 struct md5animdata* getMD5AnimData(const char* filename);
 
 void freeMD5AnimData(struct md5animdata* md5data);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

@@ -79,16 +79,19 @@ void ObjectData::loadMD5Mesh(DataBlock& def)
     if(!def("mesh").empty())
     {
 
-        unsigned int numElements;
+        {
+            unsigned int numElements;
+            md5meshdata md5data;
 
-        struct md5meshdata* md5data = getMD5MeshData(meshFile.c_str());
+            MD5MeshFile file(meshFile.c_str());
 
-        vertexBuffer  = MD5CreateVertexBuffer(md5data,&vertices,&unskinned_vertices,&num_vertices);
-        elementBuffer = MD5CreateElementBuffer(md5data,&numElements);
-        elementCount  = 3*numElements;
-        diffuseTex    = MD5CreateTextureBuffer(md5data,dirFile.c_str());
+            file.getMeshData(md5data);
 
-        freeMD5MeshData(md5data);
+            vertexBuffer = MD5CreateVertexBuffer(&md5data, &vertices, &unskinned_vertices, &num_vertices);
+            elementBuffer = MD5CreateElementBuffer(&md5data, &numElements);
+            elementCount = 3 * numElements;
+            diffuseTex = MD5CreateTextureBuffer(&md5data, dirFile.c_str());
+        }
 
         unsigned int i;
         for(i=0;i<anims.size();i+=2)

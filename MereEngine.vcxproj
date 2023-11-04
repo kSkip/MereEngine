@@ -77,15 +77,15 @@
     <ClCompile Include="src\menu\Menu.cpp" />
     <ClCompile Include="src\models\Armature.cpp" />
     <ClCompile Include="src\models\BasicGLBufferUtilities.cpp" />
-    <ClCompile Include="src\models\MD5AnimUtilities.c" />
-    <ClCompile Include="src\models\MD5CommonUtilities.c" />
+    <ClCompile Include="src\models\MD5AnimUtilities.cpp" />
+    <ClCompile Include="src\models\MD5CommonUtilities.cpp" />
     <ClCompile Include="src\models\MD5GLBufferUtilities.cpp" />
-    <ClCompile Include="src\models\MD5MeshUtilities.c" />
+    <ClCompile Include="src\models\MD5MeshUtilities.cpp" />
     <ClCompile Include="src\models\OBJGLBufferUtilities.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\utilities\DataBlock.cpp" />
     <ClCompile Include="src\utilities\TextManipulation.cpp" />
-    <ClCompile Include="src\vectormath\quaternion_math.c" />
+    <ClCompile Include="src\vectormath\quaternion_math.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\boundary.h" />

@@ -78,13 +78,13 @@
     <ClCompile Include="src\models\OBJGLBufferUtilities.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\models\MD5AnimUtilities.c">
+    <ClCompile Include="src\models\MD5AnimUtilities.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\models\MD5CommonUtilities.c">
+    <ClCompile Include="src\models\MD5CommonUtilities.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\models\MD5MeshUtilities.c">
+    <ClCompile Include="src\models\MD5MeshUtilities.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\utilities\DataBlock.cpp">
@@ -93,7 +93,7 @@
     <ClCompile Include="src\utilities\TextManipulation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\vectormath\quaternion_math.c">
+    <ClCompile Include="src\vectormath\quaternion_math.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

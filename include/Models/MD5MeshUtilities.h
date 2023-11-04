@@ -2,66 +2,96 @@
 #define MD5MESHUTILITIES_H
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
-struct md5vertex{
+#include <vector>
+#include <exception>
+
+struct md5vertex {
 	unsigned int index;
 	float s,t;
 	unsigned int startWeight, countWeight;
 };
 
-struct md5triangle{
+struct md5triangle {
 	unsigned int index;
 	unsigned int vertIndices[3];
 };
 
-struct md5weight{
+struct md5weight {
 	unsigned int index;
 	unsigned int joint;
 	float bias;
 	float weightPos[3];
 };
 
-struct md5mesh{
+struct md5mesh {
 	char shaderName[128];
-	struct md5vertex* vertices;
+	std::vector<md5vertex> vertices;
 	unsigned int numVertices;
-	struct md5triangle* triangles;
+	std::vector<md5triangle> triangles;
 	unsigned int numTriangles;
-	struct md5weight* weights;
+	std::vector<md5weight> weights;
 	unsigned int numWeights;
 };
 
-struct md5joint{
-	char name[128];
+struct md5joint {
 	unsigned int id;
-	char parentName[128];
 	int parentId;
 	float position[3];
 	float orientation[3];
 };
 
-struct md5meshdata{
-	unsigned int version;
-	char commandline[128];
+struct md5meshdata {
 	unsigned int numJoints;
 	unsigned int numMeshes;
 
-	struct md5mesh* meshes;
-	struct md5joint* joints;
+	std::vector<md5mesh> meshes;
+	std::vector<md5joint> joints;
 };
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#define MAX_LINE_LENGTH 128
 
-struct md5meshdata* getMD5MeshData(const char* filename);
+class MD5File {
+protected:
+	MD5File(const char* fileName) {
+		fp = fopen(fileName, "r");
+		memset(line, 0, sizeof line);
+	}
+	~MD5File() {
+		fclose(fp);
+	}
+	MD5File(MD5File const &) = delete;
+	MD5File& operator= (MD5File const &) = delete;
 
-void freeMD5MeshData(struct md5meshdata* md5data);
+	char* getLine();
+	unsigned int getValue(char*);
+	void seekListBegin(char*);
+	void seekListEnd();
 
-#ifdef __cplusplus
-}
-#endif
+private:
+	FILE *fp;
+	char line[MAX_LINE_LENGTH];
+};
+
+class MD5MeshFile : public MD5File {
+public:
+	MD5MeshFile(const char* fileName) : MD5File(fileName) {
+		memset(buf, 0, sizeof buf);
+	}
+	~MD5MeshFile() {}
+	MD5MeshFile(MD5MeshFile const &) = delete;
+	MD5MeshFile& operator= (MD5MeshFile const &) = delete;
+
+	void getMeshData(md5meshdata &);
+
+private:
+	char buf[MAX_LINE_LENGTH];
+
+	void getJoint(md5joint &);
+	void getVertex(md5vertex &);
+	void getTri(md5triangle &);
+	void getWeight(md5weight &);
+};
 
 #endif

@@ -74,7 +74,7 @@ GLuint buffer;
 	normals = (float*)malloc(3*(*numVertices)*sizeof(float));
 	MD5CalcNormals(bindPoseVertices,md5data,normals);
 
-	MD5CalcWeightNormals(vertices,*numVertices,md5data->joints,normals);
+	MD5CalcWeightNormals(vertices,*numVertices,md5data->joints.data(),normals);
 
 	glGenBuffers(1, &buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, buffer);
@@ -146,7 +146,7 @@ GLuint buffer;
 	normals = (float*)malloc(3*(*numVertices)*sizeof(float));
 	MD5CalcNormals(*bindPoseVertices,md5data,normals);
 
-	MD5CalcWeightNormals(*unskinned,(*numVertices),md5data->joints,normals);
+	MD5CalcWeightNormals(*unskinned,(*numVertices),md5data->joints.data(),normals);
 
 	glGenBuffers(1, &buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, buffer);
