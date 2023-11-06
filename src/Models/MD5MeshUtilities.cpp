@@ -1,5 +1,4 @@
 #include "Models/MD5MeshUtilities.h"
-#include "Models/MD5CommonUtilities.h"
 
 char* MD5File::getLine()
 {
@@ -32,7 +31,7 @@ void MD5File::seekListBegin(char* name)
 
 	do {
 		char *l = getLine();
-		count = sscanf(l, "%s%s", tag, bracket);
+		count = sscanf(l, "%s%1s", tag, bracket);
 	} while (count < 2 && strcmp(tag, name) && strcmp(bracket, "{"));
 }
 
@@ -98,7 +97,7 @@ void MD5MeshFile::getMeshData(md5meshdata &data)
 
 		mesh.numWeights = getValue("numweights");
 		mesh.weights.resize(mesh.numWeights);
-		for (j = 0; j < mesh.numVertices; j++) {
+		for (j = 0; j < mesh.numWeights; j++) {
 			getWeight(mesh.weights[j]);
 		}
 		seekListEnd();
@@ -150,6 +149,102 @@ void MD5MeshFile::getWeight(md5weight &w)
 	int count = sscanf(l, "%s%d%d%f%s%f%f%f%s", buf, &w.index, &w.joint, &w.bias,
 		left, &w.weightPos[0], &w.weightPos[1], &w.weightPos[2], right);
 	if (count != 9) {
+		throw;
+	}
+}
+
+void MD5AnimFile::getAnimData(md5animdata &data)
+{
+	unsigned int version = getValue("MD5Version");
+	if (version != 10) {
+		throw;
+	}
+
+	int i, j;
+
+	data.numFrames = getValue("numFrames");
+	data.numJoints = getValue("numJoints");
+	data.frameRate = getValue("frameRate");
+	data.numAnimatedComponents = getValue("numAnimatedComponents");
+
+	data.joints.resize(data.numJoints);
+	seekListBegin("hierarchy");
+	for (i = 0; i < data.numJoints; i++) {
+		data.joints[i].id = i;
+		getJoint(data.joints[i]);
+	}
+	seekListEnd();
+
+	data.bounds.resize(data.numFrames);
+	seekListBegin("bounds");
+	for (i = 0; i < data.numFrames; i++) {
+		getBounds(data.bounds[i]);
+	}
+	seekListEnd();
+
+	data.baseframe.resize(data.numJoints);
+	seekListBegin("baseframe");
+	for (i = 0; i < data.numJoints; i++) {
+		getBaseFrameJoint(data.baseframe[i]);
+	}
+	seekListEnd();
+
+	data.frames.resize(data.numFrames);
+	char buf[MAX_LINE_LENGTH];
+	for (i = 0; i < data.numFrames; i++) {
+		sprintf(buf, "frame %d", i);
+		seekListBegin(buf);
+		data.frames[i].animatedComponents.resize(data.numAnimatedComponents);
+		char *l = getLine();
+		int offset = 0;
+		j = 0;
+		while (j < data.numAnimatedComponents) {
+			l += offset;
+			int count = sscanf(l, "%f%n",
+				&data.frames[i].animatedComponents[j], &offset);
+			if (count < 1) {
+				l = getLine();
+				offset = 0;
+			}
+			else {
+				j++;
+			}
+		}
+		seekListEnd();
+	}
+
+}
+
+void MD5AnimFile::getJoint(md5hierarchyjoint & joint)
+{
+	char *l = getLine();
+	int count = sscanf(l, "%s%d%d%d", joint.name, &joint.parentId,
+		&joint.flags, &joint.startIndex);
+	if (count != 4) {
+		throw;
+	}
+}
+
+void MD5AnimFile::getBounds(md5bounds & b)
+{
+	char bracket[2];
+	char *l = getLine();
+	int count = sscanf(l, "%s%f%f%f%s%s%f%f%f%s", bracket,
+		b.min, b.min + 1, b.min + 2, bracket, bracket,
+		b.max, b.max + 1, b.max + 2, bracket);
+	if (count != 10) {
+		throw;
+	}
+}
+
+void MD5AnimFile::getBaseFrameJoint(md5baseframejoint & joint)
+{
+	char bracket[2];
+	char *l = getLine();
+	int count = sscanf(l, "%s%f%f%f%s%s%f%f%f%s", bracket,
+		joint.position, joint.position + 1, joint.position + 2, bracket, bracket,
+		joint.orientation, joint.orientation + 1, joint.orientation + 2, bracket);
+	if (count != 10) {
 		throw;
 	}
 }

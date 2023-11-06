@@ -27,9 +27,9 @@ public:
      * local memory data for CPU processing
      */
     std::map<std::string,Armature*> armatures;
-    unsigned int num_vertices;
-    UnskinnedVertex* unskinned_vertices;
-    vertex* vertices;
+    unsigned int numVertices;
+    std::vector<UnskinnedVertex> unskinnedVertices;
+    std::vector<vertex> vertices;
 
     /*
      * GPU texture buffers

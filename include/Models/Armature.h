@@ -5,7 +5,7 @@
 #define MAXNODES 20
 
 #include "MD5GLBufferUtilities.h"
-#include "MD5AnimUtilities.h"
+#include "MD5MeshUtilities.h"
 
 class Armature{
 	public:
@@ -46,9 +46,9 @@ class Armature{
 		unsigned int numJoints;
 		unsigned int frameRate;
 		unsigned int numAnimatedComponents;
-		struct md5bounds* bounds;
-		struct md5baseframejoint* baseframe;
-		struct md5frame* frames;
+		std::vector<md5bounds> bounds;
+		std::vector<md5baseframejoint> baseframe;
+		std::vector<md5frame> frames;
 
 		bool pushDown(struct md5hierarchyjoint* joint);
 		bool push(Node* pNode, struct md5hierarchyjoint* joint);

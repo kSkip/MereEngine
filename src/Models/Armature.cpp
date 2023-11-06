@@ -108,21 +108,11 @@ void Armature::buildArmature(struct md5animdata* md5data){
 	frameRate = md5data->frameRate;
 	numAnimatedComponents = md5data->numAnimatedComponents;
 
-	bounds = (struct md5bounds*)malloc(numFrames*sizeof(struct md5bounds));
-	memcpy(bounds,md5data->bounds,numFrames*sizeof(struct md5bounds));
+	std::swap(bounds, md5data->bounds);
 
-	baseframe = (struct md5baseframejoint*)malloc(numJoints*sizeof(struct md5baseframejoint));
-	memcpy(baseframe,md5data->baseframe,numJoints*sizeof(struct md5baseframejoint));
+	std::swap(baseframe, md5data->baseframe);
 
-	frames = (struct md5frame*)malloc(numFrames*sizeof(struct md5frame));
-	memcpy(frames,md5data->frames,numFrames*sizeof(struct md5frame));
-
-	for(i=0;i<numFrames;i++){
-
-		frames[i].animatedComponents = (float*)malloc(numAnimatedComponents*sizeof(float));
-		memcpy(frames[i].animatedComponents,md5data->frames[i].animatedComponents,numAnimatedComponents*sizeof(float));
-
-	}
+	std::swap(frames, md5data->frames);
 
 	for(i=0;i<md5data->numJoints;i++){
 

@@ -89,43 +89,39 @@ GLuint buffer;
 
 /*Version of MD5CreateVertexBuffer that takes the data structure obtained directly from the md5mesh file and puts the data
 into a format that is suitable for CPU skinning*/
-GLuint MD5CreateVertexBuffer(struct md5meshdata* md5data, struct vertex** bindPoseVertices, struct UnskinnedVertex** unskinned, unsigned int* numVertices){
+GLuint MD5CreateVertexBuffer(struct md5meshdata* md5data, std::vector<vertex> &bindPoseVertices, std::vector<UnskinnedVertex> &unskinned, unsigned int numVertices)
+{
+	unsigned int i, j;
+	GLuint buffer;
 
-unsigned int i, j;
-float* normals;
-GLuint buffer;
+	unskinned.resize(numVertices);
+	bindPoseVertices.resize(numVertices);
+	md5mesh & mesh = md5data->meshes[0];
 
-	*numVertices = md5data->meshes[0].numVertices;
+	for (i = 0; i < numVertices; i++) {
 
-	*unskinned = (struct UnskinnedVertex*)malloc((*numVertices)*sizeof(struct UnskinnedVertex));
-	*bindPoseVertices = (struct vertex*)malloc((*numVertices)*sizeof(struct vertex));
+		unskinned[i].texcoord[0] = mesh.vertices[i].s;
+		unskinned[i].texcoord[1] = mesh.vertices[i].t;
 
-	for(i=0;i<(*numVertices);i++){
+		bindPoseVertices[i].position[0] = 0.0f;
+		bindPoseVertices[i].position[1] = 0.0f;
+		bindPoseVertices[i].position[2] = 0.0f;
 
-		memset(&((*unskinned)[i]),0,sizeof(UnskinnedVertex));
+		unskinned[i].countWeight = mesh.vertices[i].countWeight;
 
-		(*unskinned)[i].texcoord[0] = md5data->meshes[0].vertices[i].s;
-		(*unskinned)[i].texcoord[1] = md5data->meshes[0].vertices[i].t;
+		for (j = 0; j < mesh.vertices[i].countWeight; j++) {
 
-		(*bindPoseVertices)[i].position[0] = 0.0f;
-		(*bindPoseVertices)[i].position[1] = 0.0f;
-		(*bindPoseVertices)[i].position[2] = 0.0f;
+			size_t weightIdx = mesh.vertices[i].startWeight + (size_t)j;
 
-		(*unskinned)[i].countWeight = md5data->meshes[0].vertices[i].countWeight;
+			unskinned[i].weightPosition[j][0] = mesh.weights[weightIdx].weightPos[0];
+			unskinned[i].weightPosition[j][1] = mesh.weights[weightIdx].weightPos[1];
+			unskinned[i].weightPosition[j][2] = mesh.weights[weightIdx].weightPos[2];
 
-		for(j=0;j<md5data->meshes[0].vertices[i].countWeight;j++){
+			unskinned[i].weightBias[j] = mesh.weights[weightIdx].bias;
 
-			unsigned int startWeight = md5data->meshes[0].vertices[i].startWeight;
+			unskinned[i].jointId[j] = mesh.weights[weightIdx].joint;
 
-			(*unskinned)[i].weightPosition[j][0] = md5data->meshes[0].weights[startWeight+j].weightPos[0];
-			(*unskinned)[i].weightPosition[j][1] = md5data->meshes[0].weights[startWeight+j].weightPos[1];
-			(*unskinned)[i].weightPosition[j][2] = md5data->meshes[0].weights[startWeight+j].weightPos[2];
-
-			(*unskinned)[i].weightBias[j] = md5data->meshes[0].weights[startWeight+j].bias;
-
-			(*unskinned)[i].jointId[j] = md5data->meshes[0].weights[startWeight+j].joint;
-
-			struct md5joint* joint = &(md5data->joints[(*unskinned)[i].jointId[j]]);
+			struct md5joint* joint = &(md5data->joints[unskinned[i].jointId[j]]);
 
 			float rotatedWeight[3];
 			float orientation[4];
@@ -133,26 +129,24 @@ GLuint buffer;
 			memcpy(orientation,joint->orientation,3*sizeof(float));
 			quaternion_w(orientation);
 
-			rotate_position(orientation,(*unskinned)[i].weightPosition[j],rotatedWeight);
+			rotate_position(orientation,unskinned[i].weightPosition[j],rotatedWeight);
 
-			(*bindPoseVertices)[i].position[0] += (joint->position[0]+rotatedWeight[0])*(*unskinned)[i].weightBias[j];
-			(*bindPoseVertices)[i].position[1] += (joint->position[1]+rotatedWeight[1])*(*unskinned)[i].weightBias[j];
-			(*bindPoseVertices)[i].position[2] += (joint->position[2]+rotatedWeight[2])*(*unskinned)[i].weightBias[j];
+			bindPoseVertices[i].position[0] += (joint->position[0]+rotatedWeight[0])*unskinned[i].weightBias[j];
+			bindPoseVertices[i].position[1] += (joint->position[1]+rotatedWeight[1])*unskinned[i].weightBias[j];
+			bindPoseVertices[i].position[2] += (joint->position[2]+rotatedWeight[2])*unskinned[i].weightBias[j];
 
 		}
 
 	}
 
-	normals = (float*)malloc(3*(*numVertices)*sizeof(float));
-	MD5CalcNormals(*bindPoseVertices,md5data,normals);
+	std::vector<float> normals(3ULL * numVertices);
+	MD5CalcNormals(bindPoseVertices.data(),md5data,normals.data());
 
-	MD5CalcWeightNormals(*unskinned,(*numVertices),md5data->joints.data(),normals);
+	MD5CalcWeightNormals(unskinned.data(),numVertices,md5data->joints.data(),normals.data());
 
 	glGenBuffers(1, &buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, buffer);
-	glBufferData(GL_ARRAY_BUFFER,(*numVertices)*sizeof(vertex), *bindPoseVertices, GL_STREAM_DRAW);
-
-	free(normals);
+	glBufferData(GL_ARRAY_BUFFER,numVertices*sizeof(vertex), bindPoseVertices.data(), GL_STREAM_DRAW);
 
 	return buffer;
 }

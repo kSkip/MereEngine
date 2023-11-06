@@ -78,12 +78,6 @@
     <ClCompile Include="src\models\OBJGLBufferUtilities.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\models\MD5AnimUtilities.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\models\MD5CommonUtilities.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\models\MD5MeshUtilities.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -147,12 +141,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\models\BasicGLBufferUtilities.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\models\MD5AnimUtilities.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\models\MD5CommonUtilities.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\models\MD5MeshUtilities.h">

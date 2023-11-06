@@ -40,7 +40,7 @@ void Weapon::move(double deltatime, Camera* player, std::list<GameObject*>* leve
                 animTime = 0.0;
             }
             arm->buildFrame(animTime, NULL);
-            arm->setVertices(data->vertices, data->unskinned_vertices, data->num_vertices);
+            arm->setVertices(data->vertices.data(), data->unskinnedVertices.data(), data->numVertices);
         }
     }
 
@@ -51,7 +51,7 @@ void Weapon::render(GameState* state){
     if(data){
 
         glBindBuffer(GL_ARRAY_BUFFER, data->vertexBuffer);
-        glBufferSubData(GL_ARRAY_BUFFER,0,data->num_vertices*sizeof(struct vertex),data->vertices);
+        glBufferSubData(GL_ARRAY_BUFFER,0,data->numVertices*sizeof(struct vertex),data->vertices.data());
 
         renderMeshElements(data->vertexBuffer,data->elementBuffer,data->elementCount,PTYPE_TRIANGLES,state);
 

@@ -87,7 +87,8 @@ void ObjectData::loadMD5Mesh(DataBlock& def)
 
             file.getMeshData(md5data);
 
-            vertexBuffer = MD5CreateVertexBuffer(&md5data, &vertices, &unskinned_vertices, &num_vertices);
+            numVertices = md5data.meshes[0].numVertices;
+            vertexBuffer = MD5CreateVertexBuffer(&md5data, vertices, unskinnedVertices, numVertices);
             elementBuffer = MD5CreateElementBuffer(&md5data, &numElements);
             elementCount = 3 * numElements;
             diffuseTex = MD5CreateTextureBuffer(&md5data, dirFile.c_str());
@@ -99,15 +100,17 @@ void ObjectData::loadMD5Mesh(DataBlock& def)
 
             std::string animFile = def("rootdir") + anims.at(i+1);
 
-            struct md5animdata* md5anim = getMD5AnimData(animFile.c_str());
+            md5animdata md5anim;
+            
+            MD5AnimFile file(animFile.c_str());
+
+            file.getAnimData(md5anim);
 
             Armature* newArm = new Armature;
 
-            newArm->buildArmature(md5anim);
+            newArm->buildArmature(&md5anim);
 
             armatures[anims.at(i)] = newArm;
-
-            freeMD5AnimData(md5anim);
 
         }
 
