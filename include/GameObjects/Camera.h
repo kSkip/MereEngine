@@ -2,7 +2,6 @@
 #define CAMERA_H
 
 #include "GameObjects/GameObject.h"
-#include "GameObjects/Billboard.h"
 #include "GameObjects/Weapon.h"
 #include "Models/Armature.h"
 

@@ -2,7 +2,11 @@
 #define PARTICLESOURCE_H
 
 #include "GameObjects/GameObject.h"
-#include "GameObjects/Particle.h"
+
+struct Particle {
+    float position[3];
+    float velocity[3];
+};
 
 #define PS_OPT_POINTSPRITE 1
 #define PS_OPT_SPRITE 2

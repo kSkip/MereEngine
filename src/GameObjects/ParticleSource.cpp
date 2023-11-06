@@ -50,28 +50,8 @@ void ParticleSource::initPointParticles(ParticleSourceParams& params_in, GameSta
 
 }
 
-void ParticleSource::initParticles(ParticleSourceParams& params_in, GameState* state){
-
-    unsigned int i;
-    ParticleParams params;
-
-    params.objectName = params_in.objectName;
-    params.initPosition = params_in.position;
-    params.life = params_in.lifetime;
-    params.gravity = params_in.gravity;
-
-    srand (time(NULL));
-    for(i=0;i<params_in.numParticles;i++){
-
-        params.initVelocity.x = (float(rand()) / float(RAND_MAX) - 0.5f)*params_in.maxInitVelocity.x;
-        params.initVelocity.y = (float(rand()) / float(RAND_MAX) - 0.5f)*params_in.maxInitVelocity.y;
-        params.initVelocity.z = (float(rand()) / float(RAND_MAX) - 0.5f)*params_in.maxInitVelocity.z;
-
-        Particle* newParticle = new Particle(params,state);
-        addTransparentObject(newParticle,state);
-        particles.push_back(newParticle);
-
-    }
+void ParticleSource::initParticles(ParticleSourceParams& params_in, GameState* state)
+{
 
 }
 
@@ -99,21 +79,8 @@ void ParticleSource::move(double deltatime, Camera* player, std::list<GameObject
 
 }
 
-void ParticleSource::commitMovement(GameState* state){
-
-    std::list<Particle*>::iterator it;
-
-    for(it = particles.begin();it != particles.end();){
-        if((*it)->getLife() < 0.0f){
-            (*it)->makeDestroy();
-            it = particles.erase(it);
-        }else{
-			it++;
-		}
-
-    }
-
-    if(particles.size() == 0) destroy = true;
+void ParticleSource::commitMovement(GameState* state)
+{
 
 }
 

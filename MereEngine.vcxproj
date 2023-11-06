@@ -60,13 +60,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\boundary.cpp" />
-    <ClCompile Include="src\gameobjects\Billboard.cpp" />
     <ClCompile Include="src\gameobjects\Bullet.cpp" />
     <ClCompile Include="src\gameobjects\Camera.cpp" />
     <ClCompile Include="src\gameobjects\Character.cpp" />
     <ClCompile Include="src\gameobjects\GameObject.cpp" />
     <ClCompile Include="src\gameobjects\ObjectData.cpp" />
-    <ClCompile Include="src\gameobjects\Particle.cpp" />
     <ClCompile Include="src\gameobjects\ParticleSource.cpp" />
     <ClCompile Include="src\gameobjects\Projectile.cpp" />
     <ClCompile Include="src\gameobjects\SkyBox.cpp" />
@@ -87,13 +85,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\boundary.h" />
-    <ClInclude Include="include\gameobjects\Billboard.h" />
     <ClInclude Include="include\gameobjects\Bullet.h" />
     <ClInclude Include="include\gameobjects\Camera.h" />
     <ClInclude Include="include\gameobjects\Character.h" />
     <ClInclude Include="include\gameobjects\GameObject.h" />
     <ClInclude Include="include\gameobjects\ObjectData.h" />
-    <ClInclude Include="include\gameobjects\Particle.h" />
     <ClInclude Include="include\gameobjects\ParticleSource.h" />
     <ClInclude Include="include\gameobjects\Projectile.h" />
     <ClInclude Include="include\gameobjects\SkyBox.h" />
