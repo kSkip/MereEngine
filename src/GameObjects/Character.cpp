@@ -103,7 +103,7 @@ void Character::move(double deltatime, Camera* player, std::list<GameObject*>* l
 
     if(data){
         if (Armature* arm = data->armatures["run"]) {
-            arm->buildFrame(charAnimTime, NULL);
+            arm->buildFrame(charAnimTime);
             arm->setVertices(data->vertices.data(), data->unskinnedVertices.data(), data->numVertices);
         }
     }

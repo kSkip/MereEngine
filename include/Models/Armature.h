@@ -1,61 +1,36 @@
 #ifndef ARMATURE_H
 #define ARMATURE_H
 
-#define MAXCHILDREN 20
-#define MAXNODES 20
-
 #include "MD5GLBufferUtilities.h"
 #include "MD5MeshUtilities.h"
 
+typedef struct vec3 { float v[3]; } vec3;
+typedef struct quat4 { float v[4]; } quat4;
+
 class Armature{
 	public:
-		Armature();
-		Armature(const Armature & rhs);
-		~Armature();
-
 		void buildArmature(struct md5animdata* md5data); 
 
-		void buildFrame(float animationTime, float* jointPositions);
+		void buildFrame(float animationTime);
 
 		void setVertices(struct vertex* vertices, struct UnskinnedVertex* unskinned, unsigned int numVertices);
 
 		double getTotalTime() { return double(numFrames) / double(frameRate); }
 
 	private:
-		class Node{
-			friend class Armature;
-
-			Node* children[MAXCHILDREN];
-			unsigned int numChildren;
-			int id;
-			int parentId;
-			int flags;
-			int startIndex;
-
-			float currentPosition[3];
-			float currentOrientation[4];
-		};
-
-		Node* rootNodes[MAXCHILDREN];
-		unsigned int numRoots;
-
-		Node* allNodes[MAXNODES];
-		unsigned int numNodes;
-
 		unsigned int numFrames;
 		unsigned int numJoints;
 		unsigned int frameRate;
 		unsigned int numAnimatedComponents;
+		std::vector<md5hierarchyjoint> joints;
 		std::vector<md5bounds> bounds;
 		std::vector<md5baseframejoint> baseframe;
 		std::vector<md5frame> frames;
 
-		bool pushDown(struct md5hierarchyjoint* joint);
-		bool push(Node* pNode, struct md5hierarchyjoint* joint);
-		void deleteNode(Node* pNode);
+		std::vector<vec3> jointPosition;
+		std::vector<quat4> jointOrientation;
 
-		void getFrameValues(Node* pNode, float position[3], float orientation[4], struct md5frame* frame);
-		void setJoint(Node* pNode, Node* pParent, unsigned int firstFrame, unsigned int secondFrame, float interpol);
+		void setJoint(unsigned int i, unsigned int firstFrame, unsigned int secondFrame, float interpol);
 };
 
 #endif

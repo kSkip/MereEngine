@@ -39,7 +39,7 @@ void Weapon::move(double deltatime, Camera* player, std::list<GameObject*>* leve
             else {
                 animTime = 0.0;
             }
-            arm->buildFrame(animTime, NULL);
+            arm->buildFrame(animTime);
             arm->setVertices(data->vertices.data(), data->unskinnedVertices.data(), data->numVertices);
         }
     }

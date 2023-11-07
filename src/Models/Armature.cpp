@@ -3,102 +3,6 @@
 #include <iostream>
 #include <cmath>
 
-Armature::Armature(){
-
-	numRoots = 0;
-	numNodes = 0;
-
-}
-
-Armature::Armature(const Armature & rhs){
-
-}
-
-Armature::~Armature(){
-
-	unsigned int i;
-
-	for(i=0;i<numRoots;i++){
-
-		deleteNode(rootNodes[i]);
-
-	}
-
-}
-
-void Armature::deleteNode(Node* pNode){
-
-	unsigned int i;
-
-	for(i=0;i<pNode->numChildren;i++){
-
-		deleteNode(pNode->children[i]);
-
-	}
-
-	delete pNode;
-
-}
-
-bool Armature::push(Node* pNode, struct md5hierarchyjoint* joint){
-
-	unsigned int i;
-
-	if(pNode->id == joint->parentId){
-
-		Node* pNew = new Node;
-		pNode->children[(pNode->numChildren)++] = pNew;
-		pNew->numChildren = 0;
-		pNew->id = joint->id;
-		allNodes[pNew->id] = pNew;
-		numNodes++;
-		pNew->parentId = pNode->id;
-		pNew->flags = joint->flags;
-		pNew->startIndex = joint->startIndex;
-
-		return true;
-
-	}
-
-	for(i=0;i<pNode->numChildren;i++){
-
-		if(push(pNode->children[i],joint)) return true;
-
-	}
-
-	return false;
-}
-
-bool Armature::pushDown(struct md5hierarchyjoint* joint){
-
-	unsigned int i;
-
-	if(joint->parentId < 0){
-
-		Node* pNew = new Node;
-		rootNodes[numRoots++] = pNew;
-		pNew->numChildren = 0;
-		pNew->id = joint->id;
-		allNodes[pNew->id] = pNew;
-		numNodes++;
-		pNew->parentId = -1;
-		pNew->flags = joint->flags;
-		pNew->startIndex = joint->startIndex;
-
-		return true;
-
-	}
-
-	for(i=0;i<numRoots;i++){
-
-		if(push(rootNodes[i],joint)) return true;
-
-	}
-
-	return false;
-
-}
-
 void Armature::buildArmature(struct md5animdata* md5data){
 
 	unsigned int i;
@@ -108,46 +12,41 @@ void Armature::buildArmature(struct md5animdata* md5data){
 	frameRate = md5data->frameRate;
 	numAnimatedComponents = md5data->numAnimatedComponents;
 
+	std::swap(joints, md5data->joints);
 	std::swap(bounds, md5data->bounds);
-
 	std::swap(baseframe, md5data->baseframe);
-
 	std::swap(frames, md5data->frames);
 
-	for(i=0;i<md5data->numJoints;i++){
-
-		pushDown(&(md5data->joints[i]));
-
-	}
-
+	jointPosition.resize(joints.size());
+	jointOrientation.resize(joints.size());
 }
 
-void Armature::getFrameValues(Node* pNode, float position[3], float orientation[4], struct md5frame* frame){
+void getFrameValues(md5hierarchyjoint &joint, float position[3], float orientation[4], md5frame &frame){
 
-	unsigned int i = 0;
+	size_t i = joint.startIndex;
 
-	if(pNode->flags & 1){
-		position[0]    = frame->animatedComponents[pNode->startIndex+i];
+	if(joint.flags & 1){
+		position[0] = frame.animatedComponents[i];
 		i++;
 	}
-	if(pNode->flags & 2){
-		position[1]    = frame->animatedComponents[pNode->startIndex+i];
+	if(joint.flags & 2){
+		position[1] = frame.animatedComponents[i];
 		i++;
 	}
-	if(pNode->flags & 4){
-		position[2]    = frame->animatedComponents[pNode->startIndex+i];
+	if(joint.flags & 4){
+		position[2] = frame.animatedComponents[i];
 		i++;
 	}
-	if(pNode->flags & 8){
-		orientation[0] = frame->animatedComponents[pNode->startIndex+i];
+	if(joint.flags & 8){
+		orientation[0] = frame.animatedComponents[i];
 		i++;
 	}
-	if(pNode->flags & 16){
-		orientation[1] = frame->animatedComponents[pNode->startIndex+i];
+	if(joint.flags & 16){
+		orientation[1] = frame.animatedComponents[i];
 		i++;
 	}
-	if(pNode->flags & 32){
-		orientation[2] = frame->animatedComponents[pNode->startIndex+i];
+	if(joint.flags & 32){
+		orientation[2] = frame.animatedComponents[i];
 		i++;
 	}
 
@@ -155,10 +54,8 @@ void Armature::getFrameValues(Node* pNode, float position[3], float orientation[
 
 }
 
-void Armature::setJoint(Node* pNode, Node* pParent, unsigned int firstFrame, unsigned int secondFrame, float interpol){
-
-	unsigned int i;
-
+void Armature::setJoint(unsigned int i, unsigned int firstFrame, unsigned int secondFrame, float interpol)
+{
 	float floorPosition[3];
 	float floorOrientation[4];
 	float ceilPosition[3];
@@ -167,56 +64,49 @@ void Armature::setJoint(Node* pNode, Node* pParent, unsigned int firstFrame, uns
 	float position[3];
 	float orientation[4];
 
-	struct md5baseframejoint* thisJointBase = &(baseframe[pNode->id]);
-	struct md5frame* first = &(frames[firstFrame]);
-	struct md5frame* second = &(frames[secondFrame]);
+	md5hierarchyjoint & joint = joints[i];
+	md5baseframejoint & thisJointBase = baseframe[i];
+	md5frame & first = frames[firstFrame];
+	md5frame & second = frames[secondFrame];
 
-	memcpy(floorPosition,thisJointBase->position,3*sizeof(float));
-	memcpy(floorOrientation,thisJointBase->orientation,3*sizeof(float));
+	memcpy(floorPosition, thisJointBase.position, 3 * sizeof(float));
+	memcpy(floorOrientation, thisJointBase.orientation, 3 * sizeof(float));
 
-	memcpy(ceilPosition,thisJointBase->position,3*sizeof(float));
-	memcpy(ceilOrientation,thisJointBase->orientation,3*sizeof(float));
+	memcpy(ceilPosition, thisJointBase.position, 3 * sizeof(float));
+	memcpy(ceilOrientation, thisJointBase.orientation, 3 * sizeof(float));
 
-	getFrameValues(pNode,floorPosition,floorOrientation,first);
+	getFrameValues(joints[i], floorPosition, floorOrientation, first);
 
-	getFrameValues(pNode,ceilPosition,ceilOrientation,second);
+	getFrameValues(joints[i], ceilPosition, ceilOrientation, second);
 
-	interpolate_quaternion(floorOrientation,ceilOrientation,interpol,orientation);
+	interpolate_quaternion(floorOrientation, ceilOrientation, interpol, orientation);
 
-	interpolate_position(floorPosition,ceilPosition,interpol,position);
+	interpolate_position(floorPosition, ceilPosition, interpol, position);
 
-	if(pParent){
-
+	if(joint.parentId >= 0) {
 		float rotatedPosition[3];
-		rotate_position(pParent->currentOrientation,position,rotatedPosition);
+		rotate_position(jointOrientation[joint.parentId].v, position, rotatedPosition);
 
-		pNode->currentPosition[0] = rotatedPosition[0] + pParent->currentPosition[0];
-		pNode->currentPosition[1] = rotatedPosition[1] + pParent->currentPosition[1];
-		pNode->currentPosition[2] = rotatedPosition[2] + pParent->currentPosition[2];
+		jointPosition[i].v[0] = rotatedPosition[0] + jointPosition[joint.parentId].v[0];
+		jointPosition[i].v[1] = rotatedPosition[1] + jointPosition[joint.parentId].v[1];
+		jointPosition[i].v[2] = rotatedPosition[2] + jointPosition[joint.parentId].v[2];
 
 		float rotatedQuat[4];
-		quaternion_product(pParent->currentOrientation,orientation,rotatedQuat);
+		quaternion_product(jointOrientation[joint.parentId].v, orientation, rotatedQuat);
 
-		memcpy(pNode->currentOrientation,rotatedQuat,4*sizeof(float));
+		memcpy(jointOrientation[i].v, rotatedQuat, 4 * sizeof(float));
 
 	}else{
 
-		memcpy(pNode->currentPosition,position,3*sizeof(float));
-		memcpy(pNode->currentOrientation,orientation,4*sizeof(float));
-
-	}
-
-	for(i=0;i<pNode->numChildren;i++){
-
-		setJoint(pNode->children[i],pNode,firstFrame,secondFrame,interpol);
+		memcpy(jointPosition[i].v, position, 3 * sizeof(float));
+		memcpy(jointOrientation[i].v, orientation, 4 * sizeof(float));
 
 	}
 
 }
 
-void Armature::buildFrame(float animationTime, float* jointPositions){
-
-	unsigned int i;
+void Armature::buildFrame(float animationTime)
+{
 	unsigned int firstFrame, secondFrame;
 	float interpol;
 
@@ -228,20 +118,8 @@ void Armature::buildFrame(float animationTime, float* jointPositions){
 
 	interpol = animationFrames - float(firstFrame);
 
-	for(i=0;i<numRoots;i++){
-
-		setJoint(rootNodes[i], NULL, firstFrame, secondFrame, interpol);
-
-	}
-
-	if(jointPositions){
-
-		for(i=0;i<numNodes;i++){
-
-			memcpy(&(jointPositions[3*i]),allNodes[i]->currentPosition,3*sizeof(float));
-
-		}
-
+	for (size_t i = 0; i < numJoints; i++) {
+		setJoint(i, firstFrame, secondFrame, interpol);
 	}
 
 }
@@ -250,17 +128,17 @@ void Armature::setVertices(struct vertex* vertices, struct UnskinnedVertex* unsk
 
 	unsigned int i, j;
 
-	for(i=0;i<numVertices;i++){
+	for (i = 0; i < numVertices; i++) {
 
 		memset(vertices[i].position,0,3*sizeof(float));
 		memset(vertices[i].normal,0,3*sizeof(float));
 
-		for(j=0;j<unskinned[i].countWeight;j++){
+		for (j = 0; j < unskinned[i].countWeight; j++) {
 
 			float jointPos[3];
 			float jointOrient[4];
-			memcpy(jointPos   ,allNodes[unskinned[i].jointId[j]]->currentPosition   ,3*sizeof(float));
-			memcpy(jointOrient,allNodes[unskinned[i].jointId[j]]->currentOrientation,4*sizeof(float));
+			memcpy(jointPos, jointPosition[unskinned[i].jointId[j]].v, 3 * sizeof(float));
+			memcpy(jointOrient, jointOrientation[unskinned[i].jointId[j]].v, 4 * sizeof(float));
 
 			float weightPosition[3];
 			float weightNormal[3];
