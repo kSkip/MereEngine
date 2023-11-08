@@ -3,15 +3,13 @@
 #include <SOIL/SOIL.h>
 #include <iostream>
 
-GLuint OBJCreateVertexBuffer(std::vector<tinyobj::shape_t>* shapes){
-
-	unsigned int i;
+GLuint OBJCreateVertexBuffer(std::vector<tinyobj::shape_t>* shapes)
+{
 	GLuint vbuf;
-	struct vertex* vertices;
+	size_t numVertices = (*shapes)[0].mesh.positions.size() / 3;
+	std::vector<vertex> vertices(numVertices);
 
-	vertices = new vertex[(*shapes)[0].mesh.positions.size()/3];
-
-	for (i = 0; i < (*shapes)[0].mesh.positions.size() / 3; i++) {
+	for (size_t i = 0; i < numVertices; i++) {
 		vertices[i].position[0] = (*shapes)[0].mesh.positions[3*i];
 		vertices[i].position[1] = (*shapes)[0].mesh.positions[3*i+1];
 		vertices[i].position[2] = (*shapes)[0].mesh.positions[3*i+2];
@@ -27,7 +25,7 @@ GLuint OBJCreateVertexBuffer(std::vector<tinyobj::shape_t>* shapes){
 
 	glGenBuffers(1, &vbuf);
 	glBindBuffer(GL_ARRAY_BUFFER, vbuf);
-	glBufferData(GL_ARRAY_BUFFER,((*shapes)[0].mesh.positions.size() / 3)*sizeof(vertex), vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, numVertices *sizeof(vertex), vertices.data(), GL_STATIC_DRAW);
 
 	return vbuf;
 
