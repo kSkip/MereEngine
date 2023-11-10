@@ -2,7 +2,7 @@
 #include <string>
 #include "VectorMath/quaternion_math.h"
 #include <math.h>
-#include <SOIL/SOIL.h>
+#include "Models/TextureReader.h"
 
 /*Function declarations for functions used only in this source file*/
 
@@ -184,7 +184,8 @@ GLuint MD5CreateTextureBuffer(struct md5meshdata* md5data, const char* shaderDir
 
 	std::string path = std::string(shaderDirectory) + std::string(md5data->meshes[0].shaderName);
 
-	texture = SOIL_load_OGL_texture(path.c_str(),SOIL_LOAD_RGBA,SOIL_CREATE_NEW_ID,SOIL_FLAG_TEXTURE_REPEATS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_COMPRESS_TO_DXT);
+	TextureReader reader(path.c_str());
+	texture = reader.createOGLTexture();
 
 	return texture;
 

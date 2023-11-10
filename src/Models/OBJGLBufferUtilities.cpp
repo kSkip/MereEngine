@@ -1,6 +1,6 @@
 #include "Models/OBJGLBufferUtilities.h"
 #include "Models/MD5GLBufferUtilities.h"
-#include <SOIL/SOIL.h>
+#include "Models/TextureReader.h"
 #include <iostream>
 
 GLuint OBJCreateVertexBuffer(std::vector<tinyobj::shape_t>* shapes)
@@ -51,7 +51,8 @@ GLuint OBJCreateTextureBuffer(std::vector<tinyobj::material_t>* materials, const
 
 	std::string path = std::string(shaderDirectory) + (*materials)[0].diffuse_texname;
 
-	texture = SOIL_load_OGL_texture(path.c_str(),SOIL_LOAD_RGBA,SOIL_CREATE_NEW_ID,SOIL_FLAG_TEXTURE_REPEATS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_COMPRESS_TO_DXT);
+	TextureReader reader(path.c_str());
+	texture = reader.createOGLTexture();
 
 	return texture;
 

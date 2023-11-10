@@ -84,6 +84,9 @@
     <ClCompile Include="src\vectormath\quaternion_math.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Models\TextureReader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\boundary.h">
@@ -153,6 +156,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Platform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Models\TextureReader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,7 +1,5 @@
 #include "Platform.h"
 
-#include <SOIL/SOIL.h>
-
 #include "GameState.h"
 #include "Menu.h"
 
@@ -350,10 +348,6 @@ LRESULT CALLBACK GameProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					break;
 				case 0x44: // D
 					state.movingRight(false);
-					break;
-				case VK_SNAPSHOT:
-					SOIL_save_screenshot("screenshot.bmp", SOIL_SAVE_TYPE_BMP,
-						0, 0, width, height);
 					break;
 			}
 			break;
