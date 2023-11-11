@@ -1,5 +1,5 @@
 #include "Models/Armature.h"
-#include "VectorMath/quaternion_math.h"
+#include "VectorMath/QuaternionMath.h"
 #include <iostream>
 #include <cmath>
 

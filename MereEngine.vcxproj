@@ -42,7 +42,7 @@
   <PropertyGroup Label="UserMacros" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)\soil\inc;$(SolutionDir)\tinyobjloader;$(SolutionDir)\include;$(SolutionDir)\..\stb;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\tinyobjloader;$(SolutionDir)\include;$(SolutionDir)\..\stb;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>tinyobjloader.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -51,7 +51,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)\soil\inc;$(SolutionDir)\tinyobjloader;$(SolutionDir)\include;$(SolutionDir)\..\stb;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\tinyobjloader;$(SolutionDir)\include;$(SolutionDir)\..\stb;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>tinyobjloader.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -82,7 +82,7 @@
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\utilities\DataBlock.cpp" />
     <ClCompile Include="src\utilities\TextManipulation.cpp" />
-    <ClCompile Include="src\vectormath\quaternion_math.cpp" />
+    <ClCompile Include="src\vectormath\QuaternionMath.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\boundary.h" />
@@ -108,7 +108,7 @@
     <ClInclude Include="include\Shader.h" />
     <ClInclude Include="include\utilities\DataBlock.h" />
     <ClInclude Include="include\utilities\TextManipulation.h" />
-    <ClInclude Include="include\vectormath\quaternion_math.h" />
+    <ClInclude Include="include\vectormath\QuaternionMath.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

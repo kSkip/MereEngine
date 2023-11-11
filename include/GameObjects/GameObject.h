@@ -13,8 +13,6 @@
 
 #include "Platform.h"
 
-#include <SOIL/SOIL.h>
-
 #define GLM_FORCE_RADIANS
 
 #include <glm/glm.hpp>

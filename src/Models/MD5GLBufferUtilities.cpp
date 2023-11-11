@@ -1,6 +1,6 @@
 #include "Models/MD5GLBufferUtilities.h"
 #include <string>
-#include "VectorMath/quaternion_math.h"
+#include "VectorMath/QuaternionMath.h"
 #include <math.h>
 #include "Models/TextureReader.h"
 

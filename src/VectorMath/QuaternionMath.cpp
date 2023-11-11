@@ -1,4 +1,4 @@
-#include "VectorMath/quaternion_math.h"
+#include "VectorMath/QuaternionMath.h"
 #include <math.h>
 #include <string.h>
 

@@ -81,7 +81,7 @@
     <ClCompile Include="src\utilities\TextManipulation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\vectormath\quaternion_math.cpp">
+    <ClCompile Include="src\vectormath\QuaternionMath.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Models\TextureReader.cpp">
@@ -152,7 +152,7 @@
     <ClInclude Include="include\utilities\TextManipulation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\vectormath\quaternion_math.h">
+    <ClInclude Include="include\vectormath\QuaternionMath.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Platform.h">
