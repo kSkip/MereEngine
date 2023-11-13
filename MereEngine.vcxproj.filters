@@ -63,9 +63,6 @@
     <ClCompile Include="src\models\Armature.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\models\BasicGLBufferUtilities.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\models\MD5GLBufferUtilities.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -129,9 +126,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\gameobjects\Weapon.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\models\BasicGLBufferUtilities.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\models\MD5MeshUtilities.h">

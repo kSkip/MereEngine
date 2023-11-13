@@ -74,7 +74,6 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\menu\Menu.cpp" />
     <ClCompile Include="src\models\Armature.cpp" />
-    <ClCompile Include="src\models\BasicGLBufferUtilities.cpp" />
     <ClCompile Include="src\models\MD5GLBufferUtilities.cpp" />
     <ClCompile Include="src\models\MD5MeshUtilities.cpp" />
     <ClCompile Include="src\models\OBJGLBufferUtilities.cpp" />
@@ -99,7 +98,6 @@
     <ClInclude Include="include\GameState.h" />
     <ClInclude Include="include\Menu.h" />
     <ClInclude Include="include\models\Armature.h" />
-    <ClInclude Include="include\models\BasicGLBufferUtilities.h" />
     <ClInclude Include="include\models\MD5GLBufferUtilities.h" />
     <ClInclude Include="include\models\MD5MeshUtilities.h" />
     <ClInclude Include="include\models\OBJGLBufferUtilities.h" />
