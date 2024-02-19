@@ -1,7 +1,7 @@
 #include "GameObjects/ObjectData.h"
 #include "Utilities/TextManipulation.h"
-#include "Models/OBJGLBufferUtilities.h"
 #include "Models/MD5GLBufferUtilities.h"
+#include "Models/OBJMesh.h"
 
 ObjectData::ObjectData(){}
 
@@ -53,15 +53,14 @@ void ObjectData::loadOBJMesh(DataBlock& def)
     {
 
         unsigned int numElements;
-        std::vector<tinyobj::shape_t> shapes;
-        std::vector<tinyobj::material_t> materials;
+        OBJ::MeshFile file(meshFile.c_str());
+        OBJ::Mesh meshes;
+        file.getMesh(meshes, dirFile.c_str(), &numElements);
 
-        std::string err = tinyobj::LoadObj(shapes,materials,meshFile.c_str(),dirFile.c_str());
-
-        vertexBuffer  =  OBJCreateVertexBuffer(&shapes);
-        elementBuffer =  OBJCreateElementBuffer(&shapes, &numElements);
-        elementCount  =  3*numElements;
-        diffuseTex    =  OBJCreateTextureBuffer(&materials,dirFile.c_str());
+        vertexBuffer = meshes.vertices;
+        elementBuffer = meshes.elements;
+        elementCount =  3*numElements;
+        diffuseTex = meshes.texture;
 
     }
 

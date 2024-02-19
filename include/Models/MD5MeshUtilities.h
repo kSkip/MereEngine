@@ -7,6 +7,8 @@
 #include <vector>
 #include <exception>
 
+#include "DataFile.h"
+
 struct md5vertex {
 	unsigned int index;
 	float s,t;
@@ -86,28 +88,13 @@ struct md5animdata {
 	std::vector<md5frame> frames;
 };
 
-#define MAX_LINE_LENGTH 128
-
-class MD5File {
+class MD5File : public DataFile {
 protected:
-	MD5File(const char* fileName) {
-		fp = fopen(fileName, "r");
-		memset(line, 0, sizeof line);
-	}
-	~MD5File() {
-		fclose(fp);
-	}
-	MD5File(MD5File const &) = delete;
-	MD5File& operator= (MD5File const &) = delete;
+	MD5File(const char* fileName) : DataFile(fileName) {}
 
-	char* getLine();
 	unsigned int getValue(char*);
 	void seekListBegin(char*);
 	void seekListEnd();
-
-private:
-	FILE *fp;
-	char line[MAX_LINE_LENGTH];
 };
 
 class MD5MeshFile : public MD5File {
@@ -115,9 +102,6 @@ public:
 	MD5MeshFile(const char* fileName) : MD5File(fileName) {
 		memset(buf, 0, sizeof buf);
 	}
-	~MD5MeshFile() {}
-	MD5MeshFile(MD5MeshFile const &) = delete;
-	MD5MeshFile& operator= (MD5MeshFile const &) = delete;
 
 	void getMeshData(md5meshdata &);
 
@@ -133,11 +117,9 @@ private:
 class MD5AnimFile : public MD5File {
 public:
 	MD5AnimFile(const char* fileName) : MD5File(fileName) {}
-	~MD5AnimFile() {}
-	MD5AnimFile(MD5AnimFile const &) = delete;
-	MD5AnimFile& operator= (MD5AnimFile const &) = delete;
 
 	void getAnimData(md5animdata &);
+
 private:
 	void getJoint(md5hierarchyjoint &);
 	void getBounds(md5bounds &);

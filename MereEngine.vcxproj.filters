@@ -66,9 +66,6 @@
     <ClCompile Include="src\models\MD5GLBufferUtilities.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\models\OBJGLBufferUtilities.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\models\MD5MeshUtilities.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -82,6 +79,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Models\TextureReader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Models\OBJMesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -137,9 +137,6 @@
     <ClInclude Include="include\models\MD5GLBufferUtilities.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\models\OBJGLBufferUtilities.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\utilities\DataBlock.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -153,6 +150,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Models\TextureReader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Models\DataFile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Models\OBJMesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

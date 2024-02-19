@@ -1,5 +1,4 @@
 #include "GameObjects/StaticObject.h"
-#include "Models/OBJGLBufferUtilities.h"
 #include "Utilities/TextManipulation.h"
 #include "Utilities/DataBlock.h"
 

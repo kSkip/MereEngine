@@ -4,11 +4,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 16.0.33927.289
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MereEngine", "MereEngine.vcxproj", "{87D76582-BFFC-4C95-8579-FC2C65A21D9E}"
-	ProjectSection(ProjectDependencies) = postProject
-		{8BF555A3-7D35-463C-A96C-3C95EBF9778B} = {8BF555A3-7D35-463C-A96C-3C95EBF9778B}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tinyobjloader", "tinyobjloader\tinyobjloader.vcxproj", "{8BF555A3-7D35-463C-A96C-3C95EBF9778B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,14 +19,6 @@ Global
 		{87D76582-BFFC-4C95-8579-FC2C65A21D9E}.Release|x64.ActiveCfg = Release|x64
 		{87D76582-BFFC-4C95-8579-FC2C65A21D9E}.Release|x64.Build.0 = Release|x64
 		{87D76582-BFFC-4C95-8579-FC2C65A21D9E}.Release|x86.ActiveCfg = Release|x64
-		{8BF555A3-7D35-463C-A96C-3C95EBF9778B}.Debug|x64.ActiveCfg = Debug|x64
-		{8BF555A3-7D35-463C-A96C-3C95EBF9778B}.Debug|x64.Build.0 = Debug|x64
-		{8BF555A3-7D35-463C-A96C-3C95EBF9778B}.Debug|x86.ActiveCfg = Debug|Win32
-		{8BF555A3-7D35-463C-A96C-3C95EBF9778B}.Debug|x86.Build.0 = Debug|Win32
-		{8BF555A3-7D35-463C-A96C-3C95EBF9778B}.Release|x64.ActiveCfg = Release|x64
-		{8BF555A3-7D35-463C-A96C-3C95EBF9778B}.Release|x64.Build.0 = Release|x64
-		{8BF555A3-7D35-463C-A96C-3C95EBF9778B}.Release|x86.ActiveCfg = Release|Win32
-		{8BF555A3-7D35-463C-A96C-3C95EBF9778B}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

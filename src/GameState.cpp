@@ -5,7 +5,6 @@
 #include "GameObjects/Character.h"
 #include "GameObjects/SkyBox.h"
 #include "GameObjects/Bullet.h"
-#include "Models/OBJGLBufferUtilities.h"
 #include "Utilities/TextManipulation.h"
 
 GameState::GameState(){}

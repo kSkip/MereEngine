@@ -42,19 +42,17 @@
   <PropertyGroup Label="UserMacros" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)\tinyobjloader;$(SolutionDir)\include;$(SolutionDir)\..\stb;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\include;$(SolutionDir)\..\stb;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>tinyobjloader.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutputPath);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)\tinyobjloader;$(SolutionDir)\include;$(SolutionDir)\..\stb;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\include;$(SolutionDir)\..\stb;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>tinyobjloader.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutputPath);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -76,7 +74,7 @@
     <ClCompile Include="src\models\Armature.cpp" />
     <ClCompile Include="src\models\MD5GLBufferUtilities.cpp" />
     <ClCompile Include="src\models\MD5MeshUtilities.cpp" />
-    <ClCompile Include="src\models\OBJGLBufferUtilities.cpp" />
+    <ClCompile Include="src\Models\OBJMesh.cpp" />
     <ClCompile Include="src\Models\TextureReader.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\utilities\DataBlock.cpp" />
@@ -98,9 +96,10 @@
     <ClInclude Include="include\GameState.h" />
     <ClInclude Include="include\Menu.h" />
     <ClInclude Include="include\models\Armature.h" />
+    <ClInclude Include="include\Models\DataFile.h" />
     <ClInclude Include="include\models\MD5GLBufferUtilities.h" />
     <ClInclude Include="include\models\MD5MeshUtilities.h" />
-    <ClInclude Include="include\models\OBJGLBufferUtilities.h" />
+    <ClInclude Include="include\Models\OBJMesh.h" />
     <ClInclude Include="include\Models\TextureReader.h" />
     <ClInclude Include="include\Platform.h" />
     <ClInclude Include="include\Shader.h" />

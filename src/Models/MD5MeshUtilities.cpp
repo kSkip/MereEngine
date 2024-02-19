@@ -1,14 +1,5 @@
 #include "Models/MD5MeshUtilities.h"
 
-char* MD5File::getLine()
-{
-	char *l = fgets(line, MAX_LINE_LENGTH, fp);
-	if (l == NULL || feof(fp)) {
-		throw;
-	}
-	return l;
-}
-
 unsigned int MD5File::getValue(char* name)
 {
 	char tag[MAX_LINE_LENGTH] = {};
