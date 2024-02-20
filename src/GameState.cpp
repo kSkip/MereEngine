@@ -1,7 +1,6 @@
 #include <numeric>
 
 #include "GameState.h"
-#include "GameObjects/GameObject.h"
 #include "GameObjects/Camera.h"
 #include "GameObjects/StaticObject.h"
 #include "GameObjects/Character.h"
@@ -10,18 +9,19 @@
 #include "Utilities/TextManipulation.h"
 
 struct FrameRateCounter {
-    double samples[16];
-    int idx;
+    std::vector<double> samples;
+    size_t idx;
 
-    FrameRateCounter() : idx(0) {}
+    FrameRateCounter() : idx(0), samples(16) {}
 
     void insert(double frameTime) {
         samples[idx] = frameTime;
-        idx = (idx + 1) % 16;
+        idx = (idx + 1) % samples.size();
     }
 
     double getMillis() {
-        return std::accumulate(samples, samples + 16, 0.0) / 16.0;
+        double result = std::accumulate(samples.begin(), samples.end(), 0.0);
+        return  result / samples.size();
     }
 } counter;
 
