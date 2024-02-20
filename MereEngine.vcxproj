@@ -69,7 +69,7 @@
     <ClCompile Include="src\gameobjects\StaticObject.cpp" />
     <ClCompile Include="src\gameobjects\Weapon.cpp" />
     <ClCompile Include="src\GameState.cpp" />
-    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Win32Main.cpp" />
     <ClCompile Include="src\menu\Menu.cpp" />
     <ClCompile Include="src\models\Armature.cpp" />
     <ClCompile Include="src\models\MD5GLBufferUtilities.cpp" />
