@@ -29,14 +29,10 @@ GameState::~GameState()
 
 GameState::GameState(const GameState & rhs){}
 
-void GameState::init(std::string dir, int width, int height)
+void GameState::init(std::string dir)
 {
 
     rootDir = dir;
-
-    screenwidth = width;
-    screenheight = height;
-	aspectRatio = float(screenwidth) / float(screenheight);
 
     /*
      * Indicate no state has been loaded yet
@@ -78,6 +74,16 @@ void GameState::clean()
 
     loaded = false;
 
+}
+
+void GameState::setWindowSize(int width, int height)
+{
+    context.width = width;
+    context.height = height;
+
+    screenwidth = width;
+    screenheight = height;
+    aspectRatio = float(screenwidth) / float(screenheight);
 }
 
 void GameState::loadObjectData(DataBlock & objectDataBlock)
@@ -268,13 +274,18 @@ void GameState::handleLeftButtonDown() {
 
 void GameState::handleMouseMove(int x, int y)
 {
-    if (x || y) {
-        player->handleMouseMove(x, y);
+    if (paused) {
+        context.cursor.x = x;
+        context.cursor.y = y;
     }
 }
 
-bool GameState::wantsRelativeMouse() {
-    return !paused;
+void GameState::handleRelativeMouseMove(int dx, int dy)
+{
+    if (!paused) {
+        context.cursor.dx += dx;
+        context.cursor.dy += dy;
+    }
 }
 
 void GameState::firePrimaryWeapon()
@@ -329,6 +340,9 @@ bool GameState::run(double elapsedTime)
 //moves the game objects through time
 void GameState::move(double deltatime)
 {
+    player->handleMouseMove(context.cursor.dx, context.cursor.dy);
+    context.cursor.dx = 0;
+    context.cursor.dy = 0;
 
     std::list<GameObject*>::iterator i, j;
 

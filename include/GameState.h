@@ -20,6 +20,23 @@ class ObjectData;
 
 class Camera;
 
+union CursorPos {
+    struct {
+        int x;
+        int y;
+    };
+    struct {
+        int dx;
+        int dy;
+    };
+};
+
+struct WindowContext {
+    CursorPos cursor;
+    int width;
+    int height;
+};
+
 class GameState{
 
     friend class GameObject;
@@ -31,8 +48,9 @@ class GameState{
         ~GameState();
         GameState(const GameState & rhs);
 
-        void init(std::string rootDir, int width, int height);
+        void init(std::string rootDir);
         void clean();
+        void setWindowSize(int, int);
 
         void loadNew(std::string levelfile);
         void loadSave(std::string savefile);
@@ -51,11 +69,13 @@ class GameState{
         void handleEscape();
         void handleLeftButtonDown();
         void handleMouseMove(int, int);
-        bool wantsRelativeMouse();
+        void handleRelativeMouseMove(int, int);
 
         void firePrimaryWeapon();
 
     private:
+
+        WindowContext context;
 
         Menu menu;
 

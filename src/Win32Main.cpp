@@ -10,10 +10,6 @@ HGLRC hglrc = NULL;
 BOOL contextIsCurrent = FALSE;
 
 GameState state;
-int width = 0;
-int height = 0;
-int midX = GetSystemMetrics(SM_CXSCREEN) / 2;
-int midY = GetSystemMetrics(SM_CYSCREEN) / 2;
 
 class Timer {
 public:
@@ -76,7 +72,6 @@ int ParseCmdLine(cmd_line_args & args, char *cmdLine)
 
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK GameProc(HWND, UINT, WPARAM, LPARAM);
-void ProcessMouseInput(HWND, int, int);
 int MainLoop(cmd_line_args&);
 void EnableVSync();
 
@@ -100,12 +95,26 @@ int APIENTRY WinMain(__in HINSTANCE hInstance,
 		return 1;
 	}
 
+	int width = GetSystemMetrics(SM_CXSCREEN);
+	int height = GetSystemMetrics(SM_CYSCREEN);
+	state.setWindowSize(width, height);
+
 	HWND hWnd = CreateWindow(L"GameWindow", L"MereEngine",
-		WS_OVERLAPPEDWINDOW | WS_VISIBLE,
-		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+		WS_POPUP | WS_VISIBLE, 0, 0, width, height,
 		NULL, NULL, hInstance, NULL);
 
 	if (!hWnd) {
+		return 1;
+	}
+
+	RAWINPUTDEVICE rid;
+	rid.usUsagePage = 0x01;
+	rid.usUsage = 0x02;
+	rid.dwFlags = 0;
+	rid.hwndTarget = hWnd;
+
+	if (!RegisterRawInputDevices(&rid, 1, sizeof(rid))) {
+		DestroyWindow(hWnd);
 		return 1;
 	}
 
@@ -165,12 +174,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					return -1;
 				}
 
-				EnableVSync(); // Sets the swap interval to 1 if not already set
-
-				RECT rt;
-				GetClientRect(hWnd, &rt);
-				width = rt.right - rt.left;
-				height = rt.bottom - rt.top;
+				EnableVSync();
 			}
 			return 0;
 		case WM_DESTROY:
@@ -191,6 +195,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		case WM_KEYUP:
 		case WM_LBUTTONDOWN:
 		case WM_MOUSEMOVE:
+		case WM_INPUT:
 			return GameProc(hWnd, message, wParam, lParam);
 		default:
 			break;
@@ -243,32 +248,28 @@ LRESULT CALLBACK GameProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			state.handleLeftButtonDown();
 			break;
 		case WM_MOUSEMOVE:
-			ProcessMouseInput(hWnd, LOWORD(lParam), HIWORD(lParam));
+			state.handleMouseMove(LOWORD(lParam), HIWORD(lParam));
+			break;
+		case WM_INPUT:
+			{
+				UINT dwSize = sizeof(RAWINPUT);
+				static BYTE lpb[sizeof(RAWINPUT)];
+
+				GetRawInputData((HRAWINPUT)lParam, RID_INPUT, lpb, &dwSize, sizeof(RAWINPUTHEADER));
+
+				RAWINPUT* raw = (RAWINPUT*)lpb;
+
+				if (raw->header.dwType == RIM_TYPEMOUSE) {
+					if (raw->data.mouse.usFlags == MOUSE_MOVE_RELATIVE) {
+						int relativeX = raw->data.mouse.lLastX;
+						int relativeY = raw->data.mouse.lLastY;
+						state.handleRelativeMouseMove(relativeX, relativeY);
+					}
+				}
+			}
 			break;
 	}
 	return 0;
-}
-
-void ProcessMouseInput(HWND hWnd, int x, int y) {
-
-	// Each time SetCursorPos is called it produces
-	// another WM_MOUSEMOVE message which must be ignored
-	static bool resetting = false;
-	if (resetting) {
-		resetting = false;
-		return;
-	}
-
-	if (state.wantsRelativeMouse()) {
-		POINT pt = { x, y };
-		ClientToScreen(hWnd, &pt);
-		state.handleMouseMove(pt.x - midX, pt.y - midY);
-		SetCursorPos(midX, midY);
-		resetting = true;
-	}
-	else {
-		state.handleMouseMove(x, y);
-	}
 }
 
 int MainLoop(cmd_line_args& args)
@@ -284,17 +285,14 @@ int MainLoop(cmd_line_args& args)
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
-	SetCursorPos(midX, midY);
-
 	std::string rootDir = args.root;
 	std::string firstLevel = args.level;
-	state.init(rootDir, width, height);
+	state.init(rootDir);
 	state.loadNew(rootDir + firstLevel);
 
 	MSG msg;
 
 	ShowCursor(FALSE);
-	int cursorVisible = 0;
 
 	Timer timer;
 	double timeElapsed = timer.reset();
