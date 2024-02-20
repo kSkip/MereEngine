@@ -111,6 +111,7 @@ void EnableVSync();
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK MenuProc(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK GameProc(HWND, UINT, WPARAM, LPARAM);
+int MainLoop(cmd_line_args&);
 
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	PSTR pCmdLine, int nCmdShow)
@@ -119,8 +120,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	if (ParseCmdLine(args, pCmdLine)) {
 		return 1;
 	}
-	std::string rootDir = args.root;
-	std::string firstLevel = args.level;
 
 	WNDCLASS wc = {};
 	wc.style = CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
@@ -141,71 +140,11 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		return 1;
 	}
 
-	wglUseFontBitmaps(hdc, 0, 256, 1000);
-	glListBase(1000);
-
-	state.init(rootDir, width, height);
-	state.loadNew(rootDir + firstLevel);
-
-	MSG msg;
-	int running = 1;
-
-	ShowCursor(FALSE);
-	int cursorVisible = 0;
-
-	Timer timer;
-	double timeElapsed = timer.reset();
-
-	while (running) {
-
-		while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
-			if (msg.message == WM_QUIT) {
-				running = 0;
-			}
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}
-
-		if (paused) {
-			if (!cursorVisible) {
-				ShowCursor(TRUE);
-				cursorVisible = 1;
-			}
-
-			switch (menu.getSelection()) {
-			case MENU_ACTION_NEWGAME:
-				if (state.loaded) state.clean();
-				state.loadNew(rootDir + firstLevel);
-				paused = 0;
-				break;
-			case MENU_ACTION_EXIT:
-				running = 0;
-				break;
-			default:
-				break;
-			}
-			menu.render(width, height);
-		}
-		else {
-			if (cursorVisible) {
-				ShowCursor(FALSE);
-				cursorVisible = 0;
-			}
-
-			state.move(timeElapsed);
-			state.render();
-		}
-
-		SwapBuffers(hdc);
-
-		timeElapsed = timer.reset();
-	}
-
-	glDeleteLists(1000, 256);
+	int exitCode = MainLoop(args);
 
 	DestroyWindow(hWnd);
 
-	return 0;
+	return exitCode;
 }
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -263,16 +202,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				GetClientRect(hWnd, &rt);
 				width = rt.right - rt.left;
 				height = rt.bottom - rt.top;
-
-				glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-				glEnable(GL_DEPTH_TEST);
-				glClearDepth(1.0f);
-				glDepthFunc(GL_LEQUAL);
-				glEnable(GL_BLEND);
-				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-				glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-
-				Mouse.setCenter();
 			}
 			return 0;
 		case WM_DESTROY:
@@ -381,6 +310,84 @@ LRESULT CALLBACK GameProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			Mouse.reset();
 			break;
 	}
+	return 0;
+}
+
+int MainLoop(cmd_line_args& args)
+{
+	wglUseFontBitmaps(hdc, 0, 256, 1000);
+	glListBase(1000);
+
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glEnable(GL_DEPTH_TEST);
+	glClearDepth(1.0f);
+	glDepthFunc(GL_LEQUAL);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+
+	Mouse.setCenter();
+
+	std::string rootDir = args.root;
+	std::string firstLevel = args.level;
+	state.init(rootDir, width, height);
+	state.loadNew(rootDir + firstLevel);
+
+	MSG msg;
+
+	ShowCursor(FALSE);
+	int cursorVisible = 0;
+
+	Timer timer;
+	double timeElapsed = timer.reset();
+
+	for (;;) {
+
+		while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+			if (msg.message == WM_QUIT) {
+				goto exit;
+			}
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+
+		if (paused) {
+			if (!cursorVisible) {
+				ShowCursor(TRUE);
+				cursorVisible = 1;
+			}
+
+			switch (menu.getSelection()) {
+			case MENU_ACTION_NEWGAME:
+				if (state.loaded) state.clean();
+				state.loadNew(rootDir + firstLevel);
+				paused = 0;
+				break;
+			case MENU_ACTION_EXIT:
+				goto exit;
+			default:
+				break;
+			}
+			menu.render(width, height);
+		}
+		else {
+			if (cursorVisible) {
+				ShowCursor(FALSE);
+				cursorVisible = 0;
+			}
+
+			state.move(timeElapsed);
+			state.render();
+		}
+
+		SwapBuffers(hdc);
+		timeElapsed = timer.reset();
+	}
+
+exit:
+
+	glDeleteLists(1000, 256);
+
 	return 0;
 }
 
