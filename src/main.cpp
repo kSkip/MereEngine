@@ -48,6 +48,31 @@ struct mouse {
 
 } Mouse;
 
+class Timer {
+public:
+	Timer() {
+		QueryPerformanceFrequency(&counterFreq);
+		QueryPerformanceCounter(&lastCounter);
+		counter = lastCounter;
+	}
+
+	double reset() {
+		LARGE_INTEGER elapsed;
+
+		QueryPerformanceCounter(&counter);
+		elapsed.QuadPart = counter.QuadPart - lastCounter.QuadPart;
+		elapsed.QuadPart *= 1000000;
+		elapsed.QuadPart /= counterFreq.QuadPart;
+		lastCounter = counter;
+		return (static_cast<double>(elapsed.QuadPart)) / 1000000.0;
+	}
+
+protected:
+	LARGE_INTEGER counterFreq;
+	LARGE_INTEGER lastCounter;
+	LARGE_INTEGER counter;
+};
+
 #define NUM_ARGS 2
 
 union cmd_line_args {
@@ -128,12 +153,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	ShowCursor(FALSE);
 	int cursorVisible = 0;
 
-	LARGE_INTEGER counterFreq;
-	QueryPerformanceFrequency(&counterFreq);
-	LARGE_INTEGER lastCounter, counter, elapsed;
-
-	QueryPerformanceCounter(&lastCounter);
-	double deltatime = 0.0;
+	Timer timer;
+	double timeElapsed = timer.reset();
 
 	while (running) {
 
@@ -171,18 +192,13 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 				cursorVisible = 0;
 			}
 
-			state.move(deltatime);
+			state.move(timeElapsed);
 			state.render();
 		}
 
 		SwapBuffers(hdc);
 
-		QueryPerformanceCounter(&counter);
-		elapsed.QuadPart = counter.QuadPart - lastCounter.QuadPart;
-		elapsed.QuadPart *= 1000000;
-		elapsed.QuadPart /= counterFreq.QuadPart;
-		deltatime = ((double)elapsed.QuadPart) / 1000000.0;
-		lastCounter = counter;
+		timeElapsed = timer.reset();
 	}
 
 	glDeleteLists(1000, 256);
