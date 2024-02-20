@@ -5,10 +5,9 @@
 #include <vector>
 #include <list>
 #include <map>
+#include <queue>
 #include <fstream>
 
-#include "Platform.h"
-#include "Menu.h"
 #include "Shader.h"
 #include "boundary.h"
 
@@ -20,21 +19,26 @@ class ObjectData;
 
 class Camera;
 
-union CursorPos {
-    struct {
-        int x;
-        int y;
-    };
-    struct {
-        int dx;
-        int dy;
-    };
+struct CursorPos {
+    int x;
+    int y;
+    int dx;
+    int dy;
+    bool leftButtonDown;
 };
 
 struct WindowContext {
     CursorPos cursor;
     int width;
     int height;
+};
+
+enum class MenuAction {
+    NOACTION,
+    NEWGAME,
+    LOADGAME,
+    SAVEGAME,
+    EXIT
 };
 
 class GameState{
@@ -55,10 +59,7 @@ class GameState{
         void loadNew(std::string levelfile);
         void loadSave(std::string savefile);
         void save();
-
         bool run(double);
-        void move(double deltatime);
-        void render();
 
         void movingForward(bool);
         void movingBackward(bool);
@@ -74,11 +75,7 @@ class GameState{
         void firePrimaryWeapon();
 
     private:
-
         WindowContext context;
-
-        Menu menu;
-
         std::string rootDir;
         std::string level;
 
@@ -90,6 +87,10 @@ class GameState{
 
         std::list<GameObject*> opaqueObjects; //contains only the opaque objects
         std::list<GameObject*> transparencyObjects; // conatins only the objects with transparent pixels
+
+        void move(double);
+        void render();
+        void renderMenu(WindowContext&, MenuAction&);
 
         void insertOpaqueObject(GameObject* newGameObject);
         void insertTransparencyObject(GameObject* newGameObject);
@@ -105,10 +106,10 @@ class GameState{
         int screenwidth;
         int screenheight;
         float aspectRatio;
+        std::queue<float> frameTimeSamples;
 
         void loadObjectData(DataBlock & objectDataBlock);
         void loadObjects(DataBlock & objectBlock);
-
 };
 
 #endif

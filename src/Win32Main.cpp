@@ -88,6 +88,7 @@ int APIENTRY WinMain(__in HINSTANCE hInstance,
 	WNDCLASS wc = {};
 	wc.style = CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
 	wc.lpfnWndProc = WndProc;
+	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
 	wc.hInstance = hInstance;
 	wc.lpszClassName = L"GameWindow";
 
@@ -291,9 +292,6 @@ int MainLoop(cmd_line_args& args)
 	state.loadNew(rootDir + firstLevel);
 
 	MSG msg;
-
-	ShowCursor(FALSE);
-
 	Timer timer;
 	double timeElapsed = timer.reset();
 

@@ -1,3 +1,5 @@
+#include <numeric>
+
 #include "GameState.h"
 #include "GameObjects/GameObject.h"
 #include "GameObjects/Camera.h"
@@ -6,6 +8,22 @@
 #include "GameObjects/SkyBox.h"
 #include "GameObjects/Bullet.h"
 #include "Utilities/TextManipulation.h"
+
+struct FrameRateCounter {
+    double samples[16];
+    int idx;
+
+    FrameRateCounter() : idx(0) {}
+
+    void insert(double frameTime) {
+        samples[idx] = frameTime;
+        idx = (idx + 1) % 16;
+    }
+
+    double getMillis() {
+        return std::accumulate(samples, samples + 16, 0.0) / 16.0;
+    }
+} counter;
 
 GameState::GameState(){}
 
@@ -38,6 +56,8 @@ void GameState::init(std::string dir)
      * Indicate no state has been loaded yet
      */
 
+    cursorVisible = false;
+    ShowCursor(FALSE);
 	loaded = false;
     paused = false;
 
@@ -265,7 +285,7 @@ void GameState::handleEscape() {
 
 void GameState::handleLeftButtonDown() {
     if (paused) {
-        menu.handleButtonDown();
+        context.cursor.leftButtonDown = true;
     }
     else {
         firePrimaryWeapon();
@@ -312,18 +332,19 @@ bool GameState::run(double elapsedTime)
             cursorVisible = 1;
         }
 
-        switch (menu.getSelection()) {
-        case MENU_ACTION_NEWGAME:
-            if (loaded) clean();
-            loadNew(level);
-            paused = 0;
+        MenuAction action = MenuAction::NOACTION;
+        renderMenu(context, action);
+        switch (action) {
+        case MenuAction::NEWGAME:
+            //if (loaded) clean();
+            //loadNew(level);
+            //paused = 0;
             break;
-        case MENU_ACTION_EXIT:
+        case MenuAction::EXIT:
             return true;
         default:
             break;
         }
-        menu.render(screenwidth, screenheight);
     }
     else {
         if (cursorVisible) {
@@ -333,6 +354,15 @@ bool GameState::run(double elapsedTime)
 
         move(elapsedTime);
         render();
+
+        glColor3f(0.0f, 0.7f, 0.0f);
+        float top = (-(float)screenheight + 24.0f) / (float)screenheight;
+        float left = ((float)screenwidth - 12.0f) / (float)screenwidth;
+        glRasterPos3f(-left, -top, 1.0f);
+        char fps[16];
+        counter.insert(1000 * elapsedTime);
+        sprintf(fps, "%4.0f", 1000 / counter.getMillis());
+        glCallLists(strlen(fps), GL_UNSIGNED_BYTE, fps);
     }
     return false;
 }
@@ -485,4 +515,56 @@ void GameState::insertTransparencyObject(GameObject* newGameObject)
 
     transparencyObjects.push_back(newGameObject);
 
+}
+
+bool isHovering(WindowContext& ctx, int x, int y)
+{
+    if (ctx.cursor.x > x && ctx.cursor.x < x + 100 && ctx.cursor.y > y - 18 && ctx.cursor.y < y + 18) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+void GameState::renderMenu(WindowContext& ctx, MenuAction& action)
+{
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
+    int x = ctx.width / 2 - 50;
+    int y = ctx.height / 2 - 50;
+
+    glColor3f(0.5f, 0.5f, 0.5f);
+    glRasterPos3f(float(x - ctx.width / 2) / ctx.width, float(ctx.height / 2 - y) / ctx.height, 1.0f);
+    glCallLists(15, GL_UNSIGNED_BYTE, "MereEngine Demo");
+    y += 36;
+
+    if (isHovering(ctx, x, y)) {
+        glColor3f(0.0f, 0.7f, 0.0f);
+        if (ctx.cursor.leftButtonDown) {
+            action = MenuAction::NEWGAME;
+        }
+    }
+    else {
+        glColor3f(0.9f, 0.9f, 0.9f);
+    }
+    glRasterPos3f(float(x - ctx.width / 2) / ctx.width, float(ctx.height / 2 - y) / ctx.height, 1.0f);
+    glCallLists(9, GL_UNSIGNED_BYTE, "New Game");
+    y += 36;
+
+    if (isHovering(ctx, x, y)) {
+        glColor3f(0.0f, 0.7f, 0.0f);
+        if (ctx.cursor.leftButtonDown) {
+            action = MenuAction::EXIT;
+        }
+    }
+    else {
+        glColor3f(0.9f, 0.9f, 0.9f);
+    }
+    glRasterPos3f(float(x - ctx.width / 2) / ctx.width, float(ctx.height / 2 - y) / ctx.height, 1.0f);
+    glCallLists(5, GL_UNSIGNED_BYTE, "Exit");
+    y += 36;
+
+    ctx.cursor.leftButtonDown = false;
 }
