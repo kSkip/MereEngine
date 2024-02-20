@@ -1,7 +1,6 @@
 #include "Platform.h"
 
 #include "GameState.h"
-#include "Menu.h"
 
 typedef BOOL(WINAPI * PFNWGLSWAPINTERVALEXTPROC) (int interval);
 typedef int (WINAPI * PFNWGLGETSWAPINTERVALEXTPROC) (void);
@@ -11,42 +10,10 @@ HGLRC hglrc = NULL;
 BOOL contextIsCurrent = FALSE;
 
 GameState state;
-Menu menu;
-int paused = 0;
 int width = 0;
 int height = 0;
-
-struct mouse {
-	int xMid;
-	int yMid;
-	int xPos;
-	int yPos;
-
-	void setCenter() {
-		xMid = GetSystemMetrics(SM_CXSCREEN) / 2;
-		yMid = GetSystemMetrics(SM_CYSCREEN) / 2;
-		xPos = xMid;
-		yPos = yMid;
-		SetCursorPos(xMid, yMid);
-	}
-
-	void reset() {
-		if (xPos != xMid && yPos != yMid) {
-			xPos = xMid;
-			yPos = yMid;
-			SetCursorPos(xMid, yMid);
-		}
-	}
-
-	int motionX() {
-		return xPos - xMid;
-	}
-
-	int motionY() {
-		return yPos - yMid;
-	}
-
-} Mouse;
+int midX = GetSystemMetrics(SM_CXSCREEN) / 2;
+int midY = GetSystemMetrics(SM_CYSCREEN) / 2;
 
 class Timer {
 public:
@@ -107,14 +74,16 @@ int ParseCmdLine(cmd_line_args & args, char *cmdLine)
 	}
 }
 
-void EnableVSync();
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
-LRESULT CALLBACK MenuProc(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK GameProc(HWND, UINT, WPARAM, LPARAM);
+void ProcessMouseInput(HWND, int, int);
 int MainLoop(cmd_line_args&);
+void EnableVSync();
 
-int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
-	PSTR pCmdLine, int nCmdShow)
+int APIENTRY WinMain(__in HINSTANCE hInstance,
+                     __in_opt HINSTANCE hPrevInstance,
+                     __in PSTR pCmdLine,
+                     __in int nCmdShow)
 {
 	cmd_line_args args;
 	if (ParseCmdLine(args, pCmdLine)) {
@@ -222,34 +191,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		case WM_KEYUP:
 		case WM_LBUTTONDOWN:
 		case WM_MOUSEMOVE:
-			if (paused) {
-				return MenuProc(hWnd, message, wParam, lParam);
-			}
-			else {
-				return GameProc(hWnd, message, wParam, lParam);
-			}
-			break;
+			return GameProc(hWnd, message, wParam, lParam);
 		default:
-			break;
-	}
-	return DefWindowProc(hWnd, message, wParam, lParam);
-}
-
-LRESULT CALLBACK MenuProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	switch (message) {
-		case WM_KEYDOWN:
-			switch (wParam) {
-				case VK_ESCAPE:
-					paused = 0;
-					break;
-			}
-			break;
-		case WM_LBUTTONDOWN:
-			menu.handleButtonDown();
-			break;
-		case WM_MOUSEMOVE:
-			menu.handleMouseMove(LOWORD(lParam), HIWORD(lParam));
 			break;
 	}
 	return DefWindowProc(hWnd, message, wParam, lParam);
@@ -261,7 +204,7 @@ LRESULT CALLBACK GameProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		case WM_KEYDOWN:
 			switch (wParam) {
 				case VK_ESCAPE:
-					paused = 1;
+					state.handleEscape();
 					break;
 				case 0x57: // W
 					state.movingForward(true);
@@ -297,20 +240,27 @@ LRESULT CALLBACK GameProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			}
 			break;
 		case WM_LBUTTONDOWN:
-			state.FirePrimaryWeapon();
+			state.handleLeftButtonDown();
 			break;
 		case WM_MOUSEMOVE:
-			POINT pt;
-			pt.x = LOWORD(lParam);
-			pt.y = HIWORD(lParam);
-			ClientToScreen(hWnd, &pt);
-			Mouse.xPos = pt.x;
-			Mouse.yPos = pt.y;
-			state.handleMouseMove(Mouse.motionX(), Mouse.motionY());
-			Mouse.reset();
+			ProcessMouseInput(hWnd, LOWORD(lParam), HIWORD(lParam));
 			break;
 	}
 	return 0;
+}
+
+void ProcessMouseInput(HWND hWnd, int x, int y) {
+	if (state.wantsRelativeMouse()) {
+		POINT pt = { x, y };
+		ClientToScreen(hWnd, &pt);
+		state.handleMouseMove(pt.x - midX, pt.y - midY);
+		if (pt.x != midX && pt.y != midY) {
+			SetCursorPos(midX, midY);
+		}
+	}
+	else {
+		state.handleMouseMove(x, y);
+	}
 }
 
 int MainLoop(cmd_line_args& args)
@@ -326,7 +276,7 @@ int MainLoop(cmd_line_args& args)
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
-	Mouse.setCenter();
+	SetCursorPos(midX, midY);
 
 	std::string rootDir = args.root;
 	std::string firstLevel = args.level;
@@ -351,33 +301,8 @@ int MainLoop(cmd_line_args& args)
 			DispatchMessage(&msg);
 		}
 
-		if (paused) {
-			if (!cursorVisible) {
-				ShowCursor(TRUE);
-				cursorVisible = 1;
-			}
-
-			switch (menu.getSelection()) {
-			case MENU_ACTION_NEWGAME:
-				if (state.loaded) state.clean();
-				state.loadNew(rootDir + firstLevel);
-				paused = 0;
-				break;
-			case MENU_ACTION_EXIT:
-				goto exit;
-			default:
-				break;
-			}
-			menu.render(width, height);
-		}
-		else {
-			if (cursorVisible) {
-				ShowCursor(FALSE);
-				cursorVisible = 0;
-			}
-
-			state.move(timeElapsed);
-			state.render();
+		if (state.run(timeElapsed)) {
+			goto exit;
 		}
 
 		SwapBuffers(hdc);

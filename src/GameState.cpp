@@ -41,7 +41,9 @@ void GameState::init(std::string dir, int width, int height)
     /*
      * Indicate no state has been loaded yet
      */
+
 	loaded = false;
+    paused = false;
 
 }
 
@@ -153,6 +155,7 @@ void GameState::loadObjects(DataBlock & objectBlock)
 
 void GameState::loadNew(std::string levelfile)
 {
+    level = levelfile;
 
     DataBlock leveldef;
 
@@ -242,13 +245,6 @@ void GameState::movingRight(bool isMoving)
     player->holdingRightStrafe = isMoving;
 }
 
-void GameState::handleMouseMove(int x, int y)
-{
-    if (x || y) {
-        player->handleMouseMove(x, y);
-    }
-}
-
 void GameState::handleSpacebar()
 {
     if (player->onGround()) {
@@ -257,7 +253,31 @@ void GameState::handleSpacebar()
     }
 }
 
-void GameState::FirePrimaryWeapon()
+void GameState::handleEscape() {
+    paused = !paused;
+}
+
+void GameState::handleLeftButtonDown() {
+    if (paused) {
+        menu.handleButtonDown();
+    }
+    else {
+        firePrimaryWeapon();
+    }
+}
+
+void GameState::handleMouseMove(int x, int y)
+{
+    if (x || y) {
+        player->handleMouseMove(x, y);
+    }
+}
+
+bool GameState::wantsRelativeMouse() {
+    return !paused;
+}
+
+void GameState::firePrimaryWeapon()
 {
     Weapon & weapon = player->GetWeapon();
     if (!weapon.isFiring) {
@@ -271,6 +291,39 @@ void GameState::FirePrimaryWeapon()
 
         weapon.fire();
     }
+}
+
+bool GameState::run(double elapsedTime)
+{
+    if (paused) {
+        if (!cursorVisible) {
+            ShowCursor(TRUE);
+            cursorVisible = 1;
+        }
+
+        switch (menu.getSelection()) {
+        case MENU_ACTION_NEWGAME:
+            if (loaded) clean();
+            loadNew(level);
+            paused = 0;
+            break;
+        case MENU_ACTION_EXIT:
+            return true;
+        default:
+            break;
+        }
+        menu.render(screenwidth, screenheight);
+    }
+    else {
+        if (cursorVisible) {
+            ShowCursor(FALSE);
+            cursorVisible = 0;
+        }
+
+        move(elapsedTime);
+        render();
+    }
+    return false;
 }
 
 //moves the game objects through time

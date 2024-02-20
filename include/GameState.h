@@ -8,7 +8,7 @@
 #include <fstream>
 
 #include "Platform.h"
-
+#include "Menu.h"
 #include "Shader.h"
 #include "boundary.h"
 
@@ -38,6 +38,7 @@ class GameState{
         void loadSave(std::string savefile);
         void save();
 
+        bool run(double);
         void move(double deltatime);
         void render();
 
@@ -47,16 +48,23 @@ class GameState{
         void movingRight(bool);
 
         void handleSpacebar();
-
+        void handleEscape();
+        void handleLeftButtonDown();
         void handleMouseMove(int, int);
+        bool wantsRelativeMouse();
 
-        void FirePrimaryWeapon();
-
-        bool loaded;
+        void firePrimaryWeapon();
 
     private:
 
+        Menu menu;
+
         std::string rootDir;
+        std::string level;
+
+        bool loaded;
+        bool paused;
+        bool cursorVisible;
 
         std::list<GameObject*> levelObjects; //contains all objects
 
