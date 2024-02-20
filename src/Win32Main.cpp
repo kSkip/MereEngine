@@ -250,13 +250,21 @@ LRESULT CALLBACK GameProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 }
 
 void ProcessMouseInput(HWND hWnd, int x, int y) {
+
+	// Each time SetCursorPos is called it produces
+	// another WM_MOUSEMOVE message which must be ignored
+	static bool resetting = false;
+	if (resetting) {
+		resetting = false;
+		return;
+	}
+
 	if (state.wantsRelativeMouse()) {
 		POINT pt = { x, y };
 		ClientToScreen(hWnd, &pt);
 		state.handleMouseMove(pt.x - midX, pt.y - midY);
-		if (pt.x != midX && pt.y != midY) {
-			SetCursorPos(midX, midY);
-		}
+		SetCursorPos(midX, midY);
+		resetting = true;
 	}
 	else {
 		state.handleMouseMove(x, y);
