@@ -8,13 +8,13 @@ class Character : public GameObject{
     public:
 
         Character();
-        Character(ObjectData* objectData, DataBlock& def, GameState* state);
+        Character(ObjectData* objectData, DataBlock& def);
         ~Character();
         Character(const Character & rhs);
 
-        void move(double deltatime, Camera* player, std::list<GameObject*>* levelObjects);
+        void move(double deltatime, Camera* player);
 
-        void commitMovement(GameState* state){
+        void commitMovement(){
 
             position += movement;
             translation = glm::translate(glm::mat4(1.0f),position);
@@ -22,9 +22,9 @@ class Character : public GameObject{
 
         }
 
-        void damage(float magnitude, glm::vec3 damageLocation, GameState* state);
+        void damage(float magnitude, glm::vec3 damageLocation);
 
-        void render(GameState* state);
+        void render(Shader&);
 
     private:
 
@@ -37,7 +37,7 @@ class Character : public GameObject{
         glm::vec3 currentTarget;
         double charAnimTime;
 
-        void trackPlayer(double deltatime, Camera* player, std::list<GameObject*>* levelObjects);
+        void trackPlayer(double deltatime, Camera* player);
 
 };
 

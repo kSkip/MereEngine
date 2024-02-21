@@ -6,7 +6,8 @@
 
 Character::Character(){}
 
-Character::Character(ObjectData* objectData, DataBlock& def, GameState* state){
+Character::Character(ObjectData* objectData, DataBlock& def)
+{
 
     data = objectData;
 
@@ -47,7 +48,8 @@ Character::~Character(){}
 
 Character::Character(const Character & rhs){}
 
-void Character::trackPlayer(double deltatime, Camera* player, std::list<GameObject*>* levelObjects){
+void Character::trackPlayer(double deltatime, Camera* player)
+{
 
     glm::vec4 allowed, temp;
 
@@ -85,11 +87,12 @@ void Character::trackPlayer(double deltatime, Camera* player, std::list<GameObje
     }
 }
 
-void Character::move(double deltatime, Camera* player, std::list<GameObject*>* levelObjects){
+void Character::move(double deltatime, Camera* player)
+{
 
     charAnimTime += deltatime;
 
-    trackPlayer(deltatime, player, levelObjects);
+    trackPlayer(deltatime, player);
 
     rotation = glm::rotate(glm::mat4(1.0f), rotY, glm::vec3(0.0, 1.0, 0.0));
     front = glm::rotateY(glm::vec3(0.0f, 0.0f, 1.0f), rotY);
@@ -110,20 +113,20 @@ void Character::move(double deltatime, Camera* player, std::list<GameObject*>* l
 
 }
 
-void Character::render(GameState* state){
+void Character::render(Shader& shader){
 
     if(data){
 
         glBindBuffer(GL_ARRAY_BUFFER, data->vertexBuffer);
         glBufferSubData(GL_ARRAY_BUFFER,0,data->numVertices*sizeof(struct vertex),data->vertices.data());
 
-        renderMeshElements(data->vertexBuffer,data->elementBuffer,data->elementCount,PTYPE_TRIANGLES,state);
+        renderMeshElements(data->vertexBuffer,data->elementBuffer,data->elementCount,PTYPE_TRIANGLES, shader);
 
     }
 
 }
 
-void Character::damage(float magnitude, glm::vec3 damageLocation, GameState* state)
+void Character::damage(float magnitude, glm::vec3 damageLocation)
 {
     health -= magnitude;
     /*GameObject* newobject = new ParticleSource("Data/BloodDrop.3ds", damageLocation, glm::vec3(1.0f, 1.0f, 1.0f), 100, 0.5f, false, 0, true, state);

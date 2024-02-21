@@ -2,7 +2,7 @@
 #include "Utilities/TextManipulation.h"
 #include "Utilities/DataBlock.h"
 
-Camera::Camera(ObjectData* objectData, float windowSize[2], DataBlock& def, GameState* state){
+Camera::Camera(ObjectData* objectData, ObjectData* weaponData, float windowSize[2], DataBlock& def){
 
 	initCamera();
 
@@ -31,7 +31,7 @@ Camera::Camera(ObjectData* objectData, float windowSize[2], DataBlock& def, Game
 
 	data = objectData;
 
-    currentWeapon = new Weapon("gun", state);
+    currentWeapon = new Weapon(weaponData);
 
     destroy = false;
 
@@ -107,7 +107,7 @@ void Camera::handleMouseMove(int mouseX, int mouseY){
 }
 
 // Function to calculate which direction we need to move the camera and by what amount
-void Camera::move(double deltatime, Camera* player, std::list<GameObject*>* levelObjects){
+void Camera::move(double deltatime, Camera* player){
 
 	movement = glm::vec3(0.0f,0.0f,0.0f);
 
@@ -144,10 +144,10 @@ void Camera::move(double deltatime, Camera* player, std::list<GameObject*>* leve
     movement.y = deltatime * velocity.y;
     movement.z = movementSpeedFactor * deltatime * movement.z;
 
-	currentWeapon->move(deltatime, player, levelObjects);
+	currentWeapon->move(deltatime, player);
 }
 
-void Camera::render(GameState* state){
+void Camera::render(Shader& levelShader){
 
     glClear(GL_DEPTH_BUFFER_BIT);
 
@@ -156,6 +156,6 @@ void Camera::render(GameState* state){
     rot = glm::rotate(glm::mat4(1.0f), rotVertical, right) * rot;
     currentWeapon->setTransformations(trans,rot);
 
-    currentWeapon->render(state);
+    currentWeapon->render(levelShader);
 
 }

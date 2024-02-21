@@ -2,15 +2,15 @@
 
 ParticleSource::ParticleSource(){}
 
-ParticleSource::ParticleSource(ParticleSourceParams& params_in, GameState* state){
+ParticleSource::ParticleSource(ParticleSourceParams& params_in){
 
     if(params_in.options & PS_OPT_POINTSPRITE){
 
-        initPointParticles(params_in,state);
+        initPointParticles(params_in);
 
     }else if(params_in.options & PS_OPT_SPRITE){
 
-        initParticles(params_in,state);
+        initParticles(params_in);
 
     }
 
@@ -25,7 +25,7 @@ ParticleSource::~ParticleSource(){}
 
 ParticleSource::ParticleSource(const ParticleSource & rhs){}
 
-void ParticleSource::initPointParticles(ParticleSourceParams& params_in, GameState* state){
+void ParticleSource::initPointParticles(ParticleSourceParams& params_in){
 
     unsigned int i;
 
@@ -50,7 +50,7 @@ void ParticleSource::initPointParticles(ParticleSourceParams& params_in, GameSta
 
 }
 
-void ParticleSource::initParticles(ParticleSourceParams& params_in, GameState* state)
+void ParticleSource::initParticles(ParticleSourceParams& params_in)
 {
 
 }
@@ -79,12 +79,12 @@ void ParticleSource::move(double deltatime, Camera* player, std::list<GameObject
 
 }
 
-void ParticleSource::commitMovement(GameState* state)
+void ParticleSource::commitMovement()
 {
 
 }
 
-void ParticleSource::render(GameState* state){
+void ParticleSource::render(){
 
     if(params.options & PS_OPT_POINTSPRITE){
 

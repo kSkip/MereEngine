@@ -45,9 +45,6 @@
     <ClCompile Include="src\gameobjects\ParticleSource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\gameobjects\Projectile.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\gameobjects\SkyBox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -108,9 +105,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\gameobjects\ParticleSource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\gameobjects\Projectile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\gameobjects\SkyBox.h">

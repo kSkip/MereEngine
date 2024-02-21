@@ -3,7 +3,7 @@
 
 SkyBox::SkyBox(){}
 
-SkyBox::SkyBox(ObjectData* objectData, Camera* p, GameState* state){
+SkyBox::SkyBox(ObjectData* objectData, Camera* p){
 
     player = p;
 
@@ -23,10 +23,10 @@ SkyBox::~SkyBox(){}
 
 SkyBox::SkyBox(const SkyBox & rhs){}
 
-void SkyBox::move(double deltatime, Camera* player, std::list<GameObject*>* levelObjects){}
+void SkyBox::move(double deltatime, Camera* player){}
 
-void SkyBox::render(GameState* state){
+void SkyBox::render(Shader& levelShader){
 
-        renderMeshElements(data->vertexBuffer,data->elementBuffer,data->elementCount,PTYPE_TRIANGLES,state);
+        renderMeshElements(data->vertexBuffer,data->elementBuffer,data->elementCount,PTYPE_TRIANGLES, levelShader);
 
 }

@@ -1,7 +1,6 @@
 #include <numeric>
 
 #include "GameState.h"
-#include "GameObjects/Camera.h"
 #include "GameObjects/StaticObject.h"
 #include "GameObjects/Character.h"
 #include "GameObjects/SkyBox.h"
@@ -149,25 +148,25 @@ void GameState::loadObjects(DataBlock & objectBlock)
             windowSize[0] = screenwidth;
             windowSize[1] = screenheight;
 
-            player = new Camera(object, windowSize, objectData, this);
+            player = new Camera(object, objectMap["gun"], windowSize, objectData);
 
             insertOpaqueObject(player);
 
         }else if(objectType == "static_object"){
 
-            StaticObject* newGameObject = new StaticObject(object, objectData, this);
+            StaticObject* newGameObject = new StaticObject(object, objectData);
 
             insertOpaqueObject(newGameObject);
 
         }else if(objectType == "character"){
 
-            Character* newGameObject = new Character(object, objectData, this);
+            Character* newGameObject = new Character(object, objectData);
 
             insertOpaqueObject(newGameObject);
 
         }else if(objectType == "sky_box"){
 
-            SkyBox* newGameObject = new SkyBox(object, player, this);
+            SkyBox* newGameObject = new SkyBox(object, player);
 
             insertOpaqueObject(newGameObject);
 
@@ -377,7 +376,7 @@ void GameState::move(double deltatime)
     std::list<GameObject*>::iterator i, j;
 
     for(i = levelObjects.begin(); i != levelObjects.end(); i++)
-        (*i)->move(deltatime,this->player,&levelObjects);
+        (*i)->move(deltatime, this->player);
 
 
     for(i = levelObjects.begin(); i != levelObjects.end(); i++)
@@ -391,7 +390,7 @@ void GameState::move(double deltatime)
     for(i = levelObjects.begin(); i != levelObjects.end();)
 
     {
-        (*i)->commitMovement(this); //commit to the new changes to the objects
+        (*i)->commitMovement(); //commit to the new changes to the objects
 
         if((*i)->isDestroyed()){ //deallocate and remove objects that no longer exist
 
@@ -438,7 +437,7 @@ void GameState::render()
     for(i = opaqueObjects.begin(); i != opaqueObjects.end(); i++)
     {
 
-        if((*i) != player) (*i)->render(this);
+        if((*i) != player) (*i)->render(*levelShader);
 
     }
 
@@ -450,11 +449,11 @@ void GameState::render()
     for(i = transparencyObjects.begin(); i != transparencyObjects.end(); i++)
     {
 
-        if((*i) != player) (*i)->render(this);
+        if((*i) != player) (*i)->render(*levelShader);
 
     }
 
-    player->render(this);
+    player->render(*levelShader);
 
     levelShader->deactivate(ENABLE_POSITION | ENABLE_NORMAL | ENABLE_TEXCOORD);
 
@@ -486,7 +485,7 @@ void GameState::insertOpaqueObject(GameObject* newGameObject)
 
     levelObjects.push_back(newGameObject);
 
-    GLuint newDiffuseTex = newGameObject->data->diffuseTex;
+    GLuint newDiffuseTex = newGameObject->getDiffuseTexture();
 
     std::list<GameObject*>::iterator it;
 
@@ -494,7 +493,7 @@ void GameState::insertOpaqueObject(GameObject* newGameObject)
 
     while(it != opaqueObjects.end()){
 
-        if( newDiffuseTex < (*it)->data->diffuseTex ){
+        if( newDiffuseTex < (*it)->getDiffuseTexture()){
 
             opaqueObjects.insert(it,newGameObject);
             return;

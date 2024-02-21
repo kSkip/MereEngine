@@ -2,12 +2,12 @@
 
 Weapon::Weapon() : animTime(0.0) {}
 
-Weapon::Weapon(std::string objectName, GameState* state) :
+Weapon::Weapon(ObjectData *data) :
     animTime(0.0),
     isFiring(0)
 {
 
-    data = getObjectData(objectName,state);
+    this->data = data;
 
     skipMVP = false;
     skipLighting = false;
@@ -25,7 +25,7 @@ void Weapon::setTransformations(glm::mat4& translation_in, glm::mat4& rotation_i
 
 }
 
-void Weapon::move(double deltatime, Camera* player, std::list<GameObject*>* levelObjects)
+void Weapon::move(double deltatime, Camera* player)
 {    
     if(data){
         if (Armature* arm = data->armatures["fire"]) {
@@ -46,14 +46,14 @@ void Weapon::move(double deltatime, Camera* player, std::list<GameObject*>* leve
 
 }
 
-void Weapon::render(GameState* state){
+void Weapon::render(Shader& levelShader){
 
     if(data){
 
         glBindBuffer(GL_ARRAY_BUFFER, data->vertexBuffer);
         glBufferSubData(GL_ARRAY_BUFFER,0,data->numVertices*sizeof(struct vertex),data->vertices.data());
 
-        renderMeshElements(data->vertexBuffer,data->elementBuffer,data->elementCount,PTYPE_TRIANGLES,state);
+        renderMeshElements(data->vertexBuffer,data->elementBuffer,data->elementCount,PTYPE_TRIANGLES, levelShader);
 
     }
 

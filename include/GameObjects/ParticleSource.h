@@ -34,21 +34,21 @@ class ParticleSource : public GameObject{
     public:
 
         ParticleSource();
-        ParticleSource(ParticleSourceParams& params, GameState* state);
+        ParticleSource(ParticleSourceParams& params);
         ~ParticleSource();
         ParticleSource(const ParticleSource & rhs);
 
 
         void move(double deltatime, Camera* player, std::list<GameObject*>* levelObjects);
 
-        void commitMovement(GameState* state);
+        void commitMovement();
 
-        void render(GameState* state);
+        void render();
 
     private:
 
-        void initPointParticles(ParticleSourceParams& params, GameState* state);
-        void initParticles(ParticleSourceParams& params, GameState* state);
+        void initPointParticles(ParticleSourceParams& params);
+        void initParticles(ParticleSourceParams& params);
 
         std::vector<vertex> pointParticles;
         std::vector<glm::vec3> pointVelocities;

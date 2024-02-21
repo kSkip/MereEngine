@@ -12,19 +12,19 @@ class Bullet : public GameObject{
         ~Bullet();
         Bullet(const Bullet & rhs);
 
-        void move(double deltatime, Camera* player, std::list<GameObject*>* levelObjects);
+        void move(double deltatime, Camera* player);
         void registerHit(GameObject* object, float point_on_ray);
 
-        void commitMovement(GameState* state){
-
+        void commitMovement()
+        {
             if(tenativeHitObject != NULL){
-                tenativeHitObject->damage(1.0f,time*(movement-position)+position,state);
+                tenativeHitObject->damage(1.0f,time*(movement-position)+position);
             }
             destroy = true;
 
         }
 
-        void render(GameState* state);
+        void render(Shader&);
 
         GameObject* getParent(){ return parent;}
 

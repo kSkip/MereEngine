@@ -6,7 +6,7 @@
 
 StaticObject::StaticObject(){}
 
-StaticObject::StaticObject(ObjectData* objectData, DataBlock& def, GameState* state){
+StaticObject::StaticObject(ObjectData* objectData, DataBlock& def){
 
     data = objectData;
 
@@ -39,13 +39,13 @@ StaticObject::~StaticObject(){}
 
 StaticObject::StaticObject(const StaticObject & rhs){}
 
-void StaticObject::move(double deltatime, Camera* player, std::list<GameObject*>* levelObjects){}
+void StaticObject::move(double deltatime, Camera* player){}
 
-void StaticObject::render(GameState* state){
+void StaticObject::render(Shader& levelShader){
 
     if(data){
 
-        renderMeshElements(data->vertexBuffer,data->elementBuffer,data->elementCount,PTYPE_TRIANGLES,state);
+        renderMeshElements(data->vertexBuffer,data->elementBuffer,data->elementCount,PTYPE_TRIANGLES, levelShader);
 
     }
 

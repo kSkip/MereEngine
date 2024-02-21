@@ -1,5 +1,6 @@
 #include "GameObjects/GameObject.h"
 #include "GameObjects/Bullet.h"
+#include "Shader.h"
 
 GameObject::GameObject() :
     position(0.0f, 0.0f, 0.0f),
@@ -15,23 +16,11 @@ GameObject::~GameObject(){}
 
 GameObject::GameObject(const GameObject & rhs){}
 
-void GameObject::move(double deltatime, Camera* player, std::list<GameObject*>* levelObjects){}
+void GameObject::move(double deltatime, Camera* player){}
 
-void GameObject::render(GameState* state){}
+void GameObject::render(Shader& levelShader){}
 
-void GameObject::addOpaqueObject(GameObject* newObject, GameState* state){
-
-    state->insertOpaqueObject(newObject);
-
-}
-
-void GameObject::addTransparentObject(GameObject* newObject, GameState* state){
-
-    state->insertTransparencyObject(newObject);
-
-}
-
-void GameObject::renderMeshElements(GLuint vertex_buffer, GLuint vertex_element_buffer, GLsizei element_count, Primative type, GameState* state){
+void GameObject::renderMeshElements(GLuint vertex_buffer, GLuint vertex_element_buffer, GLsizei element_count, Primative type, Shader& levelShader){
 
     GLenum draw_mode;
 
@@ -46,11 +35,11 @@ void GameObject::renderMeshElements(GLuint vertex_buffer, GLuint vertex_element_
             draw_mode = GL_TRIANGLES;
     }
 
-    glUniformMatrix4fv(state->levelShader->translation,1, GL_FALSE,glm::value_ptr(this->translation));
-    glUniformMatrix4fv(state->levelShader->rotation,1, GL_FALSE,glm::value_ptr(this->rotation));
+    glUniformMatrix4fv(levelShader.translation,1, GL_FALSE,glm::value_ptr(this->translation));
+    glUniformMatrix4fv(levelShader.rotation,1, GL_FALSE,glm::value_ptr(this->rotation));
 
-    glUniform1ui(state->levelShader->skipMVP,this->skipMVP);
-    glUniform1ui(state->levelShader->skipLighting,this->skipLighting);
+    glUniform1ui(levelShader.skipMVP,this->skipMVP);
+    glUniform1ui(levelShader.skipLighting,this->skipLighting);
 
     glBindTexture(GL_TEXTURE_2D,data->diffuseTex);
 
@@ -83,7 +72,7 @@ void GameObject::renderMeshElements(GLuint vertex_buffer, GLuint vertex_element_
 
 }
 
-void GameObject::renderMeshArrays(GLuint vertex_buffer, GLsizei element_count, Primative type, GameState* state){
+void GameObject::renderMeshArrays(GLuint vertex_buffer, GLsizei element_count, Primative type, Shader& levelShader){
 
     GLenum draw_mode;
 
@@ -98,11 +87,11 @@ void GameObject::renderMeshArrays(GLuint vertex_buffer, GLsizei element_count, P
             draw_mode = GL_TRIANGLES;
     }
 
-    glUniformMatrix4fv(state->levelShader->translation,1, GL_FALSE,glm::value_ptr(this->translation));
-    glUniformMatrix4fv(state->levelShader->rotation,1, GL_FALSE,glm::value_ptr(this->rotation));
+    glUniformMatrix4fv(levelShader.translation,1, GL_FALSE,glm::value_ptr(this->translation));
+    glUniformMatrix4fv(levelShader.rotation,1, GL_FALSE,glm::value_ptr(this->rotation));
 
-    glUniform1ui(state->levelShader->skipMVP,this->skipMVP);
-    glUniform1ui(state->levelShader->skipLighting,this->skipLighting);
+    glUniform1ui(levelShader.skipMVP,this->skipMVP);
+    glUniform1ui(levelShader.skipLighting,this->skipLighting);
 
     glBindTexture(GL_TEXTURE_2D,data->diffuseTex);
 
@@ -132,7 +121,7 @@ void GameObject::renderMeshArrays(GLuint vertex_buffer, GLsizei element_count, P
 
 }
 
-void GameObject::damage(float magnitude, glm::vec3 damageLocation, GameState* state){
+void GameObject::damage(float magnitude, glm::vec3 damageLocation){
 
 }
 

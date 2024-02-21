@@ -27,10 +27,9 @@
 #include "boundary.h"
 
 #include "GameObjects/ObjectData.h"
+#include "Shader.h"
 
 enum Primative {PTYPE_TRIANGLES, PTYPE_POINTS};
-
-#include "GameState.h"
 
 const float PI = 3.1415927f;
 
@@ -46,16 +45,14 @@ class Camera;
 
 class GameObject{
 
-    friend class GameState;
-
     public:
 
         GameObject();
         virtual ~GameObject();
         GameObject(const GameObject & rhs);
 
-        virtual void move(double deltatime, Camera* player, std::list<GameObject*>* levelObjects);
-        virtual void render(GameState* state);
+        virtual void move(double deltatime, Camera* player);
+        virtual void render(Shader&);
 
         glm::vec3 getPosition() const { return position;}
         float getRotation() const {return rotY;}
@@ -79,30 +76,26 @@ class GameObject{
 
         virtual float getLife(){return life;}
 
-        virtual void damage(float magnitude, glm::vec3 damageLocation, GameState* state);
+        virtual void damage(float magnitude, glm::vec3 damageLocation);
 
         unsigned int collisionType(){return collisionTypeValue;}
         static void testResolveCollision(GameObject* object1, GameObject* object2);
         virtual void registerHit(GameObject* object, float point){}
-        virtual void commitMovement(GameState* state){position += movement;}
-
-        static void addOpaqueObject(GameObject* newObject, GameState* state);
-        static void addTransparentObject(GameObject* newObject, GameState* state);
+        virtual void commitMovement(){position += movement;}
 
         static bool pGameObjectComp(const GameObject * const & a, const GameObject * const & b)
         {
             return a->cameraDistance() > b->cameraDistance();
         }
 
+        GLuint getDiffuseTexture() {
+            return data->diffuseTex;
+        }
+
     protected:
 
-        void renderMeshElements(GLuint vertex_buffer, GLuint vertex_element_buffer, GLsizei element_count, Primative type, GameState* state);
-        void renderMeshArrays(GLuint vertex_buffer, GLsizei element_count, Primative type, GameState* state);
-
-        ObjectData* getObjectData(std::string& objectName, GameState* state)
-        {
-            return state->objectMap[objectName];
-        }
+        void renderMeshElements(GLuint vertex_buffer, GLuint vertex_element_buffer, GLsizei element_count, Primative type, Shader&);
+        void renderMeshArrays(GLuint vertex_buffer, GLsizei element_count, Primative type, Shader&);
 
         ObjectData *data;
 

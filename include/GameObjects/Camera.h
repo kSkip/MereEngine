@@ -12,13 +12,11 @@
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/rotate_vector.hpp>
 
-class Weapon;
-
 class Camera : public GameObject{
 
     public:
 
-        Camera(ObjectData* objectData, float windowSize[2], DataBlock& def, GameState* state);
+        Camera(ObjectData* objectData, ObjectData* weaponData, float windowSize[2], DataBlock& def);
         ~Camera();
 
         bool holdingForward;
@@ -29,10 +27,10 @@ class Camera : public GameObject{
         Weapon & GetWeapon() { return *currentWeapon; }
 
         void handleMouseMove(int mouseX, int mouseY);
-        void move(double deltaTime, Camera* player, std::list<GameObject*>* levelObjects);
-        void render(GameState* state);
+        void move(double deltaTime, Camera* player);
+        void render(Shader&);
 
-        void commitMovement(GameState* state){
+        void commitMovement(){
 
                 position += movement;
                 head += movement;

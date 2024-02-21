@@ -12,12 +12,8 @@
 #include "boundary.h"
 
 #include "Utilities/DataBlock.h"
-
-class GameObject;
-
-class ObjectData;
-
-class Camera;
+#include "GameObjects/GameObject.h"
+#include "GameObjects/Camera.h"
 
 struct CursorPos {
     int x;
@@ -41,10 +37,7 @@ enum class MenuAction {
     EXIT
 };
 
-class GameState{
-
-    friend class GameObject;
-    friend class Character;
+class GameState {
 
     public:
 
@@ -106,7 +99,6 @@ class GameState{
         int screenwidth;
         int screenheight;
         float aspectRatio;
-        std::queue<float> frameTimeSamples;
 
         void loadObjectData(DataBlock & objectDataBlock);
         void loadObjects(DataBlock & objectBlock);

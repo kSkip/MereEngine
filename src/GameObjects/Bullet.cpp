@@ -22,7 +22,7 @@ Bullet::~Bullet(){}
 
 Bullet::Bullet(const Bullet & rhs){}
 
-void Bullet::move(double deltatime, Camera* player, std::list<GameObject*>* levelObjects){}
+void Bullet::move(double deltatime, Camera* player){}
 
 void Bullet::registerHit(GameObject* object, float point_on_ray){
 
@@ -33,4 +33,4 @@ void Bullet::registerHit(GameObject* object, float point_on_ray){
 
 }
 
-void Bullet::render(GameState* state){}
+void Bullet::render(Shader& levelShader){}
