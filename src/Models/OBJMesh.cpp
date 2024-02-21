@@ -155,18 +155,19 @@ void MeshFile::getMesh(Mesh& data, const char* mtlPath, unsigned int* numElement
 
 std::string MTLFile::getTextureName()
 {
-	char buffer[MAX_LINE_LENGTH];
+	char buffer[MAX_LINE_LENGTH] = {};
 	int read;
 	while (char* line = getLineOrNull()) {
 		int count = sscanf(line, "%s%n", buffer, &read);
 		if (count > 0) {
 			if (!strcmp(buffer, "map_Kd")) {
-				if (sscanf(line + read, "%s", buffer, &read) > 0) {
+				if (sscanf(line + read, "%s", buffer) > 0) {
 					return buffer;
 				}
 			}
 		}
 	}
+	return buffer;
 }
 
 }
