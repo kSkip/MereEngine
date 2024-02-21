@@ -35,6 +35,18 @@ GLuint TextureReader::createOGLTexture()
 		break;
 	}
 
+	for (int j = 0; j * 2 < height; ++j) {
+		int topRow = j * width * channels;
+		int bottomRow = (height - 1 - j) * width * channels;
+		for (int i = width * channels; i > 0; --i) {
+			unsigned char temp = data[topRow];
+			data[topRow] = data[bottomRow];
+			data[bottomRow] = temp;
+			++topRow;
+			++bottomRow;
+		}
+	}
+
 	glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
