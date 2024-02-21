@@ -57,7 +57,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\boundary.cpp" />
+    <ClCompile Include="src\Boundary.cpp" />
     <ClCompile Include="src\gameobjects\Bullet.cpp" />
     <ClCompile Include="src\gameobjects\Camera.cpp" />
     <ClCompile Include="src\gameobjects\Character.cpp" />
@@ -80,7 +80,7 @@
     <ClCompile Include="src\vectormath\QuaternionMath.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\boundary.h" />
+    <ClInclude Include="include\Boundary.h" />
     <ClInclude Include="include\gameobjects\Bullet.h" />
     <ClInclude Include="include\gameobjects\Camera.h" />
     <ClInclude Include="include\gameobjects\Character.h" />

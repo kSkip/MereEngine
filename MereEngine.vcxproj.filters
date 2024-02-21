@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\boundary.cpp">
+    <ClCompile Include="src\Boundary.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\GameState.cpp">
@@ -80,7 +80,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\boundary.h">
+    <ClInclude Include="include\Boundary.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\GameState.h">
