@@ -31,8 +31,6 @@ struct vertex{
 };
 #endif
 
-GLuint MD5CreateVertexBuffer(struct md5meshdata* md5data, unsigned int* numVertices); /*DO NOT USE! GPU SKINNING HAS NOT BEEN COMPLETED!*/
-
 GLuint MD5CreateVertexBuffer(struct md5meshdata* md5data, std::vector<vertex>& buffer_vertices, std::vector<UnskinnedVertex>& unskinned, unsigned int numVertices);
 
 GLuint MD5CreateElementBuffer(struct md5meshdata* md5data, unsigned int* numElements);
