@@ -296,21 +296,21 @@ int MainLoop(cmd_line_args& args)
 	double timeElapsed = timer.reset();
 
 	for (;;) {
-
-		while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
 			if (msg.message == WM_QUIT) {
 				goto exit;
 			}
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
+		else {
+			if (state.run(timeElapsed)) {
+				goto exit;
+			}
 
-		if (state.run(timeElapsed)) {
-			goto exit;
+			SwapBuffers(hdc);
+			timeElapsed = timer.reset();
 		}
-
-		SwapBuffers(hdc);
-		timeElapsed = timer.reset();
 	}
 
 exit:
