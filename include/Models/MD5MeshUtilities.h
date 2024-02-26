@@ -8,10 +8,11 @@
 #include <exception>
 
 #include "DataFile.h"
+#include "VectorMath/MathTypes.h"
 
 struct md5vertex {
 	unsigned int index;
-	float s,t;
+	vec2 texcoord;
 	unsigned int startWeight, countWeight;
 };
 
@@ -24,7 +25,7 @@ struct md5weight {
 	unsigned int index;
 	unsigned int joint;
 	float bias;
-	float weightPos[3];
+	vec3 weightPos;
 };
 
 struct md5mesh {
@@ -40,7 +41,7 @@ struct md5mesh {
 struct md5joint {
 	unsigned int id;
 	int parentId;
-	float position[3];
+	vec3 position;
 	float orientation[3];
 };
 

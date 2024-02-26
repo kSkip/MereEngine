@@ -28,7 +28,7 @@ public:
      */
     std::map<std::string,Armature*> armatures;
     unsigned int numVertices;
-    std::vector<UnskinnedVertex> unskinnedVertices;
+    std::vector<MD5Vertex> unskinnedVertices;
     std::vector<vertex> vertices;
 
     /*

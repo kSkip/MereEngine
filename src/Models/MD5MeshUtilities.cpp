@@ -105,7 +105,7 @@ void MD5MeshFile::getJoint(md5joint &j)
 	int count = sscanf(l,
 		"%s%d%s%f%f%f%s%s%f%f%f%s",
 		jointName, &j.parentId,
-		left, j.position, j.position + 1, j.position + 2, right,
+		left, &j.position.x, &j.position.y, &j.position.z, right,
 		left, j.orientation, j.orientation + 1, j.orientation + 2, right);
 	if (count != 12) {
 		throw;
@@ -117,7 +117,7 @@ void MD5MeshFile::getVertex(md5vertex & v)
 	char left[2], right[2];
 	char *l = getLine();
 	int count = sscanf(l, "%s%d%s%f%f%s%d%d", buf, &v.index,
-		left, &v.s, &v.t, right, &v.startWeight, &v.countWeight);
+		left, &v.texcoord.s, &v.texcoord.t, right, &v.startWeight, &v.countWeight);
 	if (count != 8) {
 		throw;
 	}
@@ -138,7 +138,7 @@ void MD5MeshFile::getWeight(md5weight &w)
 	char left[2], right[2];
 	char *l = getLine();
 	int count = sscanf(l, "%s%d%d%f%s%f%f%f%s", buf, &w.index, &w.joint, &w.bias,
-		left, &w.weightPos[0], &w.weightPos[1], &w.weightPos[2], right);
+		left, &w.weightPos.x, &w.weightPos.y, &w.weightPos.z, right);
 	if (count != 9) {
 		throw;
 	}

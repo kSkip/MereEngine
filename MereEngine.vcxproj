@@ -101,6 +101,7 @@
     <ClInclude Include="include\Shader.h" />
     <ClInclude Include="include\utilities\DataBlock.h" />
     <ClInclude Include="include\utilities\TextManipulation.h" />
+    <ClInclude Include="include\VectorMath\MathTypes.h" />
     <ClInclude Include="include\vectormath\QuaternionMath.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

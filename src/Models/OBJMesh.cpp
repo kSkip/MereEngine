@@ -26,17 +26,6 @@ const PrefixLabel MeshFile::tokens[] = {
 
 const int MeshFile::numTokens = sizeof(MeshFile::tokens) / sizeof(PrefixLabel);
 
-struct OBJVec3 {
-	float x;
-	float y;
-	float z;
-};
-
-struct OBJVec2 {
-	float x;
-	float y;
-};
-
 void parseFace(const char* values, std::vector<FaceIndex>& faceIndices)
 {
 	int read, offset = 0;
@@ -52,12 +41,13 @@ void MeshFile::getMesh(Mesh& data, const char* mtlPath, unsigned int* numElement
 {
 	char buffer[MAX_LINE_LENGTH];
 
-	std::vector<OBJVec3> vertices;
-	std::vector<OBJVec3> normals;
-	std::vector<OBJVec2> texcoords;
+	std::vector<vec3> vertices;
+	std::vector<vec3> normals;
+	std::vector<vec2> texcoords;
 	std::vector<FaceIndex> faceIndices;
 
-	float x, y, z;
+	vec3 val;
+	vec2 tex;
 	std::string objectName;
 	std::string diffuse;
 
@@ -80,18 +70,18 @@ void MeshFile::getMesh(Mesh& data, const char* mtlPath, unsigned int* numElement
 			}
 			break;
 		case Prefix::VERTEX:
-			if (3 == sscanf(line, "%f%f%f", &x, &y, &z)) {
-				vertices.push_back({ x, y, z });
+			if (3 == sscanf(line, "%f%f%f", &val.x, &val.y, &val.z)) {
+				vertices.push_back(val);
 			}
 			break;
 		case Prefix::NORMAL:
-			if (3 == sscanf(line, "%f%f%f", &x, &y, &z)) {
-				normals.push_back({ x, y, z });
+			if (3 == sscanf(line, "%f%f%f", &val.x, &val.y, &val.z)) {
+				normals.push_back(val);
 			}
 			break;
 		case Prefix::TEXCOORD:
-			if (2 == sscanf(line, "%f%f", &x, &y)) {
-				texcoords.push_back({ x, y });
+			if (2 == sscanf(line, "%f%f", &tex.x, &tex.y)) {
+				texcoords.push_back(tex);
 			}
 			break;
 		case Prefix::FACE:
@@ -122,14 +112,14 @@ void MeshFile::getMesh(Mesh& data, const char* mtlPath, unsigned int* numElement
 		}
 		else {
 			vertex vert;
-			vert.position[0] = vertices[faceIndices[i].v - 1].x;
-			vert.position[1] = vertices[faceIndices[i].v - 1].y;
-			vert.position[2] = vertices[faceIndices[i].v - 1].z;
-			vert.normal[0] = normals[faceIndices[i].n - 1].x;
-			vert.normal[1] = normals[faceIndices[i].n - 1].y;
-			vert.normal[2] = normals[faceIndices[i].n - 1].z;
-			vert.texcoord[0] = texcoords[faceIndices[i].t - 1].x;
-			vert.texcoord[1] = texcoords[faceIndices[i].t - 1].y;
+			vert.position.x = vertices[faceIndices[i].v - 1].x;
+			vert.position.y = vertices[faceIndices[i].v - 1].y;
+			vert.position.z = vertices[faceIndices[i].v - 1].z;
+			vert.normal.x = normals[faceIndices[i].n - 1].x;
+			vert.normal.y = normals[faceIndices[i].n - 1].y;
+			vert.normal.z = normals[faceIndices[i].n - 1].z;
+			vert.texcoord.s = texcoords[faceIndices[i].t - 1].x;
+			vert.texcoord.t = texcoords[faceIndices[i].t - 1].y;
 			vertexData.push_back(vert);
 			elements.push_back(idx);
 			vertexIndices[faceIndices[i]] = idx;

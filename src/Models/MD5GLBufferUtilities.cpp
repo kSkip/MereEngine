@@ -4,71 +4,83 @@
 #include <math.h>
 #include "Models/TextureReader.h"
 
-/*Function declarations for functions used only in this source file*/
-
-void crossProduct(float inPlaneVec0[3], float inPlaneVec1[3], float product[3]);
-
-void MD5CalcNormals(struct vertex* vertices, struct md5meshdata* data, float* normals);
-
-void MD5CalcWeightNormals(struct UnskinnedVertex* vertices, unsigned int numVertices, struct md5joint* joints, float* normals);
-
 /*Version of MD5CreateVertexBuffer that takes the data structure obtained directly from the md5mesh file and puts the data
 into a format that is suitable for CPU skinning*/
-GLuint MD5CreateVertexBuffer(struct md5meshdata* md5data, std::vector<vertex> &bindPoseVertices, std::vector<UnskinnedVertex> &unskinned, unsigned int numVertices)
+GLuint MD5CreateVertexBuffer(struct md5meshdata* md5data, std::vector<vertex> &bindPoseVertices, std::vector<MD5Vertex> &unskinned, size_t numVertices)
 {
-	unsigned int i, j;
-	GLuint buffer;
+	size_t i;
 
 	unskinned.resize(numVertices);
 	bindPoseVertices.resize(numVertices);
 	md5mesh & mesh = md5data->meshes[0];
+	std::vector<md5joint>& joints = md5data->joints;
 
 	for (i = 0; i < numVertices; i++) {
 
-		unskinned[i].texcoord[0] = mesh.vertices[i].s;
-		unskinned[i].texcoord[1] = mesh.vertices[i].t;
-
-		bindPoseVertices[i].position[0] = 0.0f;
-		bindPoseVertices[i].position[1] = 0.0f;
-		bindPoseVertices[i].position[2] = 0.0f;
-
+		unskinned[i].texcoord = mesh.vertices[i].texcoord;
 		unskinned[i].countWeight = mesh.vertices[i].countWeight;
 
-		for (j = 0; j < mesh.vertices[i].countWeight; j++) {
+		for (size_t j = 0; j < mesh.vertices[i].countWeight; j++) {
 
-			size_t weightIdx = mesh.vertices[i].startWeight + (size_t)j;
+			size_t weightIdx = mesh.vertices[i].startWeight + j;
 
-			unskinned[i].weightPosition[j][0] = mesh.weights[weightIdx].weightPos[0];
-			unskinned[i].weightPosition[j][1] = mesh.weights[weightIdx].weightPos[1];
-			unskinned[i].weightPosition[j][2] = mesh.weights[weightIdx].weightPos[2];
-
+			unskinned[i].weightPosition[j] = mesh.weights[weightIdx].weightPos;
 			unskinned[i].weightBias[j] = mesh.weights[weightIdx].bias;
-
 			unskinned[i].jointId[j] = mesh.weights[weightIdx].joint;
 
 			struct md5joint* joint = &(md5data->joints[unskinned[i].jointId[j]]);
 
-			float rotatedWeight[3];
-			float orientation[4];
+			vec3 rotatedWeight;
+			quat orientation;
 
-			memcpy(orientation,joint->orientation,3*sizeof(float));
-			quaternion_w(orientation);
+			memcpy(&orientation,joint->orientation,3*sizeof(float));
+			quaternion_w((float*)&orientation);
 
-			rotate_position(orientation,unskinned[i].weightPosition[j],rotatedWeight);
+			rotate_position((float*)&orientation, (float*)&(unskinned[i].weightPosition[j]), (float*)&rotatedWeight);
 
-			bindPoseVertices[i].position[0] += (joint->position[0]+rotatedWeight[0])*unskinned[i].weightBias[j];
-			bindPoseVertices[i].position[1] += (joint->position[1]+rotatedWeight[1])*unskinned[i].weightBias[j];
-			bindPoseVertices[i].position[2] += (joint->position[2]+rotatedWeight[2])*unskinned[i].weightBias[j];
+			bindPoseVertices[i].position += (joint->position + rotatedWeight) * unskinned[i].weightBias[j];
 
 		}
 
 	}
+	
+	quat orientation;
+	vec3 normal;
 
-	std::vector<float> normals(3ULL * numVertices);
-	MD5CalcNormals(bindPoseVertices.data(),md5data,normals.data());
+	for (i = 0; i < mesh.numTriangles; i++) {
+		unsigned int indices[3];
+		memcpy(indices, mesh.triangles[i].vertIndices, 3 * sizeof(unsigned int));
 
-	MD5CalcWeightNormals(unskinned.data(),numVertices,md5data->joints.data(),normals.data());
+		normal = cross(bindPoseVertices[indices[1]].position - bindPoseVertices[indices[0]].position,
+			           bindPoseVertices[indices[2]].position - bindPoseVertices[indices[0]].position);
 
+		bindPoseVertices[indices[0]].normal += normal;
+		bindPoseVertices[indices[1]].normal += normal;
+		bindPoseVertices[indices[2]].normal += normal;
+	}
+
+	for (i = 0; i < mesh.numVertices; i++) {
+		bindPoseVertices[i].normal = normalize(bindPoseVertices[i].normal);
+	}
+
+	for (i = 0; i < unskinned.size(); i++) {
+		for (size_t j = 0; j < 4; j++) {
+			unsigned int jointId = unskinned[i].jointId[j];
+			memcpy(&orientation, joints[jointId].orientation, 3 * sizeof(float));
+			normal = bindPoseVertices[i].normal;
+
+			orientation.x *= -1;
+			orientation.y *= -1;
+			orientation.z *= -1;
+
+			quaternion_w((float*)&orientation);
+
+			rotate_position((float*)&orientation, (float*)&normal, (float*)&unskinned[i].weightNormal[j]);
+
+		}
+	}
+
+	GLuint buffer;
 	glGenBuffers(1, &buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, buffer);
 	glBufferData(GL_ARRAY_BUFFER,numVertices*sizeof(vertex), bindPoseVertices.data(), GL_STREAM_DRAW);
@@ -114,93 +126,4 @@ GLuint MD5CreateTextureBuffer(struct md5meshdata* md5data, const char* shaderDir
 
 	return texture;
 
-}
-
-/*crossProduct produces, well,.. a vector cross product!*/
-void crossProduct(float vec0[3], float vec1[3], float product[3]){
-
-	product[0] = vec0[1]*vec1[2] - vec1[1]*vec0[2];
-	product[1] = vec1[0]*vec0[2] - vec0[0]*vec1[2];
-	product[2] = vec0[0]*vec1[1] - vec1[0]*vec0[1];
-
-}
-
-/*MD5CalcNormals calculates the normals of the bind pose model*/
-void MD5CalcNormals(struct vertex* vertices, struct md5meshdata* data, float* normals){
-
-unsigned int i;
-float p0[3], p1[3], p2[3], inPlaneVec0[3], inPlaneVec1[3], product[3];
-
-	for(i=0;i<3*data->meshes[0].numVertices;i++){
-		normals[i] = 0.0f;
-	}
-
-	for(i=0;i<data->meshes[0].numTriangles;i++){
-		unsigned int indices[3];
-		memcpy(indices,data->meshes[0].triangles[i].vertIndices,3*sizeof(unsigned int));
-		memcpy(p0, &(vertices[indices[0]].position[0]), 3*sizeof(float));
-		memcpy(p1, &(vertices[indices[1]].position[0]), 3*sizeof(float));
-		memcpy(p2, &(vertices[indices[2]].position[0]), 3*sizeof(float));
-
-		inPlaneVec0[0] = p1[0] - p0[0];
-		inPlaneVec0[1] = p1[1] - p0[1];
-		inPlaneVec0[2] = p1[2] - p0[2];
-
-		inPlaneVec1[0] = p2[0] - p0[0];
-		inPlaneVec1[1] = p2[1] - p0[1];
-		inPlaneVec1[2] = p2[2] - p0[2];
-
-		crossProduct(inPlaneVec0,inPlaneVec1,product);
-
-		normals[3*indices[0]] += product[0];
-		normals[3*indices[0]+1] += product[1];
-		normals[3*indices[0]+2] += product[2];
-
-		normals[3*indices[1]] += product[0];
-		normals[3*indices[1]+1] += product[1];
-		normals[3*indices[1]+2] += product[2];
-
-		normals[3*indices[2]] += product[0];
-		normals[3*indices[2]+1] += product[1];
-		normals[3*indices[2]+2] += product[2];
-	}
-
-	for(i=0;i<data->meshes[0].numVertices;i++){
-		float factor;
-		factor = normals[3*i]*normals[3*i] + normals[3*i+1]*normals[3*i+1] + normals[3*i+2]*normals[3*i+2];
-		factor = sqrt(factor);
-
-		normals[3*i] /= factor;
-		normals[3*i+1] /= factor;
-		normals[3*i+2] /= factor;
-
-		vertices[i].normal[0] = normals[3*i];
-		vertices[i].normal[1] = normals[3*i+1];
-		vertices[i].normal[2] = normals[3*i+2];
-	}
-}
-
-/*MD5CalcWeightNormals calculates the inverse bindpose orientation of the normals calculated from
-bind pose*/
-void MD5CalcWeightNormals(struct UnskinnedVertex* vertices, unsigned int numVertices, struct md5joint* joints, float* normals){
-
-unsigned int i, j;
-float orientation[4], normal[3];
-
-	for(i=0;i<numVertices;i++){
-		for(j=0;j<4;j++){
-			unsigned int jointId = vertices[i].jointId[j];
-			memcpy(orientation,joints[jointId].orientation,3*sizeof(float));
-			memcpy(normal,&(normals[3*i]),3*sizeof(float));
-
-			orientation[0] *= -1;
-			orientation[1] *= -1;
-			orientation[2] *= -1;
-
-			quaternion_w(orientation);
-
-			rotate_position(orientation,normal,vertices[i].weightNormal[j]);
-
-		}
-	}
 }

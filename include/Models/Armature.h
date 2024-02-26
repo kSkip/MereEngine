@@ -4,8 +4,6 @@
 #include "MD5GLBufferUtilities.h"
 #include "MD5MeshUtilities.h"
 
-typedef struct vec3 { float v[3]; } vec3;
-typedef struct quat4 { float v[4]; } quat4;
 
 class Armature{
 	public:
@@ -13,7 +11,7 @@ class Armature{
 
 		void buildFrame(float animationTime);
 
-		void setVertices(struct vertex* vertices, struct UnskinnedVertex* unskinned, unsigned int numVertices);
+		void setVertices(struct vertex* vertices, MD5Vertex* unskinned, unsigned int numVertices);
 
 		double getTotalTime() { return double(numFrames) / double(frameRate); }
 
@@ -28,7 +26,7 @@ class Armature{
 		std::vector<md5frame> frames;
 
 		std::vector<vec3> jointPosition;
-		std::vector<quat4> jointOrientation;
+		std::vector<quat> jointOrientation;
 
 		void setJoint(unsigned int i, unsigned int firstFrame, unsigned int secondFrame, float interpol);
 };

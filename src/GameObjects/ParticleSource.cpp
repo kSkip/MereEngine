@@ -34,17 +34,17 @@ void ParticleSource::initPointParticles(ParticleSourceParams& params_in){
     pointVelocities.resize(params_in.numParticles);
     for(i=0;i<params_in.numParticles;i++){
 
-        pointParticles[i].position[0] = params_in.position.x;
-        pointParticles[i].position[1] = params_in.position.y;
-        pointParticles[i].position[2] = params_in.position.x;
+        pointParticles[i].position.x = params_in.position.x;
+        pointParticles[i].position.y = params_in.position.y;
+        pointParticles[i].position.z = params_in.position.x;
 
         pointVelocities[i].x = (float(rand()) / float(RAND_MAX) - 0.5f)*params_in.maxInitVelocity.x;
         pointVelocities[i].y = (float(rand()) / float(RAND_MAX) - 0.5f)*params_in.maxInitVelocity.y;
         pointVelocities[i].z = (float(rand()) / float(RAND_MAX) - 0.5f)*params_in.maxInitVelocity.z;
 
-        pointParticles[i].color[0] = 0.0f;
-        pointParticles[i].color[1] = 0.0f;
-        pointParticles[i].color[2] = 0.0f;
+        pointParticles[i].color.r = 0.0f;
+        pointParticles[i].color.g = 0.0f;
+        pointParticles[i].color.b = 0.0f;
 
     }
 
@@ -63,9 +63,9 @@ void ParticleSource::move(double deltatime, Camera* player, std::list<GameObject
 
         for(i=0;i<pointParticles.size();i++){
 
-            pointParticles[i].position[0] += float(deltatime)*pointVelocities[i].x;
-            pointParticles[i].position[1] += float(deltatime)*pointVelocities[i].y;
-            pointParticles[i].position[2] += float(deltatime)*pointVelocities[i].z;
+            pointParticles[i].position.x += float(deltatime)*pointVelocities[i].x;
+            pointParticles[i].position.y += float(deltatime)*pointVelocities[i].y;
+            pointParticles[i].position.z += float(deltatime)*pointVelocities[i].z;
 
             //simulate gravity
             pointVelocities[i].y -= GRAVITATIONAL_ACCELERATION*float(deltatime);

@@ -85,21 +85,21 @@ void Armature::setJoint(unsigned int i, unsigned int firstFrame, unsigned int se
 
 	if(joint.parentId >= 0) {
 		float rotatedPosition[3];
-		rotate_position(jointOrientation[joint.parentId].v, position, rotatedPosition);
+		rotate_position(&jointOrientation[joint.parentId].x, position, rotatedPosition);
 
-		jointPosition[i].v[0] = rotatedPosition[0] + jointPosition[joint.parentId].v[0];
-		jointPosition[i].v[1] = rotatedPosition[1] + jointPosition[joint.parentId].v[1];
-		jointPosition[i].v[2] = rotatedPosition[2] + jointPosition[joint.parentId].v[2];
+		jointPosition[i].x = rotatedPosition[0] + jointPosition[joint.parentId].x;
+		jointPosition[i].y = rotatedPosition[1] + jointPosition[joint.parentId].y;
+		jointPosition[i].z = rotatedPosition[2] + jointPosition[joint.parentId].z;
 
 		float rotatedQuat[4];
-		quaternion_product(jointOrientation[joint.parentId].v, orientation, rotatedQuat);
+		quaternion_product(&jointOrientation[joint.parentId].x, orientation, rotatedQuat);
 
-		memcpy(jointOrientation[i].v, rotatedQuat, 4 * sizeof(float));
+		memcpy(&jointOrientation[i], rotatedQuat, 4 * sizeof(float));
 
 	}else{
 
-		memcpy(jointPosition[i].v, position, 3 * sizeof(float));
-		memcpy(jointOrientation[i].v, orientation, 4 * sizeof(float));
+		memcpy(&jointPosition[i], position, 3 * sizeof(float));
+		memcpy(&jointOrientation[i], orientation, 4 * sizeof(float));
 
 	}
 
@@ -124,35 +124,35 @@ void Armature::buildFrame(float animationTime)
 
 }
 
-void Armature::setVertices(struct vertex* vertices, struct UnskinnedVertex* unskinned, unsigned int numVertices){
+void Armature::setVertices(struct vertex* vertices, MD5Vertex* unskinned, unsigned int numVertices){
 
 	unsigned int i, j;
 
 	for (i = 0; i < numVertices; i++) {
 
-		memset(vertices[i].position,0,3*sizeof(float));
-		memset(vertices[i].normal,0,3*sizeof(float));
+		memset(&vertices[i].position,0,3*sizeof(float));
+		memset(&vertices[i].normal,0,3*sizeof(float));
 
 		for (j = 0; j < unskinned[i].countWeight; j++) {
 
 			float jointPos[3];
 			float jointOrient[4];
-			memcpy(jointPos, jointPosition[unskinned[i].jointId[j]].v, 3 * sizeof(float));
-			memcpy(jointOrient, jointOrientation[unskinned[i].jointId[j]].v, 4 * sizeof(float));
+			memcpy(jointPos, &jointPosition[unskinned[i].jointId[j]], 3 * sizeof(float));
+			memcpy(jointOrient, &jointOrientation[unskinned[i].jointId[j]], 4 * sizeof(float));
 
 			float weightPosition[3];
 			float weightNormal[3];
 
-			rotate_position(jointOrient,unskinned[i].weightPosition[j],weightPosition);
-			rotate_position(jointOrient,unskinned[i].weightNormal[j],weightNormal);
+			rotate_position(jointOrient,(float*)&unskinned[i].weightPosition[j],weightPosition);
+			rotate_position(jointOrient, (float*)&unskinned[i].weightNormal[j],weightNormal);
 
-			vertices[i].position[0] += (jointPos[0] + weightPosition[0])*unskinned[i].weightBias[j];
-			vertices[i].position[1] += (jointPos[1] + weightPosition[1])*unskinned[i].weightBias[j];
-			vertices[i].position[2] += (jointPos[2] + weightPosition[2])*unskinned[i].weightBias[j];
+			vertices[i].position.x += (jointPos[0] + weightPosition[0])*unskinned[i].weightBias[j];
+			vertices[i].position.y += (jointPos[1] + weightPosition[1])*unskinned[i].weightBias[j];
+			vertices[i].position.z += (jointPos[2] + weightPosition[2])*unskinned[i].weightBias[j];
 
-			vertices[i].normal[0] += weightNormal[0]*unskinned[i].weightBias[j];
-			vertices[i].normal[1] += weightNormal[1]*unskinned[i].weightBias[j];
-			vertices[i].normal[2] += weightNormal[2]*unskinned[i].weightBias[j];
+			vertices[i].normal.x += weightNormal[0]*unskinned[i].weightBias[j];
+			vertices[i].normal.y += weightNormal[1]*unskinned[i].weightBias[j];
+			vertices[i].normal.z += weightNormal[2]*unskinned[i].weightBias[j];
 
 		}
 
