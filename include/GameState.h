@@ -9,8 +9,7 @@
 #include <fstream>
 
 #include "Shader.h"
-#include "boundary.h"
-
+#include "Boundary.h"
 #include "Utilities/DataBlock.h"
 #include "GameObjects/GameObject.h"
 #include "GameObjects/Camera.h"

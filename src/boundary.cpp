@@ -1,4 +1,4 @@
-#include "boundary.h"
+#include "Boundary.h"
 
 boundary::boundary(){}
 
@@ -10,7 +10,7 @@ void boundary::LoadBoundaries(std::string filename){
 	std::ifstream ifs;
 	char t;
 	float values[6];
-	glm::vec3 position, lengthnorm, widthnorm, heightnorm;
+	vec3 position, lengthnorm, widthnorm, heightnorm;
 
 	ifs.open(filename.c_str());
 
@@ -18,16 +18,16 @@ void boundary::LoadBoundaries(std::string filename){
 		switch(t){
 			case 'b':
 				ifs >> values[0] >> values[1] >> values[2];
-				position = glm::vec3(values[0],values[1],values[2]);
+				position = vec3(values[0],values[1],values[2]);
 
 				ifs >> values[0] >> values[1] >> values[2];
-				lengthnorm = glm::vec3(values[0],values[1],values[2]);
+				lengthnorm = vec3(values[0],values[1],values[2]);
 
 				ifs >> values[0] >> values[1] >> values[2];
-				widthnorm = glm::vec3(values[0],values[1],values[2]);
+				widthnorm = vec3(values[0],values[1],values[2]);
 
 				ifs >> values[0] >> values[1] >> values[2];
-				heightnorm = glm::vec3(values[0],values[1],values[2]);
+				heightnorm = vec3(values[0],values[1],values[2]);
 
 				ifs >> values[0] >> values[1] >> values[2];
 				blocks.push_back(block(position,lengthnorm,widthnorm,heightnorm,values[0],values[1],values[2]));
@@ -41,11 +41,11 @@ void boundary::LoadBoundaries(std::string filename){
 
 block::block(){}
 
-block::block(glm::vec3 pos,glm::vec3 lnorm,glm::vec3 wnorm,glm::vec3 hnorm,float l,float w,float h){
+block::block(vec3 pos, vec3 lnorm, vec3 wnorm, vec3 hnorm, float l, float w, float h){
 	position = pos;
-	lengthnorm = glm::normalize(lnorm);
-	widthnorm = glm::normalize(wnorm);
-	heightnorm = glm::normalize(hnorm);
+	lengthnorm = normalize(lnorm);
+	widthnorm = normalize(wnorm);
+	heightnorm = normalize(hnorm);
 
 	length = l;
 	width = w;
@@ -84,15 +84,22 @@ block::block(const block& rhs){
 
 block::~block(){}
 
-projection block::project(glm::vec3 axis,glm::vec3 objectPosition, float roty){
+projection block::project(vec3 axis, vec3 objectPosition, float roty){
 
     unsigned int i;
-    glm::mat3 rotMat = glm::mat3(glm::rotate(glm::mat4(1.0f),roty,glm::vec3(0.0,1.0,0.0)));
-    double min = glm::dot(axis,rotMat*(vertices[0]+this->position)+objectPosition);
+
+	float sinRotY = sin(roty);
+	float cosRotY = cos(roty);
+	mat3 rotMat = mat3(1.0f);
+	rotMat[0][0] = cosRotY;
+	rotMat[0][2] = -sinRotY;
+	rotMat[2][0] = sinRotY;
+	rotMat[2][2] = cosRotY;
+	double min = dot(axis, rotMat * (vertices[0] + this->position) + objectPosition);
     double max = min;
 
     for(i=1;i<8;i++){
-        double p = glm::dot(axis,rotMat*(vertices[i]+this->position)+objectPosition);
+		double p = dot(axis, rotMat * (vertices[i] + this->position) + objectPosition);
         if(p < min){
             min = p;
         }else if(p > max){

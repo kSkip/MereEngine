@@ -8,7 +8,7 @@ class Bullet : public GameObject{
     public:
 
         Bullet();
-        Bullet(glm::vec3 raystart, glm::vec3 rayfinish, GameObject* parent);
+        Bullet(vec3 raystart, vec3 rayfinish, GameObject* parent);
         ~Bullet();
         Bullet(const Bullet & rhs);
 

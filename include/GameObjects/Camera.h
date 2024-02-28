@@ -3,21 +3,14 @@
 
 #include "GameObjects/GameObject.h"
 #include "GameObjects/Weapon.h"
-#include "Models/Armature.h"
 
-#include <iostream>
 #include <cmath>
 
-#include <glm/glm.hpp>
-#include <glm/gtx/transform.hpp>
-#include <glm/gtx/rotate_vector.hpp>
-
-class Camera : public GameObject{
+class Camera : public GameObject {
 
     public:
 
-        Camera(ObjectData* objectData, ObjectData* weaponData, float windowSize[2], DataBlock& def);
-        ~Camera();
+        Camera(ObjectData* objectData, ObjectData* weaponData);
 
         bool holdingForward;
         bool holdingBackward;
@@ -30,73 +23,35 @@ class Camera : public GameObject{
         void move(double deltaTime, Camera* player);
         void render(Shader&);
 
-        void commitMovement(){
+        const vec3& getHead() { return head; }
+        const vec3& getFront() { return front; }
 
-                position += movement;
-                head += movement;
-                origin += movement;
-                if(movement.y == 0.0f) ground = true;
-
+        void commitMovement()
+        {
+            position += movement;
+            head.x += movement.x;
+            head.y += movement.y;
+            head.z += movement.z;
+            if(movement.y == 0.0f) ground = true;
         }
 
-        float getPitchSensitivity()            { return pitchSensitivity;  }
-        void  setPitchSensitivity(float value) { pitchSensitivity = value; }
-        float getYawSensitivity()              { return yawSensitivity;    }
-        void  setYawSensitivity(float value)   { yawSensitivity   = value; }
-
-        glm::vec3 getPosition() const {return position;}
-        void setXPos(double x)	{position.x = x;}
-        void setYPos(double y)	{position.y = y;}
-        void setZPos(double z)	{position.z = z;}
-
-        glm::vec3 getHead() const { return head;}
-        void setXHead(double x)	{head.x = x;}
-        void setYHead(double y)	{head.y = y;}
-        void setZHead(double z)	{head.z = z;}
-
-        glm::vec3 getOrigin() const { return origin;}
-        void setXOrigin(double x)	{origin.x = x;}
-        void setYOrigin(double y)	{origin.y = y;}
-        void setZOrigin(double z)	{origin.z = z;}
-
-        glm::vec3 getFront() const { return front;}
-        void setXFront(double x)	{front.x = x;}
-        void setYFront(double y)	{front.y = y;}
-        void setZFront(double z)	{front.z = z;}
-
-        glm::vec3 getRight() const { return right;}
-        void setXRight(double x)	{right.x = x;}
-        void setYRight(double y)	{right.y = y;}
-        void setZRight(double z)	{right.z = z;}
-
-        glm::vec3 getUp() const { return up;}
-        void setXUp(double x)	{up.x = x;}
-        void setYUp(double y)	{up.y = y;}
-        void setZUp(double z)	{up.z = z;}
+        void getViewMatrix(mat4&);
 
     private:
 
-        glm::vec3 head;
-        glm::vec3 origin; //for glmLootAt
-        glm::vec3 front;
-        glm::vec3 up;
-        glm::vec3 right;
+        vec3 head;
+        vec3 front;
+        vec3 up;
+        vec3 right;
 
-        float rotHorizontal, rotVertical;
+        float yaw;
+        float pitch;
+
+        float movementSpeedFactor;
+        float pitchSensitivity;
+        float yawSensitivity;
 
         Weapon* currentWeapon;
-
-        double movementSpeedFactor;
-        double pitchSensitivity;
-        double yawSensitivity;
-
-        int windowWidth;
-        int windowHeight;
-        int windowMidX;
-        int windowMidY;
-
-        void initCamera();
-
 };
 
 #endif

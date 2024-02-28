@@ -14,27 +14,21 @@ class Character : public GameObject{
 
         void move(double deltatime, Camera* player);
 
-        void commitMovement(){
+        void commitMovement();
 
-            position += movement;
-            translation = glm::translate(glm::mat4(1.0f),position);
-            if(health < 0.0f)destroy = true;
-
-        }
-
-        void damage(float magnitude, glm::vec3 damageLocation);
+        void damage(float magnitude, vec3 damageLocation);
 
         void render(Shader&);
 
     private:
 
-        glm::vec3 front;
-        glm::vec3 right;
+        vec3 front;
+        vec3 right;
 
         float health;
 
         double movementSpeedFactor;
-        glm::vec3 currentTarget;
+        vec3 currentTarget;
         double charAnimTime;
 
         void trackPlayer(double deltatime, Camera* player);

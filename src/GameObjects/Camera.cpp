@@ -1,33 +1,28 @@
 #include "GameObjects/Camera.h"
-#include "Utilities/TextManipulation.h"
-#include "Utilities/DataBlock.h"
 
-Camera::Camera(ObjectData* objectData, ObjectData* weaponData, float windowSize[2], DataBlock& def){
+Camera::Camera(ObjectData* objectData, ObjectData* weaponData)
+{
 
-	initCamera();
+	position = vec3(-3.0f, 2.0f, 0.0f);
+	velocity = vec3(0.0f, 0.0f, 0.0f);
+	head.x = position.x + 0.0f;
+	head.y = position.y + 0.3f;
+	head.z = position.z + 0.0f;
 
-    strvec pos = split(def("position"),',');
+	yaw = 0.0f;
+	pitch = 0.0f;
 
-    if(pos.size() != 4)
-        throw std::runtime_error("Position requires 4 values");
+	movementSpeedFactor = 1.2f;
 
-    float pos_init[3];
-    pos_init[0] = atof(pos[0].c_str());
-    pos_init[1] = atof(pos[1].c_str());
-    pos_init[2] = atof(pos[2].c_str());
+	pitchSensitivity = 0.1f;
+	yawSensitivity = 0.1f;
 
-    rotY  = atof(pos[3].c_str());
-    rotY  = -rotY * 2.0f * PI / 360.0f;
+	ground = false;
 
-	position = glm::vec3(pos_init[0],pos_init[1],pos_init[2]);
-	head     = position + glm::vec3(0.0f,0.3f,0.0f);
-	origin   = head     + glm::vec3(0.0f,0.0f,1000.0f);
-
-	origin = glm::rotateY(origin-head,-1*rotY);
-	origin = origin + head;
-
-	front = glm::rotateY(front,-1*rotY);
-	right = glm::rotateY(right,-1*rotY);
+	holdingForward = false;
+	holdingBackward = false;
+	holdingLeftStrafe = false;
+	holdingRightStrafe = false;
 
 	data = objectData;
 
@@ -43,88 +38,37 @@ Camera::Camera(ObjectData* objectData, ObjectData* weaponData, float windowSize[
     collisionTypeValue = COLLIDER_COLLIDEE;
 }
 
-Camera::~Camera(){}
+void Camera::handleMouseMove(int mouseX, int mouseY)
+{
+	yaw -= mouseX * yawSensitivity;
+	pitch -= mouseY * pitchSensitivity;
 
-void Camera::initCamera(){
+	pitch = pitch < 60.0f ? pitch : 60.0f;
+	pitch = pitch > -60.0f ? pitch : -60.0f;
 
-	position = glm::vec3(0.0f,0.0f,0.0f);
-	head     = glm::vec3(0.0f,0.0f,0.0f);
-	origin   = glm::vec3(0.0f,0.0f,0.0f);
-	front    = glm::vec3(0.0f,0.0f,1.0f);
-	right    = glm::vec3(-1.0f,0.0f,0.0f);
-	up       = glm::vec3(0.0f, 1.0f, 0.0f);
-	velocity = glm::vec3(0.0f,0.0f,0.0f);
-
-    rotHorizontal = 0.0f;
-    rotVertical = 0.0f;
-
-	movementSpeedFactor = 1.2f;
-
-	pitchSensitivity = 0.001;
-	yawSensitivity   = 0.001;
-
-	ground = false;
-
-	// To begin with, we aren't holding down any keys
-	holdingForward     = false;
-	holdingBackward    = false;
-	holdingLeftStrafe  = false;
-	holdingRightStrafe = false;
-
-}
-
-void Camera::handleMouseMove(int mouseX, int mouseY){
-
-    glm::vec3 temp;
-
-	// Calculate our horizontal and vertical mouse movement from middle of the window
-	float horizMovement = mouseX * yawSensitivity;
-	float vertMovement  = mouseY * pitchSensitivity;
-
-	// Apply the mouse movement to vector indicating our view direction
-	rotHorizontal -= horizMovement;
-	if(rotHorizontal <= 2.0f*PI) rotHorizontal += 2.0f*PI;
-	if(rotHorizontal >= 2.0f*PI) rotHorizontal -= 2.0f*PI;
-	origin = glm::rotateY(origin-head,-1*horizMovement);
-	origin = origin + head;
-
-	front = glm::rotateY(front,-1*horizMovement);
-	right = glm::rotateY(right,-1*horizMovement);
-	up    = glm::rotateY(right,-1*horizMovement);
-
-    temp = glm::rotate(origin-head,-1*vertMovement,right);
-
-    if(fabs(glm::dot(glm::normalize(temp),glm::vec3(0.0f,1.0f,0.0f))) < 0.8f){
-
-        origin = temp + head;
-        rotVertical -= vertMovement;
-        if(rotVertical <= 2.0f*PI) rotVertical += 2.0f*PI;
-        if(rotVertical >= 2.0f*PI) rotVertical -= 2.0f*PI;
-
-    }
-
-	up = glm::rotate(up,-1*vertMovement,right);
+	yaw = yaw > 360.0f ? yaw - 360.0f : yaw;
+	yaw = yaw < 0.0f ? yaw + 360.0f : yaw;
 }
 
 // Function to calculate which direction we need to move the camera and by what amount
 void Camera::move(double deltatime, Camera* player){
 
-	movement = glm::vec3(0.0f,0.0f,0.0f);
+	movement = vec3(0.0f,0.0f,0.0f);
 
 	// Vector that resolves an invalid attempted movement
-	glm::vec4 allowed(0.0f,0.0f,0.0f,0.0f);
-	glm::vec4 temp(0.0f,0.0f,0.0f,0.0f);
+	vec4 allowed(0.0f,0.0f,0.0f,0.0f);
+	vec4 temp(0.0f,0.0f,0.0f,0.0f);
 
 	if (holdingForward)
 	{
-		movement.x += front.x;
-		movement.z += front.z;
+		movement.x += -front.x;
+		movement.z += -front.z;
 	}
 
 	if (holdingBackward)
 	{
-		movement.x += -1*front.x;
-		movement.z += -1*front.z;
+		movement.x += front.x;
+		movement.z += front.z;
 	}
 
 	if (holdingRightStrafe)
@@ -147,13 +91,40 @@ void Camera::move(double deltatime, Camera* player){
 	currentWeapon->move(deltatime, player);
 }
 
+void Camera::getViewMatrix(mat4& view)
+{
+	float cosYaw = cos((yaw * 2 * PI) / 360.0f);
+	float sinYaw = sin((yaw * 2 * PI) / 360.0f);
+	float cosPitch = cos((pitch * 2 * PI) / 360.0f);
+	float sinPitch = sin((pitch * 2 * PI) / 360.0f);
+
+	right = vec3(cosYaw, 0.0f, -sinYaw);
+	up = vec3(sinYaw * sinPitch, cosPitch, cosYaw * sinPitch);
+	front = vec3(sinYaw * cosPitch, -sinPitch, cosPitch * cosYaw);
+
+	view[0] = vec4(right.x, up.x, front.x, 0.0f);
+	view[1] = vec4(right.y, up.y, front.y, 0.0f);
+	view[2] = vec4(right.z, up.z, front.z, 0.0f);
+	view[3] = vec4(-dot(right, head), -dot(up, head), -dot(front, head), 1.0f);
+}
+
 void Camera::render(Shader& levelShader){
 
     glClear(GL_DEPTH_BUFFER_BIT);
 
-    glm::mat4 trans = glm::translate(glm::mat4(1.0f), position + 0.1f * front + 0.2f * right);
-	glm::mat4 rot = glm::rotate(glm::mat4(1.0f), rotHorizontal + 0.05f, glm::vec3(0.0f, 1.0f, 0.0f));
-    rot = glm::rotate(glm::mat4(1.0f), rotVertical, right) * rot;
+	// TODO: the weapon should really have its own view matrix
+	vec3 pos = position + 0.1f * front + 0.2f * right;
+    mat4 trans(1.0f);
+	trans[3].x = pos.x;
+	trans[3].y = pos.y;
+	trans[3].z = pos.z;
+
+	mat4 rot;
+	rot[0] = vec4(-right.x, -right.y, -right.z, 0.0f);
+	rot[1] = vec4(up.x, up.y, up.z, 0.0f);
+	rot[2] = vec4(-front.x, -front.y, -front.z, 0.0f);
+	rot[3] = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+
     currentWeapon->setTransformations(trans,rot);
 
     currentWeapon->render(levelShader);

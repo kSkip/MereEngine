@@ -15,15 +15,15 @@ struct ParticleSourceParams{
 
     std::string objectName;
 
-    glm::vec3 position;
-    glm::vec3 maxInitVelocity;
+    vec3 position;
+    vec3 maxInitVelocity;
     unsigned int numParticles;
     float lifetime;
     bool continuous;
     float generationRate;
     bool gravity;
 
-    glm::vec3 color;
+    vec3 color;
 
     unsigned short options;
 
@@ -51,7 +51,7 @@ class ParticleSource : public GameObject{
         void initParticles(ParticleSourceParams& params);
 
         std::vector<vertex> pointParticles;
-        std::vector<glm::vec3> pointVelocities;
+        std::vector<vec3> pointVelocities;
 
         std::list<Particle*> particles;
 

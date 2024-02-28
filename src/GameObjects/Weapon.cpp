@@ -18,7 +18,7 @@ Weapon::~Weapon(){}
 
 Weapon::Weapon(const Weapon & rhs){}
 
-void Weapon::setTransformations(glm::mat4& translation_in, glm::mat4& rotation_in){
+void Weapon::setTransformations(mat4& translation_in, mat4& rotation_in){
 
     translation = translation_in;
     rotation = rotation_in;

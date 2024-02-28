@@ -2,7 +2,7 @@
 
 Bullet::Bullet(){}
 
-Bullet::Bullet(glm::vec3 raystart, glm::vec3 rayfinish, GameObject* p){
+Bullet::Bullet(vec3 raystart, vec3 rayfinish, GameObject* p){
 
     position = raystart;
     movement = rayfinish;

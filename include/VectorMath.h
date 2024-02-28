@@ -19,6 +19,18 @@ struct vec3 {
 	inline vec3() : x(0.0f), y(0.0f), z(0.0f) {}
 	inline vec3(float x, float y, float z) : x(x), y(y), z(z) {}
 
+	inline float& operator[](int i) {
+		switch (i) {
+		default:
+		case 0:
+			return x;
+		case 1:
+			return y;
+		case 2:
+			return z;
+		}
+	}
+
 	inline vec3 operator+(const vec3& rhs) {
 		return vec3(x + rhs.x, y + rhs.y, z + rhs.z);
 	}
@@ -33,6 +45,13 @@ struct vec3 {
 		z += rhs.z;
 		return *this;
 	}
+
+	inline vec3& operator-=(const vec3& rhs) {
+		x -= rhs.x;
+		y -= rhs.y;
+		z -= rhs.z;
+		return *this;
+	}
 };
 
 struct vec4 {
@@ -40,6 +59,23 @@ struct vec4 {
 		struct { float x, y, z, w; };
 		struct { float r, g, b, a; };
 	};
+
+	inline vec4() : x(0.0f), y(0.0f), z(0.0f), w(0.0f) {}
+	inline vec4(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {}
+
+	inline float& operator[](int i) {
+		switch (i) {
+		default:
+		case 0:
+			return x;
+		case 1:
+			return y;
+		case 2:
+			return z;
+		case 3:
+			return w;
+		}
+	}
 };
 
 struct quat {
@@ -64,6 +100,41 @@ struct quat {
 	inline vec3 rotate(const vec3&);
 };
 
+struct mat3 {
+	vec3 value[3];
+
+	inline mat3() {}
+	inline mat3(float diag) {
+		value[0] = vec3(diag, 0.0f, 0.0f);
+		value[1] = vec3(0.0f, diag, 0.0f);
+		value[2] = vec3(0.0f, 0.0f, diag);
+	}
+
+	inline vec3& operator[](int i) {
+		return value[i];
+	}
+
+	inline const vec3& operator[](int i) const {
+		return value[i];
+	}
+};
+
+struct mat4 {
+	vec4 value[4];
+
+	inline mat4() {}
+	inline mat4(float diag) {
+		value[0] = vec4(diag, 0.0f, 0.0f, 0.0f);
+		value[1] = vec4(0.0f, diag, 0.0f, 0.0f);
+		value[2] = vec4(0.0f, 0.0f, diag, 0.0f);
+		value[3] = vec4(0.0f, 0.0f, 0.0f, diag);
+	}
+
+	inline vec4& operator[](int i) {
+		return value[i];
+	}
+};
+
 struct mat4x3 {
 	vec3 value[4];
 
@@ -75,6 +146,10 @@ struct mat4x3 {
 inline float dot(const vec3& lhs, const vec3& rhs)
 {
 	return lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z;
+}
+
+inline vec3 operator+(const vec3& lhs, const vec3& rhs) {
+	return vec3(lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z);
 }
 
 inline vec3 operator*(const vec3& lhs, const float& scalar) {
@@ -153,6 +228,23 @@ inline quat nlerp(const quat& lhs, const quat& rhs, float t)
 inline vec3 lerp(const vec3& lhs, const vec3& rhs, float t)
 {
 	return (1.0f - t) * lhs + t * rhs;
+}
+
+inline vec3 operator*(const mat3& lhs, const vec3& rhs)
+{
+	return rhs.x * lhs[0] + rhs.y * lhs[1] + rhs.z * lhs[2];
+}
+
+inline mat4 perspective(float fov, float ar, float nearZ, float farZ)
+{
+	mat4 p;
+	float invTangent = 1.0f / tan(fov / 2);
+	p[0][0] = invTangent / ar;
+	p[1][1] = invTangent;
+	p[2][2] = -(nearZ + farZ) / (farZ - nearZ);
+	p[2][3] = -1.0f;
+	p[3][2] = 2.0f * farZ * nearZ / (nearZ - farZ);
+	return p;
 }
 
 #endif

@@ -7,8 +7,8 @@ GameObject::GameObject() :
     rotY(0.0f),
     movement(0.0f, 0.0f, 0.0f),
     velocity(0.0f, 0.0f, 0.0f),
-    translation(glm::mat4(1.0f)),
-    rotation(glm::mat4(1.0f))
+    translation(mat4(1.0f)),
+    rotation(mat4(1.0f))
 {
 }
 
@@ -35,8 +35,8 @@ void GameObject::renderMeshElements(GLuint vertex_buffer, GLuint vertex_element_
             draw_mode = GL_TRIANGLES;
     }
 
-    glUniformMatrix4fv(levelShader.translation,1, GL_FALSE,glm::value_ptr(this->translation));
-    glUniformMatrix4fv(levelShader.rotation,1, GL_FALSE,glm::value_ptr(this->rotation));
+    glUniformMatrix4fv(levelShader.translation, 1, GL_FALSE, (GLfloat*)&this->translation);
+    glUniformMatrix4fv(levelShader.rotation, 1, GL_FALSE, (GLfloat*)&this->rotation);
 
     glUniform1ui(levelShader.skipMVP,this->skipMVP);
     glUniform1ui(levelShader.skipLighting,this->skipLighting);
@@ -87,8 +87,8 @@ void GameObject::renderMeshArrays(GLuint vertex_buffer, GLsizei element_count, P
             draw_mode = GL_TRIANGLES;
     }
 
-    glUniformMatrix4fv(levelShader.translation,1, GL_FALSE,glm::value_ptr(this->translation));
-    glUniformMatrix4fv(levelShader.rotation,1, GL_FALSE,glm::value_ptr(this->rotation));
+    glUniformMatrix4fv(levelShader.translation, 1, GL_FALSE, (GLfloat*)&this->translation);
+    glUniformMatrix4fv(levelShader.rotation, 1, GL_FALSE, (GLfloat*)&this->rotation);
 
     glUniform1ui(levelShader.skipMVP,this->skipMVP);
     glUniform1ui(levelShader.skipLighting,this->skipLighting);
@@ -121,15 +121,15 @@ void GameObject::renderMeshArrays(GLuint vertex_buffer, GLsizei element_count, P
 
 }
 
-void GameObject::damage(float magnitude, glm::vec3 damageLocation){
+void GameObject::damage(float magnitude, vec3 damageLocation){
 
 }
 
 void GameObject::testResolveCollision(GameObject* object1, GameObject* object2){
 
     unsigned int i, j, k;
-    glm::vec3 axes[12];
-    glm::vec3 smallest, totalCorrection1, totalCorrection2;
+    vec3 axes[12];
+    vec3 smallest, totalCorrection1, totalCorrection2;
     float overlap = 0.0;
     bool collision;
 
@@ -137,8 +137,8 @@ void GameObject::testResolveCollision(GameObject* object1, GameObject* object2){
 
     if(object1->collisionType() != RAY && object2->collisionType() != RAY){
 
-        totalCorrection1 = glm::vec3(0.0f,0.0f,0.0f);
-        totalCorrection2 = glm::vec3(0.0f,0.0f,0.0f);
+        totalCorrection1 = vec3(0.0f,0.0f,0.0f);
+        totalCorrection2 = vec3(0.0f,0.0f,0.0f);
 
         for(i=0;i<object1->data->objectBounds->blocks.size();i++){
             for(j=0;j<object2->data->objectBounds->blocks.size();j++){
@@ -161,8 +161,8 @@ void GameObject::testResolveCollision(GameObject* object1, GameObject* object2){
                 axes[11] = -1.0f*b2.heightnorm;
 
                 collision = true;
-                glm::vec3 newPosition1 = object1->getPosition()+object1->getMovement();
-                glm::vec3 newPosition2 = object2->getPosition()+object2->getMovement();
+                vec3 newPosition1 = object1->getPosition()+object1->getMovement();
+                vec3 newPosition2 = object2->getPosition()+object2->getMovement();
                 for(k=0;k<12;k++){
                     projection p1 = b1.project(axes[k],newPosition1,object1->getRotation());
                     projection p2 = b2.project(axes[k],newPosition2,object2->getRotation());
@@ -180,7 +180,7 @@ void GameObject::testResolveCollision(GameObject* object1, GameObject* object2){
 
                 if(collision){
 
-                    float checkSign = glm::dot(smallest,(newPosition1+b1.getPosition())-(newPosition2+b2.getPosition()));
+                    float checkSign = dot(smallest,(newPosition1+b1.getPosition())-(newPosition2+b2.getPosition()));
 
                     //apply the MTV to the movement of either or both objects if collision occured
                     if(object1->collisionType() == COLLIDER && object2->collisionType() == COLLIDEE){
@@ -273,16 +273,16 @@ void GameObject::testResolveCollision(GameObject* object1, GameObject* object2){
                 float p1_l, p2_l, p1_w, p2_w, p1_h, p2_h;
                 projection l_t, w_t, h_t;
 
-                p1_l = glm::dot(ray->position,b.lengthnorm);
-                p2_l = glm::dot(ray->movement,b.lengthnorm);
+                p1_l = dot(ray->position,b.lengthnorm);
+                p2_l = dot(ray->movement,b.lengthnorm);
 
 
-                p1_w = glm::dot(ray->position,b.widthnorm);
-                p2_w = glm::dot(ray->movement,b.widthnorm);
+                p1_w = dot(ray->position,b.widthnorm);
+                p2_w = dot(ray->movement,b.widthnorm);
 
 
-                p1_h = glm::dot(ray->position,b.heightnorm);
-                p2_h = glm::dot(ray->movement,b.heightnorm);
+                p1_h = dot(ray->position,b.heightnorm);
+                p2_h = dot(ray->movement,b.heightnorm);
 
 
 

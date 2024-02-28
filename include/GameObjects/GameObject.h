@@ -12,20 +12,8 @@
 #include <map>
 
 #include "Platform.h"
-
-#define GLM_FORCE_RADIANS
-
-#include <glm/glm.hpp>
-#include <glm/gtx/transform.hpp>
-#include <glm/gtx/rotate_vector.hpp>
-#include <glm/gtx/quaternion.hpp>
-#include <glm/gtx/norm.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtx/string_cast.hpp>
-
 #include "Models/Armature.h"
-#include "boundary.h"
-
+#include "Boundary.h"
 #include "GameObjects/ObjectData.h"
 #include "Shader.h"
 
@@ -54,15 +42,15 @@ class GameObject{
         virtual void move(double deltatime, Camera* player);
         virtual void render(Shader&);
 
-        glm::vec3 getPosition() const { return position;}
+        vec3 getPosition() const { return position;}
         float getRotation() const {return rotY;}
 
-        glm::vec3 getVelocity() const { return velocity;}
+        vec3 getVelocity() const { return velocity;}
         void setXSpeed(double x)	{velocity.x = x;}
         void setYSpeed(double y)	{velocity.y = y;}
         void setZSpeed(double z)	{velocity.z = z;}
 
-        glm::vec3 getMovement() const { return movement;}
+        vec3 getMovement() const { return movement;}
         double cameraDistance() const { return cDistance;}
 
         bool onGround() const {return ground;}
@@ -76,7 +64,7 @@ class GameObject{
 
         virtual float getLife(){return life;}
 
-        virtual void damage(float magnitude, glm::vec3 damageLocation);
+        virtual void damage(float magnitude, vec3 damageLocation);
 
         unsigned int collisionType(){return collisionTypeValue;}
         static void testResolveCollision(GameObject* object1, GameObject* object2);
@@ -99,12 +87,12 @@ class GameObject{
 
         ObjectData *data;
 
-        glm::vec3 position;
+        vec3 position;
         float rotY;
-        glm::vec3 movement;
-        glm::vec3 velocity;
+        vec3 movement;
+        vec3 velocity;
 
-        glm::mat4 translation, rotation;
+        mat4 translation, rotation;
 
         bool skipMVP;
         bool skipLighting;

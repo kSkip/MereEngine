@@ -23,13 +23,24 @@ Character::Character(ObjectData* objectData, DataBlock& def)
 
     rotY  = atof(pos[3].c_str());
 
-    position    = glm::vec3(pos_init[0],pos_init[1],pos_init[2]);
-    translation = glm::translate(glm::mat4(1.0f),position);
-    rotation    = glm::rotate(glm::mat4(1.0f),rotY,glm::vec3(0.0,1.0,0.0));
+    position    = vec3(pos_init[0],pos_init[1],pos_init[2]);
+    translation = mat4(1.0f);
+    translation[3].x = position.x;
+    translation[3].y = position.y;
+    translation[3].z = position.z;
 
-    front    = glm::rotateY(glm::vec3(0.0f,0.0f,1.0f),rotY);
-    right    = glm::rotateY(glm::vec3(1.0f,0.0f,0.0f),rotY);
-    velocity = glm::vec3(0.0f,0.0f,0.0f);
+    float sinRotY = sin(rotY);
+    float cosRotY = cos(rotY);
+
+    rotation = mat4(1.0f);
+    rotation[0][0] = cosRotY;
+    rotation[0][2] = -sinRotY;
+    rotation[2][0] = sinRotY;
+    rotation[2][2] = cosRotY;
+    front = vec3(sinRotY, 0.0f, cosRotY);
+    right = vec3(cosRotY, 0.0f, -sinRotY);
+
+    velocity = vec3(0.0f, 0.0f, 0.0f);
 
     movementSpeedFactor = 0.5f;
 
@@ -51,25 +62,25 @@ Character::Character(const Character & rhs){}
 void Character::trackPlayer(double deltatime, Camera* player)
 {
 
-    glm::vec4 allowed, temp;
+    vec4 allowed, temp;
 
-    movement = glm::vec3(0.0f,0.0f,0.0f);
-    allowed  = glm::vec4(0.0f,0.0f,0.0f,0.0f);
-    temp     = glm::vec4(0.0f,0.0f,0.0f,0.0f);
+    movement = vec3(0.0f, 0.0f, 0.0f);
+    allowed = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+    temp = vec4(0.0f, 0.0f, 0.0f, 0.0f);
 
     currentTarget = player->getPosition();
 
-    glm::vec3 vectorToTarget = currentTarget - position;
-    float length = glm::length(vectorToTarget);
-    vectorToTarget = glm::vec3(vectorToTarget.x, 0.0f, vectorToTarget.z);
-    float frontDotProduct = glm::dot(vectorToTarget, front) / length;
-    float rightDotProduct = glm::dot(vectorToTarget, right) / length;
+    vec3 vectorToTarget = currentTarget - position;
+    float length = sqrt(dot(vectorToTarget, vectorToTarget));
+    vectorToTarget = vec3(vectorToTarget.x, 0.0f, vectorToTarget.z);
+    float frontDotProduct = dot(vectorToTarget, front) / length;
+    float rightDotProduct = dot(vectorToTarget, right) / length;
 
-    frontDotProduct = std::min(frontDotProduct, 1.0f);
-    frontDotProduct = std::max(frontDotProduct, -1.0f);
+    frontDotProduct = min(frontDotProduct, 1.0f);
+    frontDotProduct = max(frontDotProduct, -1.0f);
 
-    rightDotProduct = std::min(rightDotProduct, 1.0f);
-    rightDotProduct = std::max(rightDotProduct, -1.0f);
+    rightDotProduct = min(rightDotProduct, 1.0f);
+    rightDotProduct = max(rightDotProduct, -1.0f);
 
     float deltaRot = 0.1f * acos(frontDotProduct) / (length + 1);
     float twoPI = 2.0 * PI;
@@ -94,9 +105,16 @@ void Character::move(double deltatime, Camera* player)
 
     trackPlayer(deltatime, player);
 
-    rotation = glm::rotate(glm::mat4(1.0f), rotY, glm::vec3(0.0, 1.0, 0.0));
-    front = glm::rotateY(glm::vec3(0.0f, 0.0f, 1.0f), rotY);
-    right = glm::rotateY(glm::vec3(1.0f, 0.0f, 0.0f), rotY);
+    float sinRotY = sin(rotY);
+    float cosRotY = cos(rotY);
+
+    rotation = mat4(1.0f);
+    rotation[0][0] = cosRotY;
+    rotation[0][2] = -sinRotY;
+    rotation[2][0] = sinRotY;
+    rotation[2][2] = cosRotY;
+    front = vec3(sinRotY, 0.0f, cosRotY);
+    right = vec3(cosRotY, 0.0f, -sinRotY);
 
     velocity.y -= GRAVITATIONAL_ACCELERATION * deltatime;
 
@@ -113,6 +131,17 @@ void Character::move(double deltatime, Camera* player)
 
 }
 
+void Character::commitMovement() {
+
+    position += movement;
+    translation = mat4(1.0f);
+    translation[3].x = position.x;
+    translation[3].y = position.y;
+    translation[3].z = position.z;
+    if (health < 0.0f)destroy = true;
+
+}
+
 void Character::render(Shader& shader){
 
     if(data){
@@ -126,7 +155,7 @@ void Character::render(Shader& shader){
 
 }
 
-void Character::damage(float magnitude, glm::vec3 damageLocation)
+void Character::damage(float magnitude, vec3 damageLocation)
 {
     health -= magnitude;
     /*GameObject* newobject = new ParticleSource("Data/BloodDrop.3ds", damageLocation, glm::vec3(1.0f, 1.0f, 1.0f), 100, 0.5f, false, 0, true, state);

@@ -12,7 +12,7 @@ class Weapon : public GameObject{
         ~Weapon();
         Weapon(const Weapon & rhs);
 
-        void setTransformations(glm::mat4& translation, glm::mat4& rotation);
+        void setTransformations(mat4& translation, mat4& rotation);
 
         void move(double deltaTime, Camera* player);
         void render(Shader&);

@@ -9,7 +9,11 @@ SkyBox::SkyBox(ObjectData* objectData, Camera* p){
 
     data = objectData;
 
-    translation = glm::translate(glm::mat4(1.0f),player->getPosition());
+    translation = mat4(1.0f);
+    vec3 pos = player->getPosition();
+    translation[3].x = pos.x;
+    translation[3].y = pos.y;
+    translation[3].z = pos.z;
 
     collisionTypeValue = NONE;
     destroy = false;
@@ -24,6 +28,15 @@ SkyBox::~SkyBox(){}
 SkyBox::SkyBox(const SkyBox & rhs){}
 
 void SkyBox::move(double deltatime, Camera* player){}
+
+void SkyBox::commitMovement()
+{
+    translation = mat4(1.0f);
+    vec3 pos = player->getPosition();
+    translation[3].x = pos.x;
+    translation[3].y = pos.y;
+    translation[3].z = pos.z;
+}
 
 void SkyBox::render(Shader& levelShader){
 

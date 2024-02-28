@@ -5,7 +5,7 @@
 
 #include "Utilities/DataBlock.h"
 #include "Models/Armature.h"
-#include "boundary.h"
+#include "Boundary.h"
 
 class ObjectData{
 

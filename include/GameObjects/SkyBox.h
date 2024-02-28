@@ -15,11 +15,7 @@ class SkyBox : public GameObject{
 
         void move(double deltatime, Camera* player);
 
-        void commitMovement(){
-
-                translation = glm::translate(glm::mat4(1.0f),player->getPosition());
-
-        }
+        void commitMovement();
 
         void render(Shader&);
 

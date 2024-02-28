@@ -6,9 +6,7 @@
 #include <fstream>
 #include <vector>
 #include <cmath>
-#include <glm/glm.hpp>
-#include <glm/gtx/transform.hpp>
-#include <glm/gtx/rotate_vector.hpp>
+#include "VectorMath.h"
 
 class projection{
     public:
@@ -47,18 +45,18 @@ class block{
 
 public:
 	block();
-	block(glm::vec3 position,glm::vec3 lengthnorm,glm::vec3 widthnorm,glm::vec3 heightnorm,float l,float w,float h);
+	block(vec3, vec3, vec3, vec3, float, float, float);
 	block(const block& rhs);
 	~block();
 
-    projection project(glm::vec3 axis,glm::vec3 position, float roty);
+    projection project(vec3, vec3, float);
 
-    glm::vec3 getPosition() const {return position;}
+    vec3 getPosition() const {return position;}
 
-	glm::vec3 position;
-	glm::vec3 lengthnorm;
-	glm::vec3 widthnorm;
-	glm::vec3 heightnorm;
+	vec3 position;
+	vec3 lengthnorm;
+	vec3 widthnorm;
+	vec3 heightnorm;
 
 	float length;
 	float width;
@@ -66,7 +64,7 @@ public:
 
 private:
 
-	glm::vec3 vertices[8];
+	vec3 vertices[8];
 
 };
 

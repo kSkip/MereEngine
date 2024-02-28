@@ -6,6 +6,7 @@
 #include "GameObjects/SkyBox.h"
 #include "GameObjects/Bullet.h"
 #include "Utilities/TextManipulation.h"
+#include "VectorMath.h"
 
 struct FrameRateCounter {
     std::vector<double> samples;
@@ -148,7 +149,7 @@ void GameState::loadObjects(DataBlock & objectBlock)
             windowSize[0] = screenwidth;
             windowSize[1] = screenheight;
 
-            player = new Camera(object, objectMap["gun"], windowSize, objectData);
+            player = new Camera(object, objectMap["gun"]);
 
             insertOpaqueObject(player);
 
@@ -312,8 +313,8 @@ void GameState::firePrimaryWeapon()
     Weapon & weapon = player->GetWeapon();
     if (!weapon.isFiring) {
 
-        glm::vec3 Begin = player->getHead() + 0.1f * glm::normalize(player->getOrigin() - player->getHead());
-        glm::vec3 End = player->getHead() + 100.0f * glm::normalize(player->getOrigin() - player->getHead());
+        vec3 Begin = player->getHead() + 0.1f * player->getFront();
+        vec3 End = player->getHead() + 100.0f * player->getFront();
         GameObject* newobject = new Bullet(Begin, End, player);
 
         levelObjects.push_back(newobject);
@@ -411,19 +412,18 @@ void GameState::render()
 
     std::map<std::string,GLuint>::iterator textureIt;
     std::list<GameObject*>::iterator i;
-    glm::mat4 MV, P;
+    mat4 perspectiveMatrix;
+    mat4 viewMatrix;
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    //get Model View Projection Matrix
-    P = glm::perspective(1.04f,aspectRatio,0.1f,1000.0f);
-    MV = glm::lookAt(player->getHead(),player->getOrigin(),glm::vec3(0.0f,1.0f,0.0f));
+    perspectiveMatrix = perspective(1.04f, aspectRatio, 0.1f, 1000.0f);
+    player->getViewMatrix(viewMatrix);
 
     levelShader->activate(ENABLE_POSITION | ENABLE_NORMAL | ENABLE_TEXCOORD); //enable all attributes
 
-    //pass MVP to shader
-    glUniformMatrix4fv(levelShader->modelView,1, GL_FALSE,glm::value_ptr(MV));
-    glUniformMatrix4fv(levelShader->projection,1, GL_FALSE,glm::value_ptr(P));
+    glUniformMatrix4fv(levelShader->modelView, 1, GL_FALSE, (GLfloat*)&viewMatrix);
+    glUniformMatrix4fv(levelShader->projection, 1, GL_FALSE, (GLfloat*)&perspectiveMatrix);
 
 
     //Use of the only the first texture only for now
