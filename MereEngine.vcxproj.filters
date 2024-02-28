@@ -140,7 +140,7 @@
     <ClInclude Include="include\Models\OBJMesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\VectorMath\VectorMath.h">
+    <ClInclude Include="include\VectorMath.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

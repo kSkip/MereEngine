@@ -8,7 +8,7 @@
 #include <exception>
 
 #include "DataFile.h"
-#include "VectorMath/VectorMath.h"
+#include "VectorMath.h"
 
 struct md5vertex {
 	unsigned int index;
