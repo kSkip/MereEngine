@@ -1,8 +1,8 @@
 #include "Models/MD5GLBufferUtilities.h"
-#include <string>
-#include "VectorMath/QuaternionMath.h"
-#include <math.h>
 #include "Models/TextureReader.h"
+
+#include <string>
+#include <math.h>
 
 /*Version of MD5CreateVertexBuffer that takes the data structure obtained directly from the md5mesh file and puts the data
 into a format that is suitable for CPU skinning*/
@@ -30,13 +30,7 @@ GLuint MD5CreateVertexBuffer(struct md5meshdata* md5data, std::vector<vertex> &b
 
 			struct md5joint* joint = &(md5data->joints[unskinned[i].jointId[j]]);
 
-			vec3 rotatedWeight;
-			quat orientation;
-
-			memcpy(&orientation,joint->orientation,3*sizeof(float));
-			quaternion_w((float*)&orientation);
-
-			rotate_position((float*)&orientation, (float*)&(unskinned[i].weightPosition[j]), (float*)&rotatedWeight);
+			vec3 rotatedWeight = joint->orientation.rotate(unskinned[i].weightPosition[j]);
 
 			bindPoseVertices[i].position += (joint->position + rotatedWeight) * unskinned[i].weightBias[j];
 
@@ -44,7 +38,6 @@ GLuint MD5CreateVertexBuffer(struct md5meshdata* md5data, std::vector<vertex> &b
 
 	}
 	
-	quat orientation;
 	vec3 normal;
 
 	for (i = 0; i < mesh.numTriangles; i++) {
@@ -66,24 +59,22 @@ GLuint MD5CreateVertexBuffer(struct md5meshdata* md5data, std::vector<vertex> &b
 	for (i = 0; i < unskinned.size(); i++) {
 		for (size_t j = 0; j < 4; j++) {
 			unsigned int jointId = unskinned[i].jointId[j];
-			memcpy(&orientation, joints[jointId].orientation, 3 * sizeof(float));
+			quat orientation = joints[jointId].orientation;
 			normal = bindPoseVertices[i].normal;
 
-			orientation.x *= -1;
-			orientation.y *= -1;
-			orientation.z *= -1;
+			orientation.x = -orientation.x;
+			orientation.y = -orientation.y;
+			orientation.z = -orientation.z;
+			//orientation.calcW();
 
-			quaternion_w((float*)&orientation);
-
-			rotate_position((float*)&orientation, (float*)&normal, (float*)&unskinned[i].weightNormal[j]);
-
+			unskinned[i].weightNormal[j] = orientation.rotate(normal);
 		}
 	}
 
 	GLuint buffer;
 	glGenBuffers(1, &buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, buffer);
-	glBufferData(GL_ARRAY_BUFFER,numVertices*sizeof(vertex), bindPoseVertices.data(), GL_STREAM_DRAW);
+	glBufferData(GL_ARRAY_BUFFER,numVertices*sizeof(vertex), bindPoseVertices.data(), GL_DYNAMIC_DRAW);
 
 	return buffer;
 }

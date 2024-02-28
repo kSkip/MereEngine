@@ -1,5 +1,4 @@
 #include "Models/Armature.h"
-#include "VectorMath/QuaternionMath.h"
 #include <iostream>
 #include <cmath>
 
@@ -21,88 +20,74 @@ void Armature::buildArmature(struct md5animdata* md5data){
 	jointOrientation.resize(joints.size());
 }
 
-void getFrameValues(md5hierarchyjoint &joint, float position[3], float orientation[4], md5frame &frame){
+void getFrameValues(md5hierarchyjoint &joint, vec3& position, quat& orientation, md5frame& frame){
 
 	size_t i = joint.startIndex;
 
 	if(joint.flags & 1){
-		position[0] = frame.animatedComponents[i];
+		position.x = frame.animatedComponents[i];
 		i++;
 	}
 	if(joint.flags & 2){
-		position[1] = frame.animatedComponents[i];
+		position.y = frame.animatedComponents[i];
 		i++;
 	}
 	if(joint.flags & 4){
-		position[2] = frame.animatedComponents[i];
+		position.z = frame.animatedComponents[i];
 		i++;
 	}
 	if(joint.flags & 8){
-		orientation[0] = frame.animatedComponents[i];
+		orientation.x = frame.animatedComponents[i];
 		i++;
 	}
 	if(joint.flags & 16){
-		orientation[1] = frame.animatedComponents[i];
+		orientation.y = frame.animatedComponents[i];
 		i++;
 	}
 	if(joint.flags & 32){
-		orientation[2] = frame.animatedComponents[i];
+		orientation.z = frame.animatedComponents[i];
 		i++;
 	}
 
-	quaternion_w(orientation);
+	orientation.calcW();
 
 }
 
 void Armature::setJoint(unsigned int i, unsigned int firstFrame, unsigned int secondFrame, float interpol)
 {
-	float floorPosition[3];
-	float floorOrientation[4];
-	float ceilPosition[3];
-	float ceilOrientation[4];
-
-	float position[3];
-	float orientation[4];
+	vec3 floorPosition;
+	quat floorOrientation;
+	vec3 ceilPosition;
+	quat ceilOrientation;
 
 	md5hierarchyjoint & joint = joints[i];
 	md5baseframejoint & thisJointBase = baseframe[i];
 	md5frame & first = frames[firstFrame];
 	md5frame & second = frames[secondFrame];
 
-	memcpy(floorPosition, thisJointBase.position, 3 * sizeof(float));
-	memcpy(floorOrientation, thisJointBase.orientation, 3 * sizeof(float));
+	floorPosition = thisJointBase.position;
+	floorOrientation = thisJointBase.orientation;
 
-	memcpy(ceilPosition, thisJointBase.position, 3 * sizeof(float));
-	memcpy(ceilOrientation, thisJointBase.orientation, 3 * sizeof(float));
+	ceilPosition = thisJointBase.position;
+	ceilOrientation = thisJointBase.orientation;
 
 	getFrameValues(joints[i], floorPosition, floorOrientation, first);
 
 	getFrameValues(joints[i], ceilPosition, ceilOrientation, second);
 
-	interpolate_quaternion(floorOrientation, ceilOrientation, interpol, orientation);
+	quat orientation = nlerp(floorOrientation, ceilOrientation, interpol);
 
-	interpolate_position(floorPosition, ceilPosition, interpol, position);
+	vec3 position = lerp(floorPosition, ceilPosition, interpol);
 
-	if(joint.parentId >= 0) {
-		float rotatedPosition[3];
-		rotate_position(&jointOrientation[joint.parentId].x, position, rotatedPosition);
-
-		jointPosition[i].x = rotatedPosition[0] + jointPosition[joint.parentId].x;
-		jointPosition[i].y = rotatedPosition[1] + jointPosition[joint.parentId].y;
-		jointPosition[i].z = rotatedPosition[2] + jointPosition[joint.parentId].z;
-
-		float rotatedQuat[4];
-		quaternion_product(&jointOrientation[joint.parentId].x, orientation, rotatedQuat);
-
-		memcpy(&jointOrientation[i], rotatedQuat, 4 * sizeof(float));
-
-	}else{
-
-		memcpy(&jointPosition[i], position, 3 * sizeof(float));
-		memcpy(&jointOrientation[i], orientation, 4 * sizeof(float));
-
+	if (joint.parentId >= 0) {
+		vec3 rotatedPosition = jointOrientation[joint.parentId].rotate(position);
+		jointPosition[i] = rotatedPosition + jointPosition[joint.parentId];
+		jointOrientation[i] = jointOrientation[joint.parentId] * orientation;
 	}
-
+	else {
+		jointPosition[i] = position;
+		jointOrientation[i] = orientation;
+	}
 }
 
 void Armature::buildFrame(float animationTime)
@@ -130,31 +115,23 @@ void Armature::setVertices(struct vertex* vertices, MD5Vertex* unskinned, unsign
 
 	for (i = 0; i < numVertices; i++) {
 
-		memset(&vertices[i].position,0,3*sizeof(float));
-		memset(&vertices[i].normal,0,3*sizeof(float));
+		vec3 position;
+		vec3 normal;
 
 		for (j = 0; j < unskinned[i].countWeight; j++) {
 
-			float jointPos[3];
-			float jointOrient[4];
-			memcpy(jointPos, &jointPosition[unskinned[i].jointId[j]], 3 * sizeof(float));
-			memcpy(jointOrient, &jointOrientation[unskinned[i].jointId[j]], 4 * sizeof(float));
+			vec3 jointPos = jointPosition[unskinned[i].jointId[j]];
+			quat jointOrient = jointOrientation[unskinned[i].jointId[j]];
 
-			float weightPosition[3];
-			float weightNormal[3];
+			vec3 weightPosition = jointOrient.rotate(unskinned[i].weightPosition[j]);
+			vec3 weightNormal = jointOrient.rotate(unskinned[i].weightNormal[j]);
 
-			rotate_position(jointOrient,(float*)&unskinned[i].weightPosition[j],weightPosition);
-			rotate_position(jointOrient, (float*)&unskinned[i].weightNormal[j],weightNormal);
-
-			vertices[i].position.x += (jointPos[0] + weightPosition[0])*unskinned[i].weightBias[j];
-			vertices[i].position.y += (jointPos[1] + weightPosition[1])*unskinned[i].weightBias[j];
-			vertices[i].position.z += (jointPos[2] + weightPosition[2])*unskinned[i].weightBias[j];
-
-			vertices[i].normal.x += weightNormal[0]*unskinned[i].weightBias[j];
-			vertices[i].normal.y += weightNormal[1]*unskinned[i].weightBias[j];
-			vertices[i].normal.z += weightNormal[2]*unskinned[i].weightBias[j];
+			position += (jointPos + weightPosition) * unskinned[i].weightBias[j];
+			normal += weightNormal * unskinned[i].weightBias[j];
 
 		}
+		vertices[i].position = position;
+		vertices[i].normal = normal;
 
 	}
 

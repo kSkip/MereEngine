@@ -1,0 +1,158 @@
+#ifndef MATHTYPES_H
+#define MATHTYPES_H
+
+#include <cmath>
+
+struct vec2 {
+	union {
+		struct { float x, y; };
+		struct { float s, t; };
+	};
+};
+
+struct vec3 {
+	union {
+		struct { float x, y, z; };
+		struct { float r, g, b; };
+	};
+
+	inline vec3() : x(0.0f), y(0.0f), z(0.0f) {}
+	inline vec3(float x, float y, float z) : x(x), y(y), z(z) {}
+
+	inline vec3 operator+(const vec3& rhs) {
+		return vec3(x + rhs.x, y + rhs.y, z + rhs.z);
+	}
+
+	inline vec3 operator-(const vec3& rhs) {
+		return vec3(x - rhs.x, y - rhs.y, z - rhs.z);
+	}
+
+	inline vec3& operator+=(const vec3& rhs) {
+		x += rhs.x;
+		y += rhs.y;
+		z += rhs.z;
+		return *this;
+	}
+};
+
+struct vec4 {
+	union {
+		struct { float x, y, z, w; };
+		struct { float r, g, b, a; };
+	};
+};
+
+struct quat {
+	float w;
+	float x;
+	float y;
+	float z;
+
+	inline quat() : w(0.0f), x(0.0f), y(0.0f), z(0.0f) {}
+	inline quat(float w, float x, float y, float z) : w(w), x(x), y(y), z(z) {}
+
+	inline void calcW() {
+		w = 1.0f - x * x - y * y - z * z;
+		w = w > 0.0f ? w : 0.0f;
+		w = -sqrt(w);
+	}
+
+	inline quat operator+(const quat& rhs) {
+		return quat(w + rhs.w, x + rhs.x, y + rhs.y, z + rhs.z);
+	}
+
+	inline vec3 rotate(const vec3&);
+};
+
+struct mat4x3 {
+	vec3 value[4];
+
+	inline vec3& operator[](int i) {
+		return value[i];
+	}
+};
+
+inline float dot(const vec3& lhs, const vec3& rhs)
+{
+	return lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z;
+}
+
+inline vec3 operator*(const vec3& lhs, const float& scalar) {
+	return vec3(scalar * lhs.x, scalar * lhs.y, scalar * lhs.z);
+}
+
+inline vec3 operator*(const float& scalar, const vec3& rhs) {
+	return rhs * scalar;
+}
+
+inline vec3 operator/(const vec3& lhs, const float& scalar) {
+	return vec3(lhs.x / scalar, lhs.y / scalar, lhs.z / scalar);
+}
+
+inline vec3 normalize(const vec3& v)
+{
+	float factor = dot(v, v);
+	factor = sqrt(factor);
+	return v / factor;
+}
+
+inline vec3 cross(const vec3& lhs, const vec3& rhs)
+{
+	return vec3(
+		lhs.y * rhs.z - rhs.y * lhs.z,
+		rhs.x * lhs.z - lhs.x * rhs.z,
+		lhs.x * rhs.y - rhs.x * lhs.y
+	);
+}
+
+inline quat operator*(const quat& lhs, const float& scalar) {
+	return quat(scalar * lhs.w, scalar * lhs.x, scalar * lhs.y, scalar * lhs.z);
+}
+
+inline quat operator*(const float& scalar, const quat& rhs) {
+	return rhs * scalar;
+}
+
+inline quat operator*(const quat& lhs, const quat& rhs) {
+	return quat(
+		lhs.w * rhs.w - lhs.x * rhs.x - lhs.y * rhs.y - lhs.z * rhs.z,
+		lhs.x * rhs.w + lhs.w * rhs.x + lhs.y * rhs.z - lhs.z * rhs.y,
+		lhs.y * rhs.w + lhs.w * rhs.y + lhs.z * rhs.x - lhs.x * rhs.z,
+		lhs.z * rhs.w + lhs.w * rhs.z + lhs.x * rhs.y - lhs.y * rhs.x
+	);
+}
+
+inline quat operator/(const quat& lhs, const float& scalar) {
+	return quat(lhs.w / scalar, lhs.x / scalar, lhs.y / scalar, lhs.z / scalar);
+}
+
+inline float dot(const quat& lhs, const quat& rhs)
+{
+	return lhs.w * rhs.w + lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z;
+}
+
+inline quat normalize(const quat& v)
+{
+	float factor = dot(v, v);
+	factor = sqrt(factor);
+	return v / factor;
+}
+
+inline vec3 quat::rotate(const vec3& pos) {
+	quat inv(w, -x, -y, -z);
+	quat temp(0.0f, pos.x, pos.y, pos.z);
+	temp =  *this * temp * inv;
+	return vec3(temp.x, temp.y, temp.z);
+}
+
+inline quat nlerp(const quat& lhs, const quat& rhs, float t)
+{
+	return normalize((1.0f - t) * lhs + t * rhs);
+}
+
+inline vec3 lerp(const vec3& lhs, const vec3& rhs, float t)
+{
+	return (1.0f - t) * lhs + t * rhs;
+}
+
+#endif

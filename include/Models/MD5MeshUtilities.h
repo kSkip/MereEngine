@@ -8,7 +8,7 @@
 #include <exception>
 
 #include "DataFile.h"
-#include "VectorMath/MathTypes.h"
+#include "VectorMath/VectorMath.h"
 
 struct md5vertex {
 	unsigned int index;
@@ -42,7 +42,7 @@ struct md5joint {
 	unsigned int id;
 	int parentId;
 	vec3 position;
-	float orientation[3];
+	quat orientation;
 };
 
 struct md5meshdata {
@@ -62,13 +62,13 @@ struct md5hierarchyjoint {
 };
 
 struct md5bounds {
-	float min[3];
-	float max[3];
+	vec3 min;
+	vec3 max;
 };
 
 struct md5baseframejoint {
-	float position[3];
-	float orientation[3];
+	vec3 position;
+	quat orientation;
 };
 
 struct md5frame {

@@ -106,10 +106,11 @@ void MD5MeshFile::getJoint(md5joint &j)
 		"%s%d%s%f%f%f%s%s%f%f%f%s",
 		jointName, &j.parentId,
 		left, &j.position.x, &j.position.y, &j.position.z, right,
-		left, j.orientation, j.orientation + 1, j.orientation + 2, right);
+		left, &j.orientation.x, &j.orientation.y, &j.orientation.z, right);
 	if (count != 12) {
 		throw;
 	}
+	j.orientation.calcW();
 }
 
 void MD5MeshFile::getVertex(md5vertex & v)
@@ -221,8 +222,8 @@ void MD5AnimFile::getBounds(md5bounds & b)
 	char bracket[2];
 	char *l = getLine();
 	int count = sscanf(l, "%s%f%f%f%s%s%f%f%f%s", bracket,
-		b.min, b.min + 1, b.min + 2, bracket, bracket,
-		b.max, b.max + 1, b.max + 2, bracket);
+		&b.min.x, &b.min.y, &b.min.z, bracket, bracket,
+		&b.max.x, &b.max.y, &b.max.z, bracket);
 	if (count != 10) {
 		throw;
 	}
@@ -233,9 +234,10 @@ void MD5AnimFile::getBaseFrameJoint(md5baseframejoint & joint)
 	char bracket[2];
 	char *l = getLine();
 	int count = sscanf(l, "%s%f%f%f%s%s%f%f%f%s", bracket,
-		joint.position, joint.position + 1, joint.position + 2, bracket, bracket,
-		joint.orientation, joint.orientation + 1, joint.orientation + 2, bracket);
+		&joint.position.x, &joint.position.y, &joint.position.z, bracket, bracket,
+		&joint.orientation.x, &joint.orientation.y, &joint.orientation.z, bracket);
 	if (count != 10) {
 		throw;
 	}
+	joint.orientation.calcW();
 }

@@ -3,7 +3,7 @@
 
 #include "Platform.h"
 #include "MD5MeshUtilities.h"
-#include "VectorMath/MathTypes.h"
+#include "VectorMath/VectorMath.h"
 
 struct MD5Vertex {
 	mat4x3 normal;
