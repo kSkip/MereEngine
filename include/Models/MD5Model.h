@@ -1,8 +1,8 @@
-#ifndef GLBUFFERUTILITIES_H
-#define GLBUFFERUTILITIES_H
+#ifndef MD5MODEL_H
+#define MD5MODEL_H
 
 #include "Platform.h"
-#include "MD5MeshUtilities.h"
+#include "MD5Mesh.h"
 #include "VectorMath.h"
 
 struct MD5Vertex {

@@ -57,10 +57,10 @@
     <ClCompile Include="src\models\Armature.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\models\MD5GLBufferUtilities.cpp">
+    <ClCompile Include="src\models\MD5Model.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\models\MD5MeshUtilities.cpp">
+    <ClCompile Include="src\models\MD5Mesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\utilities\DataBlock.cpp">
@@ -116,13 +116,13 @@
     <ClInclude Include="include\gameobjects\Weapon.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\models\MD5MeshUtilities.h">
+    <ClInclude Include="include\models\MD5Mesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\models\Armature.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\models\MD5GLBufferUtilities.h">
+    <ClInclude Include="include\models\MD5Model.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\utilities\DataBlock.h">

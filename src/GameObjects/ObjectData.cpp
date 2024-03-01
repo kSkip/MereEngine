@@ -1,6 +1,6 @@
 #include "GameObjects/ObjectData.h"
 #include "Utilities/TextManipulation.h"
-#include "Models/MD5GLBufferUtilities.h"
+#include "Models/MD5Model.h"
 #include "Models/OBJMesh.h"
 
 ObjectData::ObjectData(){}

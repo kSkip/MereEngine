@@ -71,8 +71,8 @@
     <ClCompile Include="src\GameState.cpp" />
     <ClCompile Include="src\Win32Main.cpp" />
     <ClCompile Include="src\models\Armature.cpp" />
-    <ClCompile Include="src\models\MD5GLBufferUtilities.cpp" />
-    <ClCompile Include="src\models\MD5MeshUtilities.cpp" />
+    <ClCompile Include="src\models\MD5Model.cpp" />
+    <ClCompile Include="src\models\MD5Mesh.cpp" />
     <ClCompile Include="src\Models\OBJMesh.cpp" />
     <ClCompile Include="src\Models\TextureReader.cpp" />
     <ClCompile Include="src\Shader.cpp" />
@@ -94,8 +94,8 @@
     <ClInclude Include="include\GameState.h" />
     <ClInclude Include="include\models\Armature.h" />
     <ClInclude Include="include\Models\DataFile.h" />
-    <ClInclude Include="include\models\MD5GLBufferUtilities.h" />
-    <ClInclude Include="include\models\MD5MeshUtilities.h" />
+    <ClInclude Include="include\models\MD5Model.h" />
+    <ClInclude Include="include\models\MD5Mesh.h" />
     <ClInclude Include="include\Models\OBJMesh.h" />
     <ClInclude Include="include\Models\TextureReader.h" />
     <ClInclude Include="include\Platform.h" />

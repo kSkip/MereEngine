@@ -1,5 +1,5 @@
-#ifndef MD5MESHUTILITIES_H
-#define MD5MESHUTILITIES_H
+#ifndef MD5MESH_H
+#define MD5MESH_H
 
 #include <stdio.h>
 #include <string.h>

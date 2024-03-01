@@ -1,4 +1,4 @@
-#include "Models/MD5MeshUtilities.h"
+#include "Models/MD5Mesh.h"
 
 unsigned int MD5File::getValue(char* name)
 {

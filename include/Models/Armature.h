@@ -1,8 +1,8 @@
 #ifndef ARMATURE_H
 #define ARMATURE_H
 
-#include "MD5GLBufferUtilities.h"
-#include "MD5MeshUtilities.h"
+#include "MD5Model.h"
+#include "MD5Mesh.h"
 
 
 class Armature{
