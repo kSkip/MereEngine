@@ -1,5 +1,5 @@
 #include "GameObjects/Character.h"
-#include "GameObjects/Camera.h"
+#include "GameObjects/Player.h"
 #include "Models/Armature.h"
 #include "Utilities/TextManipulation.h"
 #include "Utilities/DataBlock.h"
@@ -59,7 +59,7 @@ Character::~Character(){}
 
 Character::Character(const Character & rhs){}
 
-void Character::trackPlayer(double deltatime, Camera* player)
+void Character::trackPlayer(double deltatime, Player& player)
 {
 
     vec4 allowed, temp;
@@ -68,7 +68,7 @@ void Character::trackPlayer(double deltatime, Camera* player)
     allowed = vec4(0.0f, 0.0f, 0.0f, 0.0f);
     temp = vec4(0.0f, 0.0f, 0.0f, 0.0f);
 
-    currentTarget = player->getPosition();
+    currentTarget = player.getPosition();
 
     vec3 vectorToTarget = currentTarget - position;
     float length = sqrt(dot(vectorToTarget, vectorToTarget));
@@ -98,7 +98,7 @@ void Character::trackPlayer(double deltatime, Camera* player)
     }
 }
 
-void Character::move(double deltatime, Camera* player)
+void Character::move(double deltatime, Player& player)
 {
 
     charAnimTime += deltatime;

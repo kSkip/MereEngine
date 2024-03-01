@@ -12,10 +12,11 @@
 #include <map>
 
 #include "Platform.h"
-#include "Models/Armature.h"
-#include "Boundary.h"
 #include "GameObjects/ObjectData.h"
+#include "Boundary.h"
 #include "Shader.h"
+
+class Player;
 
 enum Primative {PTYPE_TRIANGLES, PTYPE_POINTS};
 
@@ -29,8 +30,6 @@ const float PI = 3.1415927f;
 #define RAY 4
 #define NONE 5
 
-class Camera;
-
 class GameObject{
 
     public:
@@ -39,7 +38,7 @@ class GameObject{
         virtual ~GameObject();
         GameObject(const GameObject & rhs);
 
-        virtual void move(double deltatime, Camera* player);
+        virtual void move(double, Player&);
         virtual void render(Shader&);
 
         vec3 getPosition() const { return position;}
@@ -78,6 +77,10 @@ class GameObject{
 
         GLuint getDiffuseTexture() {
             return data->diffuseTex;
+        }
+
+        void setObjectData(ObjectData* objData) {
+            data = objData;
         }
 
     protected:

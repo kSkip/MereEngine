@@ -55,7 +55,7 @@ void ParticleSource::initParticles(ParticleSourceParams& params_in)
 
 }
 
-void ParticleSource::move(double deltatime, Camera* player, std::list<GameObject*>* levelObjects){
+void ParticleSource::move(double deltatime, Player& player){
 
     unsigned int i;
 

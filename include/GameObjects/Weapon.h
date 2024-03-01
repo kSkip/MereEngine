@@ -3,28 +3,34 @@
 
 #include "GameObject.h"
 
-class Weapon : public GameObject{
+class Weapon {
+public:
+    Weapon();
 
-    public:
+    void setTransformations(mat4& translation, mat4& rotation);
 
-        Weapon();
-        Weapon(ObjectData*);
-        ~Weapon();
-        Weapon(const Weapon & rhs);
+    void move(double);
+    void render(Shader&);
 
-        void setTransformations(mat4& translation, mat4& rotation);
+    void fire() { isFiring = 1; animTime = 0.0; }
 
-        void move(double deltaTime, Camera* player);
-        void render(Shader&);
+    void setObjectData(ObjectData* objData) { data = objData; }
 
-        void commitMovement(){
+    double animTime;
+    int isFiring;
 
-        }
+private:
+    ObjectData *data;
 
-        void fire() { isFiring = 1; animTime = 0.0; }
+    vec3 position;
+    float rotY;
+    vec3 movement;
+    vec3 velocity;
 
-        double animTime;
-        int isFiring;
+    mat4 translation, rotation;
+
+    bool skipMVP;
+    bool skipLighting;
 };
 
 #endif

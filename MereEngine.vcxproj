@@ -64,6 +64,7 @@
     <ClCompile Include="src\gameobjects\GameObject.cpp" />
     <ClCompile Include="src\gameobjects\ObjectData.cpp" />
     <ClCompile Include="src\gameobjects\ParticleSource.cpp" />
+    <ClCompile Include="src\GameObjects\Player.cpp" />
     <ClCompile Include="src\gameobjects\SkyBox.cpp" />
     <ClCompile Include="src\gameobjects\StaticObject.cpp" />
     <ClCompile Include="src\gameobjects\Weapon.cpp" />
@@ -86,6 +87,7 @@
     <ClInclude Include="include\gameobjects\GameObject.h" />
     <ClInclude Include="include\gameobjects\ObjectData.h" />
     <ClInclude Include="include\gameobjects\ParticleSource.h" />
+    <ClInclude Include="include\GameObjects\Player.h" />
     <ClInclude Include="include\gameobjects\SkyBox.h" />
     <ClInclude Include="include\gameobjects\StaticObject.h" />
     <ClInclude Include="include\gameobjects\Weapon.h" />

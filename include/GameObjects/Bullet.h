@@ -4,36 +4,30 @@
 #include "GameObjects/GameObject.h"
 
 class Bullet : public GameObject{
+public:
+    Bullet(vec3, vec3, GameObject*);
 
-    public:
+    void move(double deltatime, Player&);
+    void registerHit(GameObject* object, float point_on_ray);
 
-        Bullet();
-        Bullet(vec3 raystart, vec3 rayfinish, GameObject* parent);
-        ~Bullet();
-        Bullet(const Bullet & rhs);
-
-        void move(double deltatime, Camera* player);
-        void registerHit(GameObject* object, float point_on_ray);
-
-        void commitMovement()
-        {
-            if(tenativeHitObject != NULL){
-                tenativeHitObject->damage(1.0f,time*(movement-position)+position);
-            }
-            destroy = true;
-
+    void commitMovement()
+    {
+        if(tenativeHitObject != NULL){
+            tenativeHitObject->damage(1.0f,time*(movement-position)+position);
         }
+        destroy = true;
 
-        void render(Shader&);
+    }
 
-        GameObject* getParent(){ return parent;}
+    void render(Shader&);
 
-    private:
+    GameObject* getParent(){ return parent;}
 
-        GameObject* parent;
-        GameObject* tenativeHitObject;
-        float time;
+private:
 
+    GameObject* parent;
+    GameObject* tenativeHitObject;
+    float time;
 };
 
 #endif

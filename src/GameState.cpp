@@ -143,29 +143,24 @@ void GameState::loadObjects(DataBlock & objectBlock)
 
         objectData("rootdir") = rootDir;
 
-        if(objectType == "camera"){
+        if (objectType == "camera") {
 
-            float windowSize[2];
-            windowSize[0] = screenwidth;
-            windowSize[1] = screenheight;
+            player.setObjectData(object);
+            player.weapon.setObjectData(objectMap["gun"]);
 
-            player = new Camera(object, objectMap["gun"]);
-
-            insertOpaqueObject(player);
-
-        }else if(objectType == "static_object"){
+        } else if (objectType == "static_object") {
 
             StaticObject* newGameObject = new StaticObject(object, objectData);
 
             insertOpaqueObject(newGameObject);
 
-        }else if(objectType == "character"){
+        } else if (objectType == "character") {
 
             Character* newGameObject = new Character(object, objectData);
 
             insertOpaqueObject(newGameObject);
 
-        }else if(objectType == "sky_box"){
+        } else if (objectType == "sky_box") {
 
             SkyBox* newGameObject = new SkyBox(object, player);
 
@@ -253,29 +248,29 @@ void GameState::save(){}
 
 void GameState::movingForward(bool isMoving)
 {
-    player->holdingForward = isMoving;
+    player.holdingForward = isMoving;
 }
 
 void GameState::movingBackward(bool isMoving)
 {
-    player->holdingBackward = isMoving;
+    player.holdingBackward = isMoving;
 }
 
 void GameState::movingLeft(bool isMoving)
 {
-    player->holdingLeftStrafe = isMoving;
+    player.holdingLeftStrafe = isMoving;
 }
 
 void GameState::movingRight(bool isMoving)
 {
-    player->holdingRightStrafe = isMoving;
+    player.holdingRightStrafe = isMoving;
 }
 
 void GameState::handleSpacebar()
 {
-    if (player->onGround()) {
-        player->setYSpeed(1.5f);
-        player->isNotGrounded();
+    if (player.onGround()) {
+        player.setYSpeed(1.5f);
+        player.isNotGrounded();
     }
 }
 
@@ -310,12 +305,12 @@ void GameState::handleRelativeMouseMove(int dx, int dy)
 
 void GameState::firePrimaryWeapon()
 {
-    Weapon & weapon = player->GetWeapon();
+    Weapon& weapon = player.weapon;
     if (!weapon.isFiring) {
 
-        vec3 Begin = player->getHead() + 0.1f * player->getFront();
-        vec3 End = player->getHead() + 100.0f * player->getFront();
-        GameObject* newobject = new Bullet(Begin, End, player);
+        vec3 Begin = player.camera.getHead() + 0.1f * player.camera.getFront();
+        vec3 End = player.camera.getHead() + 100.0f * player.camera.getFront();
+        GameObject* newobject = new Bullet(Begin, End, &player);
 
         levelObjects.push_back(newobject);
         opaqueObjects.push_back(newobject);
@@ -326,6 +321,8 @@ void GameState::firePrimaryWeapon()
 
 bool GameState::run(double elapsedTime)
 {
+    elapsedTime = elapsedTime > 0.1 ? 0.1 : elapsedTime;
+
     if (paused) {
         if (!cursorVisible) {
             ShowCursor(TRUE);
@@ -370,24 +367,28 @@ bool GameState::run(double elapsedTime)
 //moves the game objects through time
 void GameState::move(double deltatime)
 {
-    player->handleMouseMove(context.cursor.dx, context.cursor.dy);
+    player.camera.handleMouseMove(context.cursor.dx, context.cursor.dy);
     context.cursor.dx = 0;
     context.cursor.dy = 0;
 
     std::list<GameObject*>::iterator i, j;
 
+    player.move(deltatime, player);
+
     for(i = levelObjects.begin(); i != levelObjects.end(); i++)
-        (*i)->move(deltatime, this->player);
+        (*i)->move(deltatime, player);
 
 
     for(i = levelObjects.begin(); i != levelObjects.end(); i++)
     {
+        GameObject::testResolveCollision((*i), &player);
         for(j = i; j != levelObjects.end(); j++)
         {
             if(i != j) GameObject::testResolveCollision((*i),(*j)); //detect and resolve collisions
         }
     }
 
+    player.commitMovement();
     for(i = levelObjects.begin(); i != levelObjects.end();)
 
     {
@@ -406,7 +407,6 @@ void GameState::move(double deltatime)
 
 }
 
-//renders everything
 void GameState::render()
 {
 
@@ -418,7 +418,7 @@ void GameState::render()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     perspectiveMatrix = perspective(1.04f, aspectRatio, 0.1f, 1000.0f);
-    player->getViewMatrix(viewMatrix);
+    player.camera.getViewMatrix(viewMatrix);
 
     levelShader->activate(ENABLE_POSITION | ENABLE_NORMAL | ENABLE_TEXCOORD); //enable all attributes
 
@@ -434,11 +434,8 @@ void GameState::render()
      * Render the opaque objects first t ofill the depth buffer
      * Then the transparent obejcts will go next
      */
-    for(i = opaqueObjects.begin(); i != opaqueObjects.end(); i++)
-    {
-
-        if((*i) != player) (*i)->render(*levelShader);
-
+    for(i = opaqueObjects.begin(); i != opaqueObjects.end(); i++) {
+        (*i)->render(*levelShader);
     }
 
     /*
@@ -446,14 +443,11 @@ void GameState::render()
      */
     transparencyObjects.sort(GameObject::pGameObjectComp);
 
-    for(i = transparencyObjects.begin(); i != transparencyObjects.end(); i++)
-    {
-
-        if((*i) != player) (*i)->render(*levelShader);
-
+    for(i = transparencyObjects.begin(); i != transparencyObjects.end(); i++) {
+        (*i)->render(*levelShader);
     }
 
-    player->render(*levelShader);
+    player.render(*levelShader);
 
     levelShader->deactivate(ENABLE_POSITION | ENABLE_NORMAL | ENABLE_TEXCOORD);
 

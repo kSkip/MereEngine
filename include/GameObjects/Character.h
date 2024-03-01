@@ -12,7 +12,7 @@ class Character : public GameObject{
         ~Character();
         Character(const Character & rhs);
 
-        void move(double deltatime, Camera* player);
+        void move(double, Player&);
 
         void commitMovement();
 
@@ -31,7 +31,7 @@ class Character : public GameObject{
         vec3 currentTarget;
         double charAnimTime;
 
-        void trackPlayer(double deltatime, Camera* player);
+        void trackPlayer(double, Player&);
 
 };
 

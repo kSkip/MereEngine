@@ -12,7 +12,7 @@
 #include "Boundary.h"
 #include "Utilities/DataBlock.h"
 #include "GameObjects/GameObject.h"
-#include "GameObjects/Camera.h"
+#include "GameObjects/Player.h"
 
 struct CursorPos {
     int x;
@@ -93,7 +93,7 @@ class GameState {
         std::map<std::string,ObjectData*> objectMap;
 
         Shader* levelShader;
-        Camera* player;
+        Player player;
 
         int screenwidth;
         int screenheight;

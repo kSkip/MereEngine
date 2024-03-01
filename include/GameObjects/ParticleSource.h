@@ -39,7 +39,7 @@ class ParticleSource : public GameObject{
         ParticleSource(const ParticleSource & rhs);
 
 
-        void move(double deltatime, Camera* player, std::list<GameObject*>* levelObjects);
+        void move(double, Player&);
 
         void commitMovement();
 

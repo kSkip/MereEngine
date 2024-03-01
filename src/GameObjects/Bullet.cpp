@@ -1,7 +1,5 @@
 #include "GameObjects/Bullet.h"
 
-Bullet::Bullet(){}
-
 Bullet::Bullet(vec3 raystart, vec3 rayfinish, GameObject* p){
 
     position = raystart;
@@ -18,11 +16,7 @@ Bullet::Bullet(vec3 raystart, vec3 rayfinish, GameObject* p){
 
 }
 
-Bullet::~Bullet(){}
-
-Bullet::Bullet(const Bullet & rhs){}
-
-void Bullet::move(double deltatime, Camera* player){}
+void Bullet::move(double deltatime, Player& player){}
 
 void Bullet::registerHit(GameObject* object, float point_on_ray){
 

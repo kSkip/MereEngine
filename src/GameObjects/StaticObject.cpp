@@ -50,7 +50,7 @@ StaticObject::~StaticObject(){}
 
 StaticObject::StaticObject(const StaticObject & rhs){}
 
-void StaticObject::move(double deltatime, Camera* player){}
+void StaticObject::move(double deltatime, Player& player){}
 
 void StaticObject::render(Shader& levelShader){
 

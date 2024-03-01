@@ -16,7 +16,7 @@ GameObject::~GameObject(){}
 
 GameObject::GameObject(const GameObject & rhs){}
 
-void GameObject::move(double deltatime, Camera* player){}
+void GameObject::move(double deltatime, Player& player){}
 
 void GameObject::render(Shader& levelShader){}
 

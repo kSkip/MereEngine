@@ -12,7 +12,7 @@ class StaticObject : public GameObject{
         ~StaticObject();
         StaticObject(const StaticObject & rhs);
 
-        void move(double deltatime, Camera* player);
+        void move(double, Player&);
 
         void render(Shader&);
 
