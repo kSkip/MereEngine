@@ -16,15 +16,12 @@ Bullet::Bullet(vec3 raystart, vec3 rayfinish, GameObject* p){
 
 }
 
-void Bullet::move(double deltatime, Player& player){}
+void Bullet::move(double deltatime){}
 
-void Bullet::registerHit(GameObject* object, float point_on_ray){
-
+void Bullet::registerHit(GameObject* object, float point_on_ray)
+{
     if(point_on_ray < time && point_on_ray > 0){
         tenativeHitObject = object;
         time = point_on_ray;
     }
-
 }
-
-void Bullet::render(Shader& levelShader){}

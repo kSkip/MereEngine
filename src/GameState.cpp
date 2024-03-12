@@ -5,7 +5,6 @@
 #include "GameObjects/Character.h"
 #include "GameObjects/SkyBox.h"
 #include "GameObjects/Bullet.h"
-#include "Utilities/TextManipulation.h"
 #include "VectorMath.h"
 
 struct FrameRateCounter {
@@ -33,7 +32,6 @@ GameState::~GameState()
     std::list<GameObject*>::iterator i;
 
     //cleanup everything before exiting program
-    delete levelShader;
 
     for(i = levelObjects.begin(); i != levelObjects.end(); i++)
         delete (*i);
@@ -49,8 +47,7 @@ GameState::GameState(const GameState & rhs){}
 
 void GameState::init(std::string dir)
 {
-
-    rootDir = dir;
+    manager.build(dir);
 
     /*
      * Indicate no state has been loaded yet
@@ -65,11 +62,7 @@ void GameState::init(std::string dir)
 
 void GameState::clean()
 {
-
     std::list<GameObject*>::iterator i;
-    std::map<std::string,GLuint>::iterator textureIt;
-
-    delete levelShader;
 
     for(i = levelObjects.begin(); i != levelObjects.end(); i++)
         delete (*i);
@@ -79,21 +72,9 @@ void GameState::clean()
     opaqueObjects.clear();
     transparencyObjects.clear();
 
-    std::map<std::string,ObjectData*>::iterator objIt;
-
-    for(objIt = objectMap.begin(); objIt != objectMap.end(); objIt++){
-
-        glDeleteBuffers(1,&objIt->second->vertexBuffer);
-        glDeleteBuffers(1,&objIt->second->elementBuffer);
-        glDeleteTextures(1,&objIt->second->diffuseTex);
-        delete objIt->second->objectBounds;
-
-    }
-
-    objectMap.clear();
+    manager.clear();
 
     loaded = false;
-
 }
 
 void GameState::setWindowSize(int width, int height)
@@ -106,140 +87,28 @@ void GameState::setWindowSize(int width, int height)
     aspectRatio = float(screenwidth) / float(screenheight);
 }
 
-void GameState::loadObjectData(DataBlock & objectDataBlock)
-{
+void GameState::loadNew(std::string levelFilePath)
+{    
+    std::string vs = manager.getVertexShader("demo");
+    std::string fs = manager.getFragmentShader("demo");
 
-    block_it it = objectDataBlock.beginBlocks();
+    shader.loadShader(vs.c_str(),fs.c_str());
 
-    while(it != objectDataBlock.endBlocks())
-    {
+    player.bounds.LoadBoundaries(manager.getBoundsFilePath("Camera").c_str());
 
-        std::string name      = it->first;
-        DataBlock& objectData = it->second;
+    insertOpaqueObject(new StaticObject(manager.getStaticModel("Ground")));
+    insertOpaqueObject(new StaticObject(manager.getStaticModel("Walls")));
+    insertOpaqueObject(new StaticObject(manager.getStaticModel("ShedFloor")));
+    insertOpaqueObject(new StaticObject(manager.getStaticModel("ShedWalls")));
+    insertOpaqueObject(new StaticObject(manager.getStaticModel("ShedRoof")));
 
-        objectData("rootdir") = rootDir;
+    insertOpaqueObject(new SkyBox(player, manager.getStaticModel("SkyBox")));
 
-        objectMap[name] = new ObjectData(objectData);
+    insertOpaqueObject(new Character(vec3(3.0f, 2.0f, 0.0f), player, manager.getAnimatedModel("Character")));
 
-        ++it;
-
-    }
-
-}
-
-void GameState::loadObjects(DataBlock & objectBlock)
-{
-
-    block_it it = objectBlock.beginBlocks();
-
-    while(it != objectBlock.endBlocks())
-    {
-
-        DataBlock& objectData = it->second;
-
-        ObjectData* object = objectMap[it->first];
-
-        std::string objectType = objectData("obj_type");
-
-        objectData("rootdir") = rootDir;
-
-        if (objectType == "camera") {
-
-            player.setObjectData(object);
-            player.weapon.setObjectData(objectMap["gun"]);
-
-        } else if (objectType == "static_object") {
-
-            StaticObject* newGameObject = new StaticObject(object, objectData);
-
-            insertOpaqueObject(newGameObject);
-
-        } else if (objectType == "character") {
-
-            Character* newGameObject = new Character(object, objectData);
-
-            insertOpaqueObject(newGameObject);
-
-        } else if (objectType == "sky_box") {
-
-            SkyBox* newGameObject = new SkyBox(object, player);
-
-            insertOpaqueObject(newGameObject);
-
-        }
-
-        ++it;
-
-    }
-
-}
-
-void GameState::loadNew(std::string levelfile)
-{
-    level = levelfile;
-
-    DataBlock leveldef;
-
-    leveldef.load(levelfile.c_str());
-
-    try{
-
-        /*
-         * load shaders
-         */
-        std::string vs = rootDir + leveldef["shaders"]("vs");
-
-        std::string fs = rootDir + leveldef["shaders"]("fs");
-
-        levelShader = new Shader;
-
-        levelShader->loadShader(vs.c_str(),fs.c_str());
-
-    }
-    catch(std::exception& e)
-    {
-
-        std::cerr << e.what() << "\n";
-        delete levelShader;
-        throw std::runtime_error("Failed to init shaders");
-
-    }
-
-    try{
-
-        /*
-         * load shared data and GPU buffers
-         */
-        loadObjectData(leveldef["objectdata"]);
-
-    }
-    catch(std::exception& e)
-    {
-
-        std::cerr << e.what() << "\n";
-        throw std::runtime_error("Failed to load shared and GPU buffer");
-
-    }
-
-    try{
-
-        /*
-         * load object instances
-         */
-        loadObjects(leveldef["objects"]);
-
-    }
-    catch(std::exception& e)
-    {
-
-        std::cerr << e.what() << "\n";
-        throw std::runtime_error("Failed to load object instances");
-
-    }
-
+    player.weapon.model = manager.getAnimatedModel("Gun");
 
     loaded = true;
-
 }
 
 void GameState::loadSave(std::string savefile){}
@@ -373,10 +242,10 @@ void GameState::move(double deltatime)
 
     std::list<GameObject*>::iterator i, j;
 
-    player.move(deltatime, player);
+    player.move(deltatime);
 
     for(i = levelObjects.begin(); i != levelObjects.end(); i++)
-        (*i)->move(deltatime, player);
+        (*i)->move(deltatime);
 
 
     for(i = levelObjects.begin(); i != levelObjects.end(); i++)
@@ -419,23 +288,23 @@ void GameState::render()
 
     perspectiveMatrix = perspective(1.04f, aspectRatio, 0.1f, 1000.0f);
     player.camera.getViewMatrix(viewMatrix);
+    
+    glUseProgram(shader.program);
 
-    levelShader->activate(ENABLE_POSITION | ENABLE_NORMAL | ENABLE_TEXCOORD); //enable all attributes
-
-    glUniformMatrix4fv(levelShader->modelView, 1, GL_FALSE, (GLfloat*)&viewMatrix);
-    glUniformMatrix4fv(levelShader->projection, 1, GL_FALSE, (GLfloat*)&perspectiveMatrix);
+    glUniformMatrix4fv(shader.modelView, 1, GL_FALSE, (GLfloat*)&viewMatrix);
+    glUniformMatrix4fv(shader.projection, 1, GL_FALSE, (GLfloat*)&perspectiveMatrix);
 
 
     //Use of the only the first texture only for now
     glActiveTexture(GL_TEXTURE0);
-    glUniform1i(levelShader->texture, 0);
+    glUniform1i(shader.texture, 0);
 
     /*
      * Render the opaque objects first t ofill the depth buffer
      * Then the transparent obejcts will go next
      */
     for(i = opaqueObjects.begin(); i != opaqueObjects.end(); i++) {
-        (*i)->render(*levelShader);
+        (*i)->draw(shader);
     }
 
     /*
@@ -444,12 +313,20 @@ void GameState::render()
     transparencyObjects.sort(GameObject::pGameObjectComp);
 
     for(i = transparencyObjects.begin(); i != transparencyObjects.end(); i++) {
-        (*i)->render(*levelShader);
+        (*i)->draw(shader);
     }
 
-    player.render(*levelShader);
+    glClear(GL_DEPTH_BUFFER_BIT);
 
-    levelShader->deactivate(ENABLE_POSITION | ENABLE_NORMAL | ENABLE_TEXCOORD);
+    viewMatrix[0] = vec4(1.0f, 0.0f, 0.0f, 0.0f);
+    viewMatrix[1] = vec4(0.0f, 1.0f, 0.0f, 0.0f);
+    viewMatrix[2] = vec4(0.0f, 0.0f, 1.0f, 0.0f);
+    viewMatrix[3] = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+    glUniformMatrix4fv(shader.modelView, 1, GL_FALSE, (GLfloat*)&viewMatrix);
+
+    player.weapon.draw(shader);
+
+    glUseProgram(0);
 
     // Render health meter
     glColor3f(0.0f, 0.7f, 0.0f);
@@ -476,38 +353,14 @@ void GameState::render()
 
 void GameState::insertOpaqueObject(GameObject* newGameObject)
 {
-
     levelObjects.push_back(newGameObject);
-
-    GLuint newDiffuseTex = newGameObject->getDiffuseTexture();
-
-    std::list<GameObject*>::iterator it;
-
-    it = opaqueObjects.begin();
-
-    while(it != opaqueObjects.end()){
-
-        if( newDiffuseTex < (*it)->getDiffuseTexture()){
-
-            opaqueObjects.insert(it,newGameObject);
-            return;
-
-        }
-
-        it++;
-    }
-
     opaqueObjects.push_back(newGameObject);
-
 }
 
 void GameState::insertTransparencyObject(GameObject* newGameObject)
 {
-
     levelObjects.push_back(newGameObject);
-
     transparencyObjects.push_back(newGameObject);
-
 }
 
 bool isHovering(WindowContext& ctx, int x, int y)

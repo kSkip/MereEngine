@@ -1,27 +1,25 @@
 #ifndef WEAPON_H
 #define WEAPON_H
 
-#include "GameObject.h"
+#include "VectorMath.h"
+#include "Shader.h"
+#include "Models/MD5Model.h"
 
 class Weapon {
 public:
     Weapon();
 
-    void setTransformations(mat4& translation, mat4& rotation);
-
     void move(double);
-    void render(Shader&);
+    void draw(Shader&);
 
     void fire() { isFiring = 1; animTime = 0.0; }
-
-    void setObjectData(ObjectData* objData) { data = objData; }
 
     double animTime;
     int isFiring;
 
-private:
-    ObjectData *data;
+    MD5Model* model;
 
+private:
     vec3 position;
     float rotY;
     vec3 movement;

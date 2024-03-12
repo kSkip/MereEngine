@@ -289,7 +289,8 @@ int MainLoop(cmd_line_args& args)
 	std::string rootDir = args.root;
 	std::string firstLevel = args.level;
 	state.init(rootDir);
-	state.loadNew(rootDir + firstLevel);
+
+	state.loadNew(firstLevel);
 
 	MSG msg;
 	Timer timer;

@@ -1,85 +1,49 @@
 #include "GameObjects/Weapon.h"
+#include "Models/MD5Model.h"
 
 Weapon::Weapon() :
     animTime(0.0),
     isFiring(0),
-    data(nullptr),
-    rotY(0.0f)
+    rotY(0.0f),
+    model(nullptr)
 {
     skipMVP = false;
     skipLighting = false;
-}
 
-void Weapon::setTransformations(mat4& translation_in, mat4& rotation_in){
+    translation = mat4(1.0f);
+    rotation = mat4(1.0f);
 
-    translation = translation_in;
-    rotation = rotation_in;
+    float yaw = -5.0f;
+    float pitch = 185.0f;
+    float cosYaw = cos(toRadians(yaw));
+    float sinYaw = sin(toRadians(yaw));
+    float cosPitch = cos(toRadians(pitch));
+    float sinPitch = sin(toRadians(pitch));
 
+    rotation[0] = vec4(cosPitch, 0.0f, -sinPitch, 0.0f);
+    rotation[1] = vec4(sinYaw * sinPitch, cosYaw, sinYaw * cosPitch, 0.0f);
+    rotation[2] = vec4(cosYaw * sinPitch, -sinYaw, cosPitch * cosYaw, 0.0f);
+    translation[3] = vec4(0.2f, -0.3f, 0.0f, 1.0f);
 }
 
 void Weapon::move(double deltatime)
-{    
-    if(data){
-        if (Armature* arm = data->armatures["fire"]) {
-            if (isFiring) {
-                animTime += deltatime;
-                if (animTime > arm->getTotalTime()) {
-                    animTime = 0.0;
-                    isFiring = 0;
-                }
-            }
-            else {
+{
+    if(model) {
+        if (isFiring) {
+            animTime += deltatime;
+            if (animTime > model->animation.getTotalTime()) {
                 animTime = 0.0;
+                isFiring = 0;
             }
-            arm->buildFrame(animTime);
-            arm->setVertices(data->vertices.data(), data->unskinnedVertices.data(), data->numVertices);
         }
+        else {
+            animTime = 0.0;
+        }
+        model->setAnimation(animTime);
     }
-
 }
 
-void Weapon::render(Shader& levelShader){
-
-    if(data){
-
-        glBindBuffer(GL_ARRAY_BUFFER, data->vertexBuffer);
-        glBufferSubData(GL_ARRAY_BUFFER,0,data->numVertices*sizeof(struct vertex),data->vertices.data());
-
-        glUniformMatrix4fv(levelShader.translation, 1, GL_FALSE, (GLfloat*)&this->translation);
-        glUniformMatrix4fv(levelShader.rotation, 1, GL_FALSE, (GLfloat*)&this->rotation);
-
-        glUniform1ui(levelShader.skipMVP, this->skipMVP);
-        glUniform1ui(levelShader.skipLighting, this->skipLighting);
-
-        glBindTexture(GL_TEXTURE_2D, data->diffuseTex);
-
-        glBindBuffer(GL_ARRAY_BUFFER, data->vertexBuffer);
-
-        glVertexAttribPointer(
-            LOCATION_POSITION,
-            3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
-            (void*)offsetof(struct vertex, position)
-        );
-        glVertexAttribPointer(
-            LOCATION_NORMAL,
-            3, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
-            (void*)offsetof(struct vertex, normal)
-        );
-        glVertexAttribPointer(
-            LOCATION_TEXCOORD,
-            2, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
-            (void*)offsetof(struct vertex, texcoord)
-        );
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, data->elementBuffer);
-
-        glDrawElements(
-            GL_TRIANGLES,
-            data->elementCount,
-            GL_UNSIGNED_INT,
-            (void*)0
-        );
-
-    }
-
+void Weapon::draw(Shader& shader)
+{
+    model->draw(shader, translation, rotation, skipMVP, skipLighting);
 }

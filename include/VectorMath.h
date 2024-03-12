@@ -247,4 +247,10 @@ inline mat4 perspective(float fov, float ar, float nearZ, float farZ)
 	return p;
 }
 
+inline float toRadians(float x)
+{
+	static const float PI = 3.1415927f;
+	return (x * 2 * PI) / 360.0f;
+}
+
 #endif

@@ -4,6 +4,9 @@
 #include "Platform.h"
 #include "MD5Mesh.h"
 #include "VectorMath.h"
+#include "CommonTypes.h"
+#include "Boundary.h"
+#include "Shader.h"
 
 struct MD5Vertex {
 	mat4x3 normal;
@@ -15,19 +18,54 @@ struct MD5Vertex {
 	unsigned int jointId[4];
 };
 
-struct vertex{
+class Animation {
+public:
+	void buildAnimation(md5animdata& md5data);
 
-	vec3 position;
-	vec3 normal;
-	vec2 texcoord;
-	vec3 color;
+	void buildFrame(float animationTime);
 
+	void setVertices(Vertex* vertices, MD5Vertex* unskinned, unsigned int numVertices);
+
+	double getTotalTime() { return double(numFrames) / double(frameRate); }
+
+private:
+	unsigned int numFrames;
+	unsigned int numJoints;
+	unsigned int frameRate;
+	unsigned int numAnimatedComponents;
+	std::vector<md5hierarchyjoint> joints;
+	std::vector<md5bounds> bounds;
+	std::vector<md5baseframejoint> baseframe;
+	std::vector<md5frame> frames;
+
+	std::vector<vec3> jointPosition;
+	std::vector<quat> jointOrientation;
+
+	void setJoint(unsigned int i, unsigned int firstFrame, unsigned int secondFrame, float interpol);
 };
 
-GLuint MD5CreateVertexBuffer(struct md5meshdata* md5data, std::vector<vertex>& buffer_vertices, std::vector<MD5Vertex>& unskinned, size_t numVertices);
+struct MD5Model {
 
-GLuint MD5CreateElementBuffer(struct md5meshdata* md5data, unsigned int* numElements);
+	static MD5Model* createMD5Model(const std::string&, const std::string&, const std::string&);
+	MD5Model(md5meshdata&, md5animdata&, const std::string&, const std::string&);
 
-GLuint MD5CreateTextureBuffer(struct md5meshdata* md5data, const char* shaderDirectory);
+	void createVertexBuffer(md5meshdata&);
+	void createElementBuffer(md5meshdata&);
+	void setAnimation(double);
+	void draw(Shader&, mat4&, mat4&, bool, bool);
+
+	std::vector<MD5Vertex> unskinned;
+	std::vector<Vertex> vertices;
+
+	GLuint vertexArray;
+	GLuint vertexBuffer;
+	GLuint elementBuffer;
+	GLsizei elementCount;
+	GLuint diffuseTex;
+
+	Animation animation;
+
+	boundary bounds;
+};
 
 #endif

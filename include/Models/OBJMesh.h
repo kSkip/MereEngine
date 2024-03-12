@@ -3,14 +3,9 @@
 
 #include "Platform.h"
 #include "DataFile.h"
-
-namespace OBJ {
-
-struct Mesh {
-	GLuint vertices;
-	GLuint elements;
-	GLuint texture;
-};
+#include "Boundary.h"
+#include "Shader.h"
+#include "CommonTypes.h"
 
 enum class Prefix {
 	UNKNOWN = -1,
@@ -22,24 +17,19 @@ enum class Prefix {
 	TEXCOORD
 };
 
-struct FaceIndex {
-	int v; // vertex
-	int n; // normal
-	int t; // tex coord
-
-	FaceIndex(int v, int n, int t) : v(v), n(n), t(t) {}
-};
-
 struct PrefixLabel {
 	const char *token;
 	Prefix value;
 };
 
-class MeshFile : public DataFile {
+class OBJMeshFile : public DataFile {
 public:
-	MeshFile(const char* fileName) : DataFile(fileName) {}
+	OBJMeshFile(const char* fileName) : DataFile(fileName) {}
 
-	void getMesh(Mesh&, const char*, unsigned int*);
+	void getMesh(std::vector<Vertex>&,
+		std::vector<unsigned int>&,
+		const std::string&,
+		std::string&);
 
 protected:
 	static const PrefixLabel tokens[];
@@ -72,6 +62,23 @@ public:
 	std::string getTextureName();
 };
 
-}
+struct OBJMesh {
+	GLuint vertexArray;
+	GLuint vertices;
+	GLuint elements;
+	GLuint elementCount;
+	GLuint texture;
+
+	boundary bounds;
+
+	static OBJMesh* createOBJMesh(const std::string&,
+		const std::string&,
+		const std::string&,
+		const std::string&);
+
+	OBJMesh(const std::vector<Vertex>&, const std::vector<unsigned int>&, const std::string&, const std::string&);
+
+	void draw(Shader&, mat4&, mat4&, bool, bool);
+};
 
 #endif

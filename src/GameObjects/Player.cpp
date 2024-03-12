@@ -16,7 +16,7 @@ Player::Player() :
     collisionTypeValue = COLLIDER_COLLIDEE;
 }
 
-void Player::move(double deltatime, Player& player) {
+void Player::move(double deltatime) {
 
 	movement = vec3(0.0f, 0.0f, 0.0f);
 
@@ -65,30 +65,4 @@ void Player::commitMovement()
 	camera.head.y += movement.y;
 	camera.head.z += movement.z;
 	if (movement.y == 0.0f) ground = true;
-}
-
-void Player::render(Shader& levelShader) {
-
-	glClear(GL_DEPTH_BUFFER_BIT);
-
-	// TODO: the weapon should really have its own view matrix
-	vec3 front = camera.getFront();
-	vec3 right = camera.getRight();
-	vec3 up = camera.getUp();
-	vec3 pos = position + 0.1f * front + 0.2f * right;
-	mat4 trans(1.0f);
-	trans[3].x = pos.x;
-	trans[3].y = pos.y;
-	trans[3].z = pos.z;
-
-	mat4 rot;
-	rot[0] = vec4(-right.x, -right.y, -right.z, 0.0f);
-	rot[1] = vec4(up.x, up.y, up.z, 0.0f);
-	rot[2] = vec4(-front.x, -front.y, -front.z, 0.0f);
-	rot[3] = vec4(0.0f, 0.0f, 0.0f, 1.0f);
-
-	weapon.setTransformations(trans, rot);
-
-	weapon.render(levelShader);
-
 }

@@ -1,29 +1,9 @@
 #include "GameObjects/Character.h"
-#include "GameObjects/Player.h"
-#include "Models/Armature.h"
-#include "Utilities/TextManipulation.h"
-#include "Utilities/DataBlock.h"
 
-Character::Character(){}
-
-Character::Character(ObjectData* objectData, DataBlock& def)
+Character::Character(const vec3& pos, Player& p, MD5Model* model) : player(p), model(model)
 {
-
-    data = objectData;
-
-    strvec pos = split(def("position"),',');
-
-    if(pos.size() != 4)
-        throw std::runtime_error("Position requires 4 values");
-
-    float pos_init[3];
-    pos_init[0] = atof(pos[0].c_str());
-    pos_init[1] = atof(pos[1].c_str());
-    pos_init[2] = atof(pos[2].c_str());
-
-    rotY  = atof(pos[3].c_str());
-
-    position    = vec3(pos_init[0],pos_init[1],pos_init[2]);
+    rotY = 0.0f;
+    position = pos;
     translation = mat4(1.0f);
     translation[3].x = position.x;
     translation[3].y = position.y;
@@ -52,14 +32,11 @@ Character::Character(ObjectData* objectData, DataBlock& def)
 
     collisionTypeValue = COLLIDER_COLLIDEE;
     charAnimTime = 0;
-
 }
 
 Character::~Character(){}
 
-Character::Character(const Character & rhs){}
-
-void Character::trackPlayer(double deltatime, Player& player)
+void Character::trackPlayer(double deltatime)
 {
 
     vec4 allowed, temp;
@@ -98,12 +75,12 @@ void Character::trackPlayer(double deltatime, Player& player)
     }
 }
 
-void Character::move(double deltatime, Player& player)
+void Character::move(double deltatime)
 {
 
     charAnimTime += deltatime;
 
-    trackPlayer(deltatime, player);
+    trackPlayer(deltatime);
 
     float sinRotY = sin(rotY);
     float cosRotY = cos(rotY);
@@ -121,14 +98,6 @@ void Character::move(double deltatime, Player& player)
     movement.x = movementSpeedFactor * deltatime * front.x;
     movement.y = deltatime * velocity.y;
     movement.z = movementSpeedFactor * deltatime * front.z;
-
-    if(data){
-        if (Armature* arm = data->armatures["run"]) {
-            arm->buildFrame(charAnimTime);
-            arm->setVertices(data->vertices.data(), data->unskinnedVertices.data(), data->numVertices);
-        }
-    }
-
 }
 
 void Character::commitMovement() {
@@ -142,23 +111,13 @@ void Character::commitMovement() {
 
 }
 
-void Character::render(Shader& shader){
-
-    if(data){
-
-        glBindBuffer(GL_ARRAY_BUFFER, data->vertexBuffer);
-        glBufferSubData(GL_ARRAY_BUFFER,0,data->numVertices*sizeof(struct vertex),data->vertices.data());
-
-        renderMeshElements(data->vertexBuffer,data->elementBuffer,data->elementCount,PTYPE_TRIANGLES, shader);
-
-    }
-
-}
-
 void Character::damage(float magnitude, vec3 damageLocation)
 {
     health -= magnitude;
-    /*GameObject* newobject = new ParticleSource("Data/BloodDrop.3ds", damageLocation, glm::vec3(1.0f, 1.0f, 1.0f), 100, 0.5f, false, 0, true, state);
-    addOpaqueObject(newobject,state);*/
+}
 
+void Character::draw(Shader& shader)
+{
+    model->setAnimation(charAnimTime);
+    model->draw(shader, translation, rotation, skipMVP, skipLighting);
 }

@@ -1,6 +1,5 @@
 #include "GameObjects/GameObject.h"
 #include "GameObjects/Bullet.h"
-#include "Shader.h"
 
 GameObject::GameObject() :
     position(0.0f, 0.0f, 0.0f),
@@ -8,122 +7,7 @@ GameObject::GameObject() :
     movement(0.0f, 0.0f, 0.0f),
     velocity(0.0f, 0.0f, 0.0f),
     translation(mat4(1.0f)),
-    rotation(mat4(1.0f))
-{
-}
-
-GameObject::~GameObject(){}
-
-GameObject::GameObject(const GameObject & rhs){}
-
-void GameObject::move(double deltatime, Player& player){}
-
-void GameObject::render(Shader& levelShader){}
-
-void GameObject::renderMeshElements(GLuint vertex_buffer, GLuint vertex_element_buffer, GLsizei element_count, Primative type, Shader& levelShader){
-
-    GLenum draw_mode;
-
-    switch(type){
-        case PTYPE_TRIANGLES:
-            draw_mode = GL_TRIANGLES;
-            break;
-        case PTYPE_POINTS:
-            draw_mode = GL_POINTS;
-            break;
-        default:
-            draw_mode = GL_TRIANGLES;
-    }
-
-    glUniformMatrix4fv(levelShader.translation, 1, GL_FALSE, (GLfloat*)&this->translation);
-    glUniformMatrix4fv(levelShader.rotation, 1, GL_FALSE, (GLfloat*)&this->rotation);
-
-    glUniform1ui(levelShader.skipMVP,this->skipMVP);
-    glUniform1ui(levelShader.skipLighting,this->skipLighting);
-
-    glBindTexture(GL_TEXTURE_2D,data->diffuseTex);
-
-    glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-
-    glVertexAttribPointer(
-        LOCATION_POSITION,
-        3, GL_FLOAT, GL_FALSE,sizeof(struct vertex),
-        (void*)offsetof(struct vertex, position)
-    );
-    glVertexAttribPointer(
-        LOCATION_NORMAL,
-        3, GL_FLOAT, GL_FALSE,sizeof(struct vertex),
-        (void*)offsetof(struct vertex, normal)
-    );
-    glVertexAttribPointer(
-        LOCATION_TEXCOORD,
-        2, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
-        (void*)offsetof(struct vertex, texcoord)
-    );
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vertex_element_buffer);
-
-    glDrawElements(
-        draw_mode,
-        element_count,
-        GL_UNSIGNED_INT,
-        (void*)0
-    );
-
-}
-
-void GameObject::renderMeshArrays(GLuint vertex_buffer, GLsizei element_count, Primative type, Shader& levelShader){
-
-    GLenum draw_mode;
-
-    switch(type){
-        case PTYPE_TRIANGLES:
-            draw_mode = GL_TRIANGLES;
-            break;
-        case PTYPE_POINTS:
-            draw_mode = GL_POINTS;
-            break;
-        default:
-            draw_mode = GL_TRIANGLES;
-    }
-
-    glUniformMatrix4fv(levelShader.translation, 1, GL_FALSE, (GLfloat*)&this->translation);
-    glUniformMatrix4fv(levelShader.rotation, 1, GL_FALSE, (GLfloat*)&this->rotation);
-
-    glUniform1ui(levelShader.skipMVP,this->skipMVP);
-    glUniform1ui(levelShader.skipLighting,this->skipLighting);
-
-    glBindTexture(GL_TEXTURE_2D,data->diffuseTex);
-
-    glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-
-    glVertexAttribPointer(
-        LOCATION_POSITION,
-        3, GL_FLOAT, GL_FALSE,sizeof(struct vertex),
-        (void*)offsetof(struct vertex, position)
-    );
-    glVertexAttribPointer(
-        LOCATION_NORMAL,
-        3, GL_FLOAT, GL_FALSE,sizeof(struct vertex),
-        (void*)offsetof(struct vertex, normal)
-    );
-    glVertexAttribPointer(
-        LOCATION_TEXCOORD,
-        2, GL_FLOAT, GL_FALSE, sizeof(struct vertex),
-        (void*)offsetof(struct vertex, texcoord)
-    );
-
-    glDrawArrays(
-        draw_mode,
-        0,
-        element_count
-    );
-
-}
-
-void GameObject::damage(float magnitude, vec3 damageLocation){
-
-}
+    rotation(mat4(1.0f)) {}
 
 void GameObject::testResolveCollision(GameObject* object1, GameObject* object2){
 
@@ -133,6 +17,11 @@ void GameObject::testResolveCollision(GameObject* object1, GameObject* object2){
     float overlap = 0.0;
     bool collision;
 
+    boundary* obj1Bounds = object1->getBounds();
+    boundary* obj2Bounds = object2->getBounds();
+    if ((!obj1Bounds && object1->collisionType() != RAY) ||
+        (!obj2Bounds && object2->collisionType() != RAY)) return;
+
     if(object1->collisionType() != NONE && object2->collisionType() != NONE){
 
     if(object1->collisionType() != RAY && object2->collisionType() != RAY){
@@ -140,11 +29,11 @@ void GameObject::testResolveCollision(GameObject* object1, GameObject* object2){
         totalCorrection1 = vec3(0.0f,0.0f,0.0f);
         totalCorrection2 = vec3(0.0f,0.0f,0.0f);
 
-        for(i=0;i<object1->data->objectBounds->blocks.size();i++){
-            for(j=0;j<object2->data->objectBounds->blocks.size();j++){
+        for(i=0;i< obj1Bounds->blocks.size();i++){
+            for(j=0;j< obj2Bounds->blocks.size();j++){
 
-                block b1 = object1->data->objectBounds->blocks[i];
-                block b2 = object2->data->objectBounds->blocks[j];
+                block b1 = obj1Bounds->blocks[i];
+                block b2 = obj2Bounds->blocks[j];
 
                 axes[0] = b1.lengthnorm;
                 axes[1] = b1.widthnorm;
@@ -261,11 +150,12 @@ void GameObject::testResolveCollision(GameObject* object1, GameObject* object2){
             ray = object2;
             hitObject = object1;
         }
+        boundary* hitBounds = hitObject->getBounds();
 
         if(static_cast<Bullet*>(ray)->getParent() != hitObject){
 
-        for(i=0;i<hitObject->data->objectBounds->blocks.size();i++){
-                block b = hitObject->data->objectBounds->blocks[i];
+        for(i=0;i< hitBounds->blocks.size();i++){
+                block b = hitBounds->blocks[i];
                 projection p_l = b.project(b.lengthnorm,hitObject->getPosition(),hitObject->getRotation());
                 projection p_w = b.project(b.widthnorm,hitObject->getPosition(),hitObject->getRotation());
                 projection p_h = b.project(b.heightnorm,hitObject->getPosition(),hitObject->getRotation());

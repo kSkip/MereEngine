@@ -42,9 +42,9 @@ void ParticleSource::initPointParticles(ParticleSourceParams& params_in){
         pointVelocities[i].y = (float(rand()) / float(RAND_MAX) - 0.5f)*params_in.maxInitVelocity.y;
         pointVelocities[i].z = (float(rand()) / float(RAND_MAX) - 0.5f)*params_in.maxInitVelocity.z;
 
-        pointParticles[i].color.r = 0.0f;
-        pointParticles[i].color.g = 0.0f;
-        pointParticles[i].color.b = 0.0f;
+        //pointParticles[i].color.r = 0.0f;
+        //pointParticles[i].color.g = 0.0f;
+        //pointParticles[i].color.b = 0.0f;
 
     }
 
@@ -55,7 +55,7 @@ void ParticleSource::initParticles(ParticleSourceParams& params_in)
 
 }
 
-void ParticleSource::move(double deltatime, Player& player){
+void ParticleSource::move(double deltatime){
 
     unsigned int i;
 

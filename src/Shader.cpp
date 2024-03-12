@@ -43,36 +43,6 @@ bool Shader::loadShader(const std::string& vertexFile, const std::string& fragme
     return true;
 }
 
-void Shader::activate(unsigned short atrribs){
-
-    glUseProgram(program);
-
-    if(atrribs & ENABLE_POSITION){
-        glEnableVertexAttribArray(LOCATION_POSITION);
-    }
-    if(atrribs & ENABLE_NORMAL){
-        glEnableVertexAttribArray(LOCATION_NORMAL);
-    }
-    if(atrribs & ENABLE_TEXCOORD){
-        glEnableVertexAttribArray(LOCATION_TEXCOORD);
-    }
-
-}
-
-void Shader::deactivate(unsigned short atrribs){
-
-    if(atrribs & ENABLE_POSITION){
-        glDisableVertexAttribArray(LOCATION_POSITION);
-    }
-    if(atrribs & ENABLE_NORMAL){
-        glDisableVertexAttribArray(LOCATION_NORMAL);
-    }
-    if(atrribs & ENABLE_TEXCOORD){
-        glDisableVertexAttribArray(LOCATION_TEXCOORD);
-    }
-    glUseProgram(0);
-}
-
 GLuint Shader::makeShader(GLenum type, const char *filename){
 
     GLint length;

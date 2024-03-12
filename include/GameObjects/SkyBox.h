@@ -3,16 +3,19 @@
 
 #include "GameObjects/GameObject.h"
 #include "Player.h"
+#include "Models/OBJMesh.h"
 
-class SkyBox : public GameObject{
+class SkyBox : public GameObject {
 public:
-    SkyBox(ObjectData*, Player&);
+    SkyBox(Player&, OBJMesh*);
     void commitMovement();
-    void render(Shader&);
+
+    void draw(Shader&);
+    boundary* getBounds() { return &model->bounds; }
 
 private:
     Player& player;
-
+    OBJMesh* model;
 };
 
 #endif

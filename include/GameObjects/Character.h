@@ -2,37 +2,38 @@
 #define CHARACTER_H
 
 #include "GameObject.h"
+#include "GameObjects/Player.h"
+#include "Models/MD5Model.h"
 
-class Character : public GameObject{
+class Character : public GameObject {
 
-    public:
+public:
+    Character(const vec3&, Player&, MD5Model*);
+    ~Character();
 
-        Character();
-        Character(ObjectData* objectData, DataBlock& def);
-        ~Character();
-        Character(const Character & rhs);
+    void move(double);
 
-        void move(double, Player&);
+    void commitMovement();
 
-        void commitMovement();
+    void damage(float magnitude, vec3 damageLocation);
 
-        void damage(float magnitude, vec3 damageLocation);
+    void draw(Shader&);
+    boundary* getBounds() { return &model->bounds; }
 
-        void render(Shader&);
+private:
+    MD5Model* model;
+    vec3 front;
+    vec3 right;
 
-    private:
+    float health;
 
-        vec3 front;
-        vec3 right;
+    double movementSpeedFactor;
+    vec3 currentTarget;
+    double charAnimTime;
 
-        float health;
+    Player& player;
 
-        double movementSpeedFactor;
-        vec3 currentTarget;
-        double charAnimTime;
-
-        void trackPlayer(double, Player&);
-
+    void trackPlayer(double);
 };
 
 #endif

@@ -12,13 +12,8 @@
 #include <map>
 
 #include "Platform.h"
-#include "GameObjects/ObjectData.h"
 #include "Boundary.h"
 #include "Shader.h"
-
-class Player;
-
-enum Primative {PTYPE_TRIANGLES, PTYPE_POINTS};
 
 const float PI = 3.1415927f;
 
@@ -30,84 +25,61 @@ const float PI = 3.1415927f;
 #define RAY 4
 #define NONE 5
 
-class GameObject{
+class GameObject {
+public:
+    GameObject();
+    virtual ~GameObject() {}
 
-    public:
+    virtual void move(double) {};
+    virtual void draw(Shader&) {}
+    virtual boundary* getBounds() { return nullptr; }
+    virtual void registerHit(GameObject* object, float point) {}
+    virtual void commitMovement() { position += movement; }
+    virtual void damage(float magnitude, vec3 damageLocation) {}
 
-        GameObject();
-        virtual ~GameObject();
-        GameObject(const GameObject & rhs);
+    vec3 getPosition() const { return position;}
+    float getRotation() const {return rotY;}
 
-        virtual void move(double, Player&);
-        virtual void render(Shader&);
+    void setPosition(const vec3& pos) { position = pos; }
+    vec3 getVelocity() const { return velocity;}
+    void setXSpeed(double x)	{velocity.x = x;}
+    void setYSpeed(double y)	{velocity.y = y;}
+    void setZSpeed(double z)	{velocity.z = z;}
 
-        vec3 getPosition() const { return position;}
-        float getRotation() const {return rotY;}
+    vec3 getMovement() const { return movement;}
+    double cameraDistance() const { return cDistance;}
+    bool onGround() const {return ground;}
+    void isGrounded(){ground = true;}
+    void isNotGrounded(){ground = false;}
+    bool isDestroyed(){return destroy;}
+    void makeDestroy(){destroy = true;}
+    unsigned int collisionType(){return collisionTypeValue;}
 
-        vec3 getVelocity() const { return velocity;}
-        void setXSpeed(double x)	{velocity.x = x;}
-        void setYSpeed(double y)	{velocity.y = y;}
-        void setZSpeed(double z)	{velocity.z = z;}
+    static void testResolveCollision(GameObject* object1, GameObject* object2);
+    static bool pGameObjectComp(const GameObject * const & a, const GameObject * const & b)
+    {
+        return a->cameraDistance() > b->cameraDistance();
+    }
 
-        vec3 getMovement() const { return movement;}
-        double cameraDistance() const { return cDistance;}
+protected:
+    vec3 position;
+    float rotY;
+    vec3 movement;
+    vec3 velocity;
 
-        bool onGround() const {return ground;}
-        void isGrounded(){ground = true;}
-        void isNotGrounded(){ground = false;}
+    mat4 translation, rotation;
 
-        bool isDestroyed(){return destroy;}
-        void makeDestroy(){destroy = true;}
+    bool skipMVP;
+    bool skipLighting;
 
-        virtual bool fades(){return false;}
+    unsigned int collisionTypeValue;
+    bool ground;
+    float life;
+    bool destroy;
 
-        virtual float getLife(){return life;}
+    float cDistance;
 
-        virtual void damage(float magnitude, vec3 damageLocation);
-
-        unsigned int collisionType(){return collisionTypeValue;}
-        static void testResolveCollision(GameObject* object1, GameObject* object2);
-        virtual void registerHit(GameObject* object, float point){}
-        virtual void commitMovement(){position += movement;}
-
-        static bool pGameObjectComp(const GameObject * const & a, const GameObject * const & b)
-        {
-            return a->cameraDistance() > b->cameraDistance();
-        }
-
-        GLuint getDiffuseTexture() {
-            return data->diffuseTex;
-        }
-
-        void setObjectData(ObjectData* objData) {
-            data = objData;
-        }
-
-    protected:
-
-        void renderMeshElements(GLuint vertex_buffer, GLuint vertex_element_buffer, GLsizei element_count, Primative type, Shader&);
-        void renderMeshArrays(GLuint vertex_buffer, GLsizei element_count, Primative type, Shader&);
-
-        ObjectData *data;
-
-        vec3 position;
-        float rotY;
-        vec3 movement;
-        vec3 velocity;
-
-        mat4 translation, rotation;
-
-        bool skipMVP;
-        bool skipLighting;
-
-        unsigned int collisionTypeValue;
-        bool ground;
-        float life;
-        bool destroy;
-
-        float cDistance;
-
-        bool hit;
+    bool hit;
 
 };
 

@@ -2,11 +2,17 @@
 #include <string>
 #include <map>
 
+#include "CommonTypes.h"
 #include "Models/OBJMesh.h"
-#include "Models/MD5Model.h"
 #include "Models/TextureReader.h"
 
-namespace OBJ {
+struct FaceIndex {
+	int v; // vertex
+	int n; // normal
+	int t; // tex coord
+
+	FaceIndex(int v, int n, int t) : v(v), n(n), t(t) {}
+};
 
 bool operator<(const FaceIndex& a, const FaceIndex& b) {
 	if (a.v != b.v) return (a.v < b.v);
@@ -15,7 +21,7 @@ bool operator<(const FaceIndex& a, const FaceIndex& b) {
 	return false;
 }
 
-const PrefixLabel MeshFile::tokens[] = {
+const PrefixLabel OBJMeshFile::tokens[] = {
 	{"f", Prefix::FACE},
 	{"mtllib", Prefix::MTL},
 	{"o", Prefix::OBJECT},
@@ -24,7 +30,7 @@ const PrefixLabel MeshFile::tokens[] = {
 	{"vt", Prefix::TEXCOORD}
 };
 
-const int MeshFile::numTokens = sizeof(MeshFile::tokens) / sizeof(PrefixLabel);
+const int OBJMeshFile::numTokens = sizeof(OBJMeshFile::tokens) / sizeof(PrefixLabel);
 
 void parseFace(const char* values, std::vector<FaceIndex>& faceIndices)
 {
@@ -37,7 +43,10 @@ void parseFace(const char* values, std::vector<FaceIndex>& faceIndices)
 	}
 }
 
-void MeshFile::getMesh(Mesh& data, const char* mtlPath, unsigned int* numElements)
+void OBJMeshFile::getMesh(std::vector<Vertex>& vertexData,
+	std::vector<unsigned int>& elements,
+	const std::string& mtlPath,
+	std::string& diffuse)
 {
 	char buffer[MAX_LINE_LENGTH];
 
@@ -49,7 +58,6 @@ void MeshFile::getMesh(Mesh& data, const char* mtlPath, unsigned int* numElement
 	vec3 val;
 	vec2 tex;
 	std::string objectName;
-	std::string diffuse;
 
 	while (char* line = getLineOrNull()) {
 		if (line[0] == '#') continue;
@@ -102,8 +110,6 @@ void MeshFile::getMesh(Mesh& data, const char* mtlPath, unsigned int* numElement
 	}
 
 	std::map<FaceIndex, int> vertexIndices;
-	std::vector<vertex> vertexData;
-	std::vector<unsigned int> elements;
 	int idx = 0;
 	for (int i = 0; i < faceIndices.size(); ++i) {
 		auto it = vertexIndices.find(faceIndices[i]);
@@ -111,7 +117,7 @@ void MeshFile::getMesh(Mesh& data, const char* mtlPath, unsigned int* numElement
 			elements.push_back(it->second);
 		}
 		else {
-			vertex vert;
+			Vertex vert;
 			vert.position.x = vertices[faceIndices[i].v - 1].x;
 			vert.position.y = vertices[faceIndices[i].v - 1].y;
 			vert.position.z = vertices[faceIndices[i].v - 1].z;
@@ -127,20 +133,6 @@ void MeshFile::getMesh(Mesh& data, const char* mtlPath, unsigned int* numElement
 		}
 	}
 
-	glGenBuffers(1, &data.vertices);
-	glBindBuffer(GL_ARRAY_BUFFER, data.vertices);
-	glBufferData(GL_ARRAY_BUFFER, vertexData.size() * sizeof(vertex), vertexData.data(), GL_STATIC_DRAW);
-
-	glGenBuffers(1, &data.elements);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, data.elements);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, elements.size() * sizeof(GLuint), elements.data(), GL_STATIC_DRAW);
-
-	*numElements = elements.size() / 3;
-
-	std::string path = std::string(mtlPath) + diffuse;
-
-	TextureReader reader(path.c_str());
-	data.texture = reader.createOGLTexture();
 }
 
 std::string MTLFile::getTextureName()
@@ -160,4 +152,76 @@ std::string MTLFile::getTextureName()
 	return buffer;
 }
 
+OBJMesh* OBJMesh::createOBJMesh(const std::string& name,
+	const std::string& objectsPath,
+	const std::string& materialsPath,
+	const std::string& texturesPath)
+{
+	OBJMeshFile file((objectsPath + name + ".obj").c_str());
+
+	std::vector<Vertex> vertices;
+	std::vector<unsigned int> indices;
+	std::string diffuse;
+	file.getMesh(vertices, indices, materialsPath, diffuse);
+
+	return new OBJMesh(vertices, indices, (texturesPath + diffuse), (objectsPath + name + ".bounds"));
+}
+
+OBJMesh::OBJMesh(const std::vector<Vertex>& vertexData,
+	const std::vector<unsigned int>& indices,
+	const std::string& texturePath,
+	const std::string& boundsFileName)
+{
+	glGenVertexArrays(1, &vertexArray);
+	glBindVertexArray(vertexArray);
+
+	glGenBuffers(1, &vertices);
+	glBindBuffer(GL_ARRAY_BUFFER, vertices);
+	glBufferData(GL_ARRAY_BUFFER, vertexData.size() * sizeof(Vertex), vertexData.data(), GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+		(void*)offsetof(Vertex, position));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+		(void*)offsetof(Vertex, normal));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+		(void*)offsetof(Vertex, texcoord));
+
+	glGenBuffers(1, &elements);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elements);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), indices.data(), GL_STATIC_DRAW);
+
+	glBindVertexArray(0);
+
+	elementCount = indices.size();
+
+	TextureReader reader(texturePath.c_str());
+	texture = reader.createOGLTexture();
+
+	bounds.LoadBoundaries(boundsFileName);
+}
+
+void OBJMesh::draw(Shader& shader, mat4& translation, mat4&rotation, bool skipMVP, bool skipLighting)
+{
+	glUniformMatrix4fv(shader.translation, 1, GL_FALSE, (GLfloat*)&translation);
+	glUniformMatrix4fv(shader.rotation, 1, GL_FALSE, (GLfloat*)&rotation);
+
+	glUniform1ui(shader.skipMVP, skipMVP);
+	glUniform1ui(shader.skipLighting, skipLighting);
+
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	glBindVertexArray(vertexArray);
+
+	glDrawElements(
+		GL_TRIANGLES,
+		elementCount,
+		GL_UNSIGNED_INT,
+		(void*)0
+	);
+
+	glBindVertexArray(0);
 }

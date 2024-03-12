@@ -1,12 +1,5 @@
 #include "GameObjects/Camera.h"
 
-const float PI = 3.1415927f;
-
-inline float toRadians(float x)
-{
-	return (x * 2 * PI) / 360.0f;
-}
-
 Camera::Camera(float y, float ySense, float p, float pSense) :
 	yaw(y),
 	yawSensitivity(ySense),

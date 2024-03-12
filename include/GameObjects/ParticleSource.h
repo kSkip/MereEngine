@@ -2,6 +2,7 @@
 #define PARTICLESOURCE_H
 
 #include "GameObjects/GameObject.h"
+#include "CommonTypes.h"
 
 struct Particle {
     float position[3];
@@ -39,7 +40,7 @@ class ParticleSource : public GameObject{
         ParticleSource(const ParticleSource & rhs);
 
 
-        void move(double, Player&);
+        void move(double);
 
         void commitMovement();
 
@@ -50,7 +51,7 @@ class ParticleSource : public GameObject{
         void initPointParticles(ParticleSourceParams& params);
         void initParticles(ParticleSourceParams& params);
 
-        std::vector<vertex> pointParticles;
+        std::vector<Vertex> pointParticles;
         std::vector<vec3> pointVelocities;
 
         std::list<Particle*> particles;

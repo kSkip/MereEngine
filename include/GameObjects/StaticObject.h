@@ -2,20 +2,18 @@
 #define STATICOBJECT_H
 
 #include "GameObject.h"
+#include "Models/OBJMesh.h"
 
-class StaticObject : public GameObject{
+class StaticObject : public GameObject {
+public:
+    StaticObject(OBJMesh*);
+    ~StaticObject();
 
-    public:
+    void draw(Shader&);
+    boundary* getBounds() { return &model->bounds; }
 
-        StaticObject();
-        StaticObject(ObjectData* objectData, DataBlock& def);
-        ~StaticObject();
-        StaticObject(const StaticObject & rhs);
-
-        void move(double, Player&);
-
-        void render(Shader&);
-
+private:
+    OBJMesh* model;
 };
 
 #endif

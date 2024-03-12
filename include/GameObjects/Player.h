@@ -4,14 +4,14 @@
 #include "GameObject.h"
 #include "Camera.h"
 #include "Weapon.h"
+#include "Boundary.h"
 
 class Player : public GameObject {
 public:
 	Player();
 
-	void move(double, Player&);
+	void move(double);
 	void commitMovement();
-	void render(Shader&);
 
 	Camera camera;
 	Weapon weapon;
@@ -22,6 +22,9 @@ public:
 	bool holdingRightStrafe = false;
 
 	float movementSpeedFactor;
+
+	boundary bounds;
+	boundary* getBounds() { return &bounds; }
 };
 
 #endif

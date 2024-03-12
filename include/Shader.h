@@ -27,13 +27,11 @@ class Shader{
 
         bool loadShader(const std::string& vertexFile, const std::string& fragmentFile);
 
-        void activate(unsigned short atrribs);
-        void deactivate(unsigned short atrribs);
-
         GLint texture, translation, rotation, scale, position, normal, texcoord, skipMVP, skipLighting, modelView, projection, mouseOver;
+        GLuint program;
 
     private:
-        GLuint vertexShader, fragmentShader, program;
+        GLuint vertexShader, fragmentShader;
 
         GLuint makeShader(GLenum type, const char *filename);
         GLuint makeProgram(GLuint vertex_shader, GLuint fragment_shader);

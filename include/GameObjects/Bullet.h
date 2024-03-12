@@ -7,7 +7,7 @@ class Bullet : public GameObject{
 public:
     Bullet(vec3, vec3, GameObject*);
 
-    void move(double deltatime, Player&);
+    void move(double deltatime);
     void registerHit(GameObject* object, float point_on_ray);
 
     void commitMovement()
@@ -18,8 +18,6 @@ public:
         destroy = true;
 
     }
-
-    void render(Shader&);
 
     GameObject* getParent(){ return parent;}
 

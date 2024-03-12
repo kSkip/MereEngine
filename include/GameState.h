@@ -1,16 +1,7 @@
 #ifndef GAMESTATE_H
 #define GAMESTATE_H
 
-#include <string>
-#include <vector>
-#include <list>
-#include <map>
-#include <queue>
-#include <fstream>
-
-#include "Shader.h"
-#include "Boundary.h"
-#include "Utilities/DataBlock.h"
+#include "ResourceManager.h"
 #include "GameObjects/GameObject.h"
 #include "GameObjects/Player.h"
 
@@ -68,7 +59,7 @@ class GameState {
 
     private:
         WindowContext context;
-        std::string rootDir;
+        ResourceManager manager;
         std::string level;
 
         bool loaded;
@@ -87,20 +78,12 @@ class GameState {
         void insertOpaqueObject(GameObject* newGameObject);
         void insertTransparencyObject(GameObject* newGameObject);
 
-
-        GLuint boundDiffuseTexture;
-
-        std::map<std::string,ObjectData*> objectMap;
-
-        Shader* levelShader;
+        Shader shader;
         Player player;
 
         int screenwidth;
         int screenheight;
         float aspectRatio;
-
-        void loadObjectData(DataBlock & objectDataBlock);
-        void loadObjects(DataBlock & objectBlock);
 };
 
 #endif

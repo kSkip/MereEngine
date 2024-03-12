@@ -57,12 +57,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\ResourceManager.cpp" />
     <ClCompile Include="src\Boundary.cpp" />
     <ClCompile Include="src\gameobjects\Bullet.cpp" />
     <ClCompile Include="src\gameobjects\Camera.cpp" />
     <ClCompile Include="src\gameobjects\Character.cpp" />
     <ClCompile Include="src\gameobjects\GameObject.cpp" />
-    <ClCompile Include="src\gameobjects\ObjectData.cpp" />
     <ClCompile Include="src\gameobjects\ParticleSource.cpp" />
     <ClCompile Include="src\GameObjects\Player.cpp" />
     <ClCompile Include="src\gameobjects\SkyBox.cpp" />
@@ -70,29 +70,26 @@
     <ClCompile Include="src\gameobjects\Weapon.cpp" />
     <ClCompile Include="src\GameState.cpp" />
     <ClCompile Include="src\Win32Main.cpp" />
-    <ClCompile Include="src\models\Armature.cpp" />
     <ClCompile Include="src\models\MD5Model.cpp" />
     <ClCompile Include="src\models\MD5Mesh.cpp" />
     <ClCompile Include="src\Models\OBJMesh.cpp" />
     <ClCompile Include="src\Models\TextureReader.cpp" />
     <ClCompile Include="src\Shader.cpp" />
-    <ClCompile Include="src\utilities\DataBlock.cpp" />
-    <ClCompile Include="src\utilities\TextManipulation.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\ResourceManager.h" />
     <ClInclude Include="include\Boundary.h" />
+    <ClInclude Include="include\CommonTypes.h" />
     <ClInclude Include="include\gameobjects\Bullet.h" />
     <ClInclude Include="include\gameobjects\Camera.h" />
     <ClInclude Include="include\gameobjects\Character.h" />
     <ClInclude Include="include\gameobjects\GameObject.h" />
-    <ClInclude Include="include\gameobjects\ObjectData.h" />
     <ClInclude Include="include\gameobjects\ParticleSource.h" />
     <ClInclude Include="include\GameObjects\Player.h" />
     <ClInclude Include="include\gameobjects\SkyBox.h" />
     <ClInclude Include="include\gameobjects\StaticObject.h" />
     <ClInclude Include="include\gameobjects\Weapon.h" />
     <ClInclude Include="include\GameState.h" />
-    <ClInclude Include="include\models\Armature.h" />
     <ClInclude Include="include\Models\DataFile.h" />
     <ClInclude Include="include\models\MD5Model.h" />
     <ClInclude Include="include\models\MD5Mesh.h" />
@@ -100,8 +97,6 @@
     <ClInclude Include="include\Models\TextureReader.h" />
     <ClInclude Include="include\Platform.h" />
     <ClInclude Include="include\Shader.h" />
-    <ClInclude Include="include\utilities\DataBlock.h" />
-    <ClInclude Include="include\utilities\TextManipulation.h" />
     <ClInclude Include="include\VectorMath.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
